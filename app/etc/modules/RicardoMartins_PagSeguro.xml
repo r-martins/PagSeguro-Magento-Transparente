@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <RicardoMartins_PagSeguro>
+            <active>true</active>
+            <codePool>community</codePool>
+        </RicardoMartins_PagSeguro>
+    </modules>
+</config>

@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    Mage
+ * @package     Mage_Paygate
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+-->
+<config>
+    <sections>
+        <payment>
+            <groups>
+                <pagseguro module="ricardomartins_pagseguro">
+                    <label>PagSeguro - Ricardo Martins</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>110</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <!--<comment><![CDATA[<a href="http://celinks.magento.com/authorize_netRegistration" target="_blank">Click here to sign up for an Authorize.net account</a>]]></comment>-->
+                    <fields>
+                        <merchant_email translate="label">
+                            <label>E-mail</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-email</validate>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>E-mail da loja (conta vendedor)</comment>
+                        </merchant_email>
+                        <token translate="label">
+                            <label>Token</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </token>
+                        <debug translate="label">
+                            <label>Debug</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Veja a saída de log em var/log/pagseguro.log</comment>
+                        </debug>
+                        <customer_cpf_attribute>
+                            <label>CPF do cliente</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_attributes</source_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o CPF do cliente, selecione aqui.]]></comment>
+                        </customer_cpf_attribute>
+                        <address_street_attribute>
+                            <label>Atributo Rua de entrega</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_address_attributes</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para a Rua de entrega, selecione aqui.]]></comment>
+                        </address_street_attribute>
+                        <address_number_attribute>
+                            <label>Atributo Número</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_address_attributes</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o campo 'Número' de entrega, selecione aqui.]]></comment>
+                        </address_number_attribute>
+                        <address_complement_attribute>
+                            <label>Atributo Complemento</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_address_attributes_optional</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o campo 'Complemento' de entrega, selecione aqui. Você pode omitir esta informação ao PagSeguro.]]></comment>
+                        </address_complement_attribute>
+                        <address_neighborhood_attribute>
+                            <label>Atributo Bairro</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_address_attributes</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o campo 'Bairro' de entrega, selecione aqui.]]></comment>
+                        </address_neighborhood_attribute>
+                    </fields>
+                </pagseguro>
+                <pagseguro_cc module="ricardomartins_pagseguro">
+                    <label>PagSeguro - Cartão de Crédito - Ricardo Martins</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>111</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </title>
+                        <order_status translate="label">
+                            <label>New Order Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_order_status</source_model>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </order_status>
+                        <owner_dob_attribute>
+                            <label>Data de Nascimento</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_dob</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Data de nascimento do dono do cartão de crédito é obrigatório para o PagSeguro.]]></comment>
+                        </owner_dob_attribute>
+                    </fields>
+                </pagseguro_cc>
+            </groups>
+        </payment>
+    </sections>
+</config>
