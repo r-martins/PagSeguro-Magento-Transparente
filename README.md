@@ -1,7 +1,3 @@
-> **NOTA:**
-> 
-> - Estou aguardando o PagSeguro autorizar minha conta pra usar a API do Checkout transparente. Quando autorizarem eu continuo o desenvolvimento...
-
 
 ----------
 PagSeguro Transparente
