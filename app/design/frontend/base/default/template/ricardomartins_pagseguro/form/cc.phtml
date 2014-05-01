@@ -59,6 +59,10 @@ $_code=$this->getMethodCode();
     </li>
     <?php endif ?>
     <?php echo $this->getChildHtml() ?>
+    <li>
+        <?php /* O selo do PagSeguro deve ser exibido obrigatoriamente. Você pode escolher outra imagem disponivel na pasta 'selo' */ ?>
+        <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>
+    </li>
 </ul>
 
 <script type="text/javascript">

@@ -1,19 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: martins
- * Date: 4/7/14
- * Time: 5:28 PM
- */ 
+
 class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    const WS_URL = 'https://ws.pagseguro.uol.com.br/v2/';
-    const JS_URL = 'https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js';
-//    const JS_URL = 'http://magento.local.com.br/js/pagseguro.js';
-
-    const XML_PATH_PAYMENT_PAGSEGURO_EMAIL = 'payment/pagseguro/merchant_email';
-    const XML_PATH_PAYMENT_PAGSEGURO_TOKEN = 'payment/pagseguro/token';
-    const XML_PATH_PAYMENT_PAGSEGURO_DEBUG = 'payment/pagseguro/debug';
+    const XML_PATH_PAYMENT_PAGSEGURO_EMAIL          = 'payment/pagseguro/merchant_email';
+    const XML_PATH_PAYMENT_PAGSEGURO_TOKEN          = 'payment/pagseguro/token';
+    const XML_PATH_PAYMENT_PAGSEGURO_DEBUG          = 'payment/pagseguro/debug';
+    const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX        = 'payment/pagseguro/sandbox';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL  = 'payment/pagseguro/sandbox_merchant_email';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN  = 'payment/pagseguro/sandbox_token';
+    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL         = 'payment/pagseguro/ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_JS_URL         = 'payment/pagseguro/js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL = 'payment/pagseguro/sandbox_ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL = 'payment/pagseguro/sandbox_js_url';
 
 
     /**
@@ -26,7 +24,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $client = new Zend_Http_Client($this->getWsUrl('sessions'));
         $client->setMethod(Zend_Http_Client::POST);
         $client->setParameterGet('email',Mage::getStoreConfig($this::XML_PATH_PAYMENT_PAGSEGURO_EMAIL));
-        $client->setParameterGet('token',$this->_getToken());
+        $client->setParameterGet('token',$this->getToken());
         try{
             $response = $client->request();
         }catch(Exception $e){
@@ -44,24 +42,72 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         return (string)$xml->id;
     }
 
+    /**
+     * Retorna o email do lojista
+     * @return string
+     */
+    public function getMerchantEmail()
+    {
+        if($this->isSandbox())
+        {
+            return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL);
+        }
+        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL);
+    }
+
+    /**
+     * Retorna URL do Webservice do Pagseguro de acordo com o ambiente selecionado
+     * @param string $amend acrescenta algo no final
+     *
+     * @return string
+     */
     public function getWsUrl($amend='')
     {
-        return self::WS_URL . $amend;
+        if($this->isSandbox())
+        {
+            return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL) . $amend;
+        }
+        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL) . $amend;
     }
 
+    /**
+     * Retorna o url do JavaScript da lib do Pagseguro de acordo com o ambiente selecionado
+     * @return string
+     */
     public function getJsUrl()
     {
-        return self::JS_URL;
+        if($this->isSandbox())
+        {
+            return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL);
+        }
+        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_JS_URL);
     }
 
+    /**
+     * Retorna a tag pra adicionar o script do pagseguro
+     * @return string
+     */
     public function getFullJsScriptString()
     {
-        return sprintf('<script type="text/javascript" src="%s"></script>', self::JS_URL);
+        return sprintf('<script type="text/javascript" src="%s"></script>', $this->getJsUrl());
     }
 
+    /**
+     * Verifica se o debug está ativado
+     * @return bool
+     */
     public function isDebugActive()
     {
         return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_DEBUG);
+    }
+
+    /**
+     * Está no modo SandBox?
+     * @return bool
+     */
+    public function isSandbox()
+    {
+        return Mage::getStoreConfigFlag(self::XML_PATH_PAUMENT_PAGSEGURO_SANDBOX);
     }
 
     /**
@@ -81,9 +127,17 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         }
     }
 
-    protected function _getToken()
+    /**
+     * Retorna o TOKEN configurado pro ambiente selecionado. Retorna false caso não tenha sido preenchido.
+     * @return string | false
+     */
+    public function getToken()
     {
         $token = Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN);
+        if($this->isSandbox())
+        {
+            $token = Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN);
+        }
         if(empty($token))
         {
             return false;

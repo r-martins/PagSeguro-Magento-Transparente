@@ -1,7 +1,6 @@
 <?php
-class RicardoMartins_PagSeguro_Model_Payment_Cc extends Mage_Payment_Model_Method_Abstract
+class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro_Model_Abstract
 {
-
     protected $_code = 'pagseguro_cc';
     protected $_formBlockType = 'ricardomartins_pagseguro/form_cc';
     protected $_infoBlockType = 'ricardomartins_pagseguro/form_info_cc';
@@ -14,7 +13,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends Mage_Payment_Model_Metho
     protected $_canUseCheckout = true;
     protected $_canUseForMultishipping = true;
     protected $_canSaveCc = false;
-
 
     public function assignData($data)
     {
@@ -52,28 +50,48 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends Mage_Payment_Model_Metho
         return $this;
     }
 
-    public function capture(Varien_Object $payment, $amount)
+    public function order(Varien_Object $payment, $amount)
     {
-        //ver debug dos parametros recebidos em var/capture_params.txt
         $order = $payment->getOrder();
-        $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
-        $this->_callApi($params,$payment);
 
-        Mage::log('capture $payment: '. var_export($payment->debug(), true), null, 'martins.log', true);
-        Mage::log('capture $amount: '. var_export($amount, true), null, 'martins.log', true);
-        Mage::log('capture $_POST: '. var_export($_POST, true), null, 'martins.log', true);
-die('captured');
+        //montaremos os dados a ser enviados via POST pra api em $params
+        $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
+
+        //chamamos a API
+        $xmlRetorno = $this->_callApi($params,$payment);
+        $this->proccessNotificatonResult($xmlRetorno);
+
+        if(isset($xmlRetorno->errors)){
+            $errMsg = array();
+            foreach($xmlRetorno->errors as $error){
+                $errMsg[] = (string)$error->message . '(' . $error->code . ')';
+            }
+            Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL,$errMsg));
+        }
+
+        if(isset($xmlRetorno->code)){
+            $payment->setAdditionalInformation(array('transaction_id'=>(string)$xmlRetorno->code));
+        }
+        return $this;
     }
 
+    /**
+     * Chama API pra realizar um pagamento
+     * @param $params
+     * @param $payment
+     *
+     * @return SimpleXMLElement
+     */
     protected function _callApi($params, $payment)
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
         $client = new Zend_Http_Client($helper->getWsUrl('transactions'));
         $client->setMethod(Zend_Http_Client::POST);
-        $client->setParameterPost($params);
+        $client->setParameterPost($params); //parametros enviados via POST
         $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params,true));
+
         try{
-            $response = $client->request();
+            $response = $client->request(); //faz o request
         }catch(Exception $e){
             Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
         }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Payment Method Codes
  *

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Class RicardoMartins_PagSeguro_Helper_Internal
+ * Trata chamadas internas da API
+ *
+ * @author    Ricardo Martins <ricardo@ricardomartins.net.br>
+ */
 class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
 {
     /*
@@ -19,22 +25,27 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
      */
     public function getCreditCardApiCallParams(Mage_Sales_Model_Order $order, $payment)
     {
+        $helper = Mage::helper('ricardomartins_pagseguro');
+        $phelper = Mage::helper('ricardomartins_pagseguro/params'); //params helper - helper auxiliar de parametrização
         $params = array(
-            'email' => Mage::getStoreConfig('payment/pagseguro/merchant_email'),
-            'token' => Mage::helper('core')->decrypt(Mage::getStoreConfig('payment/pagseguro/token')),
+            'email' => $helper->getMerchantEmail(),
+            'token' => $helper->getToken(),
             'paymentMode'   => 'default',
             'paymentMethod' =>  'creditCard',
-            'receiverEmail' =>  Mage::getStoreConfig('payment/pagseguro/merchant_email'),
+            'receiverEmail' =>  $helper->getMerchantEmail(),
             'currency'  => 'BRL',
-            'senderName'    =>  sprintf('%s %s',$order->getCustomerFirstname(), $order->getCustomerLastname()),
-            'senderEmail'   => $order->getCustomerEmail(),
-            'senderHash'    => $payment['additional_information']['sender_hash'],
             'creditCardToken'   => $payment['additional_information']['credit_card_token'],
             'reference'     => $order->getIncrementId(),
-
-            //parametros falsos abaixo
-
+            'notificationURL' => Mage::getUrl('ricardomartins_pagseguro/notification'),
+//            'notificationURL' => 'http://magento.ricardomartins.net.br/transport.php',
         );
+        $items = $phelper->getItemsParams($order);
+        $params = array_merge($params, $phelper->getItemsParams($order));
+        $params = array_merge($params, $phelper->getSenderParams($order,$payment));
+        $params = array_merge($params, $phelper->getAddressParams($order,'shipping'));
+        $params = array_merge($params, $phelper->getAddressParams($order,'billing'));
+        $params = array_merge($params, $phelper->getCreditCardHolderParams($order,$payment));
+        $params = array_merge($params, $phelper->getCreditCardInstallmentsParams($order,$payment));
 
         return $params;
     }

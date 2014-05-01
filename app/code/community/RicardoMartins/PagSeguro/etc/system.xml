@@ -57,6 +57,42 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </token>
+
+                        <sandbox translate="label">
+                            <label>Ambiente de testes?</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[No modo de testes, os dados são enviados para sandbox do PagSeguro. Habilite o acesso à Sandbox <a href="http://sandbox.pagseguro.uol.com.br" target="_blank">aqui</a>]]></comment>
+                        </sandbox>
+                        <sandbox_merchant_email translate="label">
+                            <label>E-mail Sandbox</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-email</validate>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <sandbox>1</sandbox>
+                            </depends>
+                            <comment>E-mail da loja (conta vendedor) no ambiente de testes</comment>
+                        </sandbox_merchant_email>
+                        <sandbox_token translate="label">
+                            <label>Token Sandbox</label>
+                            <frontend_type>obscure</frontend_type>
+                            <backend_model>adminhtml/system_config_backend_encrypted</backend_model>
+                            <sort_order>23</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <sandbox>1</sandbox>
+                            </depends>
+                        </sandbox_token>
                         <debug translate="label">
                             <label>Debug</label>
                             <frontend_type>select</frontend_type>
