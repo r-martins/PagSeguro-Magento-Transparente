@@ -1,0 +1,11 @@
+<strong><?php echo $this->escapeHtml($this->getMethod()->getTitle()) ?> (PagSeguro)</strong>
+<?php if($info = $this->getInfo()): ?>
+    <br/>
+    <?php if($additional = $info->getAdditionalInformation()):?>
+        Id Transação: <?php echo $this->escapeHtml($additional['transaction_id']);?>
+        <br/>
+    <?php endif;?>
+    Bandeira: <?php echo ucfirst($this->escapeHtml($info->getCcType()));?>
+    <br/>
+    Últimos 4 dígitos: <?php echo $this->escapeHtml($info->getCcLast4());?>
+<?php endif; ?>
