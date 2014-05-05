@@ -136,7 +136,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $addressDistrict = $this->_getAddressAttributeValue($address,$address_neighborhood_attribute);
         $addressPostalCode = $address->getPostcode();
         $addressCity = $address->getCity();
-        $addressState = $address->getRegion();
+        $addressState = $this->getStateCode( $address->getRegion() );
 
 
         $retorno = array(
@@ -164,6 +164,55 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         return $retorno;
     }
 
+    public function getStateCode($state)
+    {
+        if(strlen($state) == 2 && is_string($state))
+        {
+            return mb_convert_case($state,MB_CASE_UPPER);
+        }
+        else if(strlen($state) > 2 && is_string($state))
+        {
+            $state = $this->normalizeChars($state);
+            $state = trim($state);
+            $state = mb_convert_case($state, MB_CASE_UPPER);
+            $codes = array("AC"=>"ACRE", "AL"=>"ALAGOAS", "AM"=>"AMAZONAS", "AP"=>"AMAPA","BA"=>"BAHIA","CE"=>"CEARA","DF"=>"DISTRITO FEDERAL","ES"=>"ESPIRITO SANTO","GO"=>"GOIAS","MA"=>"MARANHAO","MT"=>"MATO GROSSO","MS"=>"MATO GROSSO DO SUL","MG"=>"MINAS GERAIS","PA"=>"PARA","PB"=>"PARAIBA","PR"=>"PARANA","PE"=>"PERNAMBUCO","PI"=>"PIAUI","RJ"=>"RIO DE JANEIRO","RN"=>"RIO GRANDE DO NORTE","RO"=>"RONDONIA","RS"=>"RIO GRANDE DO SUL","RR"=>"RORAIMA","SC"=>"SANTA CATARINA","SE"=>"SERGIPE","SP"=>"SAO PAULO","TO"=>"TOCANTINS");
+            if($code = array_search($state,$codes))
+            {
+                return $code;
+            }
+        }
+        return $state;
+    }
+
+    /**
+     * Replace language-specific characters by ASCII-equivalents.
+     * @see http://stackoverflow.com/a/16427125/529403
+     * @param string $s
+     * @return string
+     */
+    public static function normalizeChars($s) {
+        $replace = array(
+            'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'Ae', 'Å'=>'A', 'Æ'=>'A', 'Ă'=>'A',
+            'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'ae', 'å'=>'a', 'ă'=>'a', 'æ'=>'ae',
+            'þ'=>'b', 'Þ'=>'B',
+            'Ç'=>'C', 'ç'=>'c',
+            'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E',
+            'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e',
+            'Ğ'=>'G', 'ğ'=>'g',
+            'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'İ'=>'I', 'ı'=>'i', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i',
+            'Ñ'=>'N',
+            'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'Oe', 'Ø'=>'O', 'ö'=>'oe', 'ø'=>'o',
+            'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
+            'Š'=>'S', 'š'=>'s', 'Ş'=>'S', 'ș'=>'s', 'Ș'=>'S', 'ş'=>'s', 'ß'=>'ss',
+            'ț'=>'t', 'Ț'=>'T',
+            'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'Ue',
+            'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ü'=>'ue',
+            'Ý'=>'Y',
+            'ý'=>'y', 'ý'=>'y', 'ÿ'=>'y',
+            'Ž'=>'Z', 'ž'=>'z'
+        );
+        return strtr($s, $replace);
+    }
 
     /**
      * Extraí codigo de area e telefone e devolve array com area e number como chave
