@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Pagseguro-magento-transparente by r-martins</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Pagseguro-magento-transparente</h1>
+        <p>Módulo de checkout transparente para Pagseguro - com api v. 2.0</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>
+<a name="pagseguro-transparente" class="anchor" href="#pagseguro-transparente"><span class="octicon octicon-link"></span></a>PagSeguro Transparente</h1>
+
+<hr><h3>
+<a name="m%C3%B3dulo-de-checkout-integrado-com-pagseguro-transparente-para-magento" class="anchor" href="#m%C3%B3dulo-de-checkout-integrado-com-pagseguro-transparente-para-magento"><span class="octicon octicon-link"></span></a>Módulo de Checkout integrado com PagSeguro Transparente para Magento</h3>
+
+<h2>
+<a name="recursos" class="anchor" href="#recursos"><span class="octicon octicon-link"></span></a>Recursos</h2>
+
+<ul>
+<li>Adiciona o PagSeguro com suporte a cartão de crédito permitindo digitar os dados sem a necessidade de ser redirecionado para o site do PagSeguro</li>
+<li>Atributos de CPF, Data de Nascimento, rua, bairro, e outros configuráveis.</li>
+<li>Utiliza API v2</li>
+<li>Trata retorno automático com atualizações do pedido</li>
+<li>Modo de debug com logs detalhados</li>
+<li>Modo de testes usando Sandbox opcional</li>
+<li>Token criptografado para maior segurança</li>
+<li>Não salva dados do cartão, apenas os 4 últimos digitos</li>
+</ul><h2>
+<a name="instala%C3%A7%C3%A3o" class="anchor" href="#instala%C3%A7%C3%A3o"><span class="octicon octicon-link"></span></a>Instalação</h2>
+
+<h3>
+<a name="instalar-com-modgit" class="anchor" href="#instalar-com-modgit"><span class="octicon octicon-link"></span></a>Instalar com <a href="https://github.com/jreinke/modgit">modgit</a>
+</h3>
+
+<pre><code>$ cd path/to/magento
+$ modgit init
+$ modgit clone pagseguro git@github.com:r-martins/PagSeguro-Magento-Transparente.git
+</code></pre>
+
+<h3>
+<a name="ou-fa%C3%A7a-manualmente" class="anchor" href="#ou-fa%C3%A7a-manualmente"><span class="octicon octicon-link"></span></a>Ou faça manualmente:</h3>
+
+<ul>
+<li>Faça download da última versão <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/downloads">aqui</a>
+</li>
+<li>Descompacte na raíz da instalação da loja <em>mesclando com as pastas existentes</em>
+</li>
+<li>Limpe o cache</li>
+<li>Solicite autorização para uso da API transparente <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent">aqui</a>
+</li>
+</ul><h3>
+<a name="bugs" class="anchor" href="#bugs"><span class="octicon octicon-link"></span></a>Bugs?</h3>
+
+<ul>
+<li>Relate problemas na parte de <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/issues">Issues</a> aqui no github.</li>
+<li>A maior parte dos problemas pode ser resolvido lendo o log das transações com o modo de debug ativo.</li>
+</ul><h3>
+<a name="suporte-e-customiza%C3%A7%C3%B5es" class="anchor" href="#suporte-e-customiza%C3%A7%C3%B5es"><span class="octicon octicon-link"></span></a>Suporte e customizações</h3>
+
+<p>O suporte pode ser obtido nas comunidades magento, ou você pode orçar uma cotação comigo pelo e-mail abaixo.
+Um FAQ será criado com as dúvidas mais frequentes.</p>
+
+<h3>
+<a name="contribua" class="anchor" href="#contribua"><span class="octicon octicon-link"></span></a>Contribua</h3>
+
+<p>Apesar de ser open source e gratuito, o módulo não nasceu sozinho ou com suporte de nenhuma empresa e não tem vínculo com o PagSeguro (maior beneficiado). Considere <a href="https://pagseguro.uol.com.br/checkout/v2/donation.html?currency=BRL&amp;receiverEmail=ricardo@ricardomartins.info"><strong>fazer uma doação</strong></a> ou contribuir com melhorias realizando um pull request.</p>
+
+<h3>
+<a name="o-que-vem-por-a%C3%AD" class="anchor" href="#o-que-vem-por-a%C3%AD"><span class="octicon octicon-link"></span></a>O que vem por aí?</h3>
+
+<p>Dependendo do resultado, do apoio de empresas, etc, a versão com suporte a boleto e TEF transparentes serão disponibilizadas gratuitamente.</p>
+
+<h3>
+<a name="termos-de-uso" class="anchor" href="#termos-de-uso"><span class="octicon octicon-link"></span></a>Termos de uso</h3>
+
+<p>O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realizada seja publicadas com forks e pull requests. (MIT)</p>
+
+<h2>
+<a name="autor" class="anchor" href="#autor"><span class="octicon octicon-link"></span></a>Autor</h2>
+
+<p><a href="http://ricardomartins.net.br/">Ricardo Martins</a>  (<a href="mailto:pagseguro-transparente@ricardomartins.net.br">pagseguro-transparente@ricardomartins.net.br</a>)</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/r-martins">r-martins</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-3314217-5");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
