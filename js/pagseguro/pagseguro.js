@@ -24,6 +24,7 @@ document.observe("dom:loaded", function() {
                     success: function(psresponse){
                         RMPagSeguro.brand= psresponse.brand;
                         $('card-brand').innerHTML = psresponse.brand.name;
+                        $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*/g,'');
                         $$('input[name="payment[ps_card_type]"]').first().value = psresponse.brand.name;
                     },
                     error: function(psresponse){
