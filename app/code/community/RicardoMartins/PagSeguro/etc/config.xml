@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>0.1.2</version>
+            <version>0.1.3</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -39,6 +39,15 @@
                 </ricardomartins_pagseguro>
             </updates>
         </layout>-->
+        <translate>
+            <modules>
+                <ricardomartins_pagseguro>
+                    <files>
+                        <default>RicardoMartins_PagSeguro.csv</default>
+                    </files>
+                </ricardomartins_pagseguro>
+            </modules>
+        </translate>
     </frontend>
     <default>
         <payment>

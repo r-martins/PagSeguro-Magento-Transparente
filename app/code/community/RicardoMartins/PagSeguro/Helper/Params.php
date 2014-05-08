@@ -84,7 +84,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
 
         $retorno = array(
-            'creditCardHolderName'      =>  sprintf('%s %s',$order->getCustomerFirstname(), $order->getCustomerLastname()),
+            'creditCardHolderName'      =>  $payment['additional_information']['credit_card_owner'],
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
             'creditCardHolderCPF'       => $digits->filter($cpf),
             'creditCardHolderAreaCode'  => $phone['area'],
@@ -294,7 +294,9 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         if(empty($cc_dob_attribute)) //Soliciado ao cliente junto com os dados do cartao
         {
-            //@TODO Implementar
+            if(isset($payment['additional_information']['credit_card_owner_birthdate'])){
+                return $payment['additional_information']['credit_card_owner_birthdate'];
+            }
         }
 
         $dob = $customer->getResource()->getAttribute($cc_dob_attribute)->getFrontend()->getValue($customer);

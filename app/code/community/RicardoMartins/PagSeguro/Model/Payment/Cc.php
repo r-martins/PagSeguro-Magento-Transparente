@@ -23,12 +23,15 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $info = $this->getInfoInstance();
         $info->setAdditionalInformation('sender_hash',$data->getSenderHash())
             ->setAdditionalInformation('credit_card_token',$data->getCreditCardToken())
+            ->setAdditionalInformation('credit_card_owner', $data->getPsCcOwner())
             ->setCcType($data->getPsCardType())
             ->setCcLast4(substr($data->getPsCcNumber(), -4));
 
         $owner_dob_attribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
         if(empty($owner_dob_attribute)){// pegar o dob e salvar aí
-
+            $info->setAdditionalInformation('credit_card_owner_birthdate', date('d/m/Y',strtotime(
+                        $data->getPsCcOwnerBirthdayYear().'/'.$data->getPsCcOwnerBirthdayMonth().'/'.$data->getPsCcOwnerBirthdayDay()
+                    )));
         }
 
         return $this;
@@ -89,7 +92,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $client->setMethod(Zend_Http_Client::POST);
         $client->setParameterPost($params); //parametros enviados via POST
         $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params,true));
-
         try{
             $response = $client->request(); //faz o request
         }catch(Exception $e){

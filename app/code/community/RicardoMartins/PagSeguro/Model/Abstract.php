@@ -17,6 +17,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $order = Mage::getModel('sales/order')->loadByIncrementId((string)$resultXML->reference);
             $payment = $order->getPayment();
             $processedState = $this->processStatus((int)$resultXML->status);
+            $message = $processedState->getMessage();
 
             if((int)$resultXML->status == 6) //valor devolvido (gera credit memo e tenta cancelar o pedido)
             {
@@ -38,6 +39,19 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             if((int)$resultXML->status == 3) //Quando o pedido foi dado como Pago
             {
                 $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
+            }
+
+            if((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) //Especificamos a fonte do cancelamento do pedido
+            {
+                switch((string)$resultXML->cancellationSource)
+                {
+                    case 'INTERNAL':
+                        $mssage .= ' O próprio PagSeguro negou ou cancelou a transação.';
+                        break;
+                    case 'EXTERNAL':
+                        $mssage .= ' A transação foi negada ou cancelada pela instituição bancária.';
+                        break;
+                }
             }
 
             $order->addStatusHistoryComment($processedState->getMessage());
