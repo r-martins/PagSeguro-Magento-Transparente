@@ -57,7 +57,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </token>
-
                         <sandbox translate="label">
                             <label>Ambiente de testes?</label>
                             <frontend_type>select</frontend_type>
@@ -202,6 +201,15 @@
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[Data de nascimento do dono do cartão de crédito é obrigatório para o PagSeguro.]]></comment>
                         </owner_dob_attribute>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </pagseguro_cc>
             </groups>
