@@ -90,7 +90,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $helper = Mage::helper('ricardomartins_pagseguro');
         $client = new Zend_Http_Client($helper->getWsUrl('transactions'));
         $client->setMethod(Zend_Http_Client::POST);
+        $client->setConfig(array('timeout'=>30));
+
         $client->setParameterPost($params); //parametros enviados via POST
+
         $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params,true));
         try{
             $response = $client->request(); //faz o request

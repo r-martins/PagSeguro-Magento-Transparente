@@ -21,7 +21,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             for($x=1, $y=0, $c=count($items); $x <= $c; $x++, $y++)
             {
                 $retorno['itemId'.$x] = $items[$y]->getId();
-                $retorno['itemDescription'.$x] = $items[$y]->getName();
+                $retorno['itemDescription'.$x] = $this->normalizeChars($items[$y]->getName());
                 $retorno['itemAmount'.$x] = number_format($items[$y]->getPrice(),2,'.','');
                 $retorno['itemQuantity'.$x] = $items[$y]->getQtyOrdered();
             }
@@ -140,12 +140,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
 
         $retorno = array(
-            $type.'AddressStreet'      =>  $addressStreet,
+            $type.'AddressStreet'     => $this->normalizeChars($addressStreet),
             $type.'AddressNumber'     => $addressNumber,
-            $type.'AddressComplement' => $addressComplement,
-            $type.'AddressDistrict'   => $addressDistrict,
+            $type.'AddressComplement' => $this->normalizeChars($addressComplement),
+            $type.'AddressDistrict'   => $this->normalizeChars($addressDistrict),
             $type.'AddressPostalCode' => $addressPostalCode,
-            $type.'AddressCity'       => $addressCity,
+            $type.'AddressCity'       => $this->normalizeChars($addressCity),
             $type.'AddressState'      => $addressState,
             $type.'AddressCountry'    => 'BRA',
          );

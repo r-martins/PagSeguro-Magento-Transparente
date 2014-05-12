@@ -23,8 +23,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $client = new Zend_Http_Client($this->getWsUrl('sessions'));
         $client->setMethod(Zend_Http_Client::POST);
-        $client->setParameterGet('email',Mage::getStoreConfig($this::XML_PATH_PAYMENT_PAGSEGURO_EMAIL));
-        $client->setParameterGet('token',$this->getToken());
+        $client->setParameterGet('email', $this->getMerchantEmail());
+        $client->setParameterGet('token', $this->getToken());
         $client->setConfig(array('timeout'=>30));
         try{
             $response = $client->request();
@@ -35,9 +35,10 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 
         $response = $client->getLastResponse()->getBody();
 
+        libxml_use_internal_errors(true);
         $xml = simplexml_load_string($response);
         if(false === $xml){
-            $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados.');
+            $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados. Retorno pagseguro: ' . $response);
             return false;
         }
         return (string)$xml->id;

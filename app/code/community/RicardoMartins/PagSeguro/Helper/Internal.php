@@ -36,8 +36,8 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'currency'  => 'BRL',
             'creditCardToken'   => $payment['additional_information']['credit_card_token'],
             'reference'     => $order->getIncrementId(),
+            'extraAmount'=> number_format($order->getDiscountAmount(),2, '.',''),
             'notificationURL' => Mage::getUrl('ricardomartins_pagseguro/notification'),
-//            'notificationURL' => 'http://magento.ricardomartins.net.br/transport.php',
         );
         $items = $phelper->getItemsParams($order);
         $params = array_merge($params, $phelper->getItemsParams($order));
@@ -47,14 +47,7 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
         $params = array_merge($params, $phelper->getCreditCardHolderParams($order,$payment));
         $params = array_merge($params, $phelper->getCreditCardInstallmentsParams($order,$payment));
 
-
-        foreach($params as $k=>$v) //converte o encoding das strings pra iso-8859-1
-        {
-            if(is_string($v))
-            {
-                $params[$k] = mb_convert_encoding($v,'ISO-8859-1');
-            }
-        }
+//    Mage::log(var_export($params, true), null, 'pagseguro.log', true);
 
         return $params;
     }
