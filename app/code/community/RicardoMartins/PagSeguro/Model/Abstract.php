@@ -46,15 +46,15 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 switch((string)$resultXML->cancellationSource)
                 {
                     case 'INTERNAL':
-                        $mssage .= ' O próprio PagSeguro negou ou cancelou a transação.';
+                        $message .= ' O próprio PagSeguro negou ou cancelou a transação.';
                         break;
                     case 'EXTERNAL':
-                        $mssage .= ' A transação foi negada ou cancelada pela instituição bancária.';
+                        $message .= ' A transação foi negada ou cancelada pela instituição bancária.';
                         break;
                 }
             }
 
-            $order->addStatusHistoryComment($processedState->getMessage());
+            $order->addStatusHistoryComment($message);
             $payment->save();
             $order->save();
         }else{
