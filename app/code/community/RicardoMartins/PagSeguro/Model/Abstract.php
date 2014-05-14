@@ -21,19 +21,23 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
             if((int)$resultXML->status == 6) //valor devolvido (gera credit memo e tenta cancelar o pedido)
             {
+                if ($order->canUnhold()) {
+                    $order->unhold();
+                }
                 if($order->canCancel())
                 {
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->cancel();
                     $order->save();
                 }else{
-                    $order->addStatusHistoryComment('Devolvido: o valor foi devolvido ao comprador, mas o pedido encontra-se em um estado que não pode ser cancelado.')->save();
+                    $order->addStatusHistoryComment('Devolvido: o valor foi devolvido ao comprador, mas o pedido encontra-se em um estado que não pode ser cancelado.')
+                        ->save();
                 }
             }
 
             if($processedState->getStateChanged())
             {
-                $order->setState($processedState->getState(),false,$processedState->getIsCustomerNotified())->save();
+                $order->setState($processedState->getState(),true,$processedState->getIsCustomerNotified())->save();
             }
 
             if((int)$resultXML->status == 3) //Quando o pedido foi dado como Pago
