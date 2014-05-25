@@ -45,7 +45,7 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
                 <script type="text/javascript" src="%s"></script>
                 <script type="text/javascript" src="%s"></script>
                 ',
-                Mage::getBaseUrl(),
+                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK,true),
                 Mage::helper('ricardomartins_pagseguro')->getJsUrl(),
                 Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, true) . 'pagseguro/pagseguro.js'
             ));
