@@ -86,15 +86,6 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Retorna a tag pra adicionar o script do pagseguro
-     * @return string
-     */
-    public function getFullJsScriptString()
-    {
-        return sprintf('<script type="text/javascript" src="%s"></script>', $this->getJsUrl());
-    }
-
-    /**
      * Verifica se o debug está ativado
      * @return bool
      */

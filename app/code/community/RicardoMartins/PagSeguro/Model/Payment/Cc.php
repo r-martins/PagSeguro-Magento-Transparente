@@ -27,11 +27,22 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             ->setCcType($data->getPsCardType())
             ->setCcLast4(substr($data->getPsCcNumber(), -4));
 
+        //data de nascimento
         $owner_dob_attribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
         if(empty($owner_dob_attribute)){// pegar o dob e salvar aí
             $info->setAdditionalInformation('credit_card_owner_birthdate', date('d/m/Y',strtotime(
                         $data->getPsCcOwnerBirthdayYear().'/'.$data->getPsCcOwnerBirthdayMonth().'/'.$data->getPsCcOwnerBirthdayDay()
                     )));
+        }
+
+        //parcelas
+        if($data->getPsCcInstallments())
+        {
+            $installments = explode('|', $data->getPsCcInstallments());
+            if(false !== $installments && count($installments)==2){
+                $info->setAdditionalInformation('installment_quantity', (int)$installments[0]);
+                $info->setAdditionalInformation('installment_value', $installments[1]);
+            }
         }
 
         return $this;

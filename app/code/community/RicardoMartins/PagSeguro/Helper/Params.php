@@ -97,16 +97,24 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     /**
      * Retorna um array com informações de parcelamento (Cartao) para ser enviado pra API
      * @param Mage_Sales_Model_Order $order
-     * @param $payment
+     * @param $payment Mage_Sales_Model_Order_Payment
      * @return array
      */
     public function getCreditCardInstallmentsParams(Mage_Sales_Model_Order $order, $payment)
     {
-        //@TODO Criar parcelamentos variáveis
-        $retorno = array(
-            'installmentQuantity'   => '1',
-            'installmentValue'      => number_format($order->getGrandTotal(),2,'.',''),
-        );
+        $retorno = array();
+        if($payment->getAdditionalInformation('installment_quantity') && $payment->getAdditionalInformation('installment_value'))
+        {
+            $retorno = array(
+                'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity'),
+                'installmentValue'      => number_format($payment->getAdditionalInformation('installment_value'),2,'.',''),
+            );
+        }else{
+            $retorno = array(
+                'installmentQuantity'   => '1',
+                'installmentValue'      => number_format($order->getGrandTotal(),2,'.',''),
+            );
+        }
         return $retorno;
     }
 

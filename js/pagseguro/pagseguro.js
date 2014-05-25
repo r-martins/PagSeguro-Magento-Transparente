@@ -2,6 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
+ * @version 0.2.0
  */
 document.observe("dom:loaded", function() {
     RMPagSeguro = function RMPagSeguro(){};
@@ -15,7 +16,7 @@ document.observe("dom:loaded", function() {
 
     RMPagSeguro.addBrandObserver = function(){
         var elm = $$('input[name="payment[ps_cc_number]"]').first();
-        Event.observe(elm, 'keyup', function(e){
+        Event.observe(elm, 'change', function(e){
             var elmValue = elm.value.replace(/^\s+|\s+$/g,'');
             if(elmValue.length >= 6){
                 var cBin = elmValue.substr(0,6);
@@ -26,6 +27,7 @@ document.observe("dom:loaded", function() {
                         $('card-brand').innerHTML = psresponse.brand.name;
                         $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*/g,'');
                         $$('input[name="payment[ps_card_type]"]').first().value = psresponse.brand.name;
+                        RMPagSeguro.getInstallments();
                     },
                     error: function(psresponse){
                         RMPagSeguro.brand= psresponse;
@@ -59,6 +61,7 @@ document.observe("dom:loaded", function() {
                 },
                 complete: function(psresponse){
 //                    console.log(psresponse);
+                    RMPagSeguro.reCheckSenderHash();
                 }
             });
         }
@@ -76,20 +79,55 @@ document.observe("dom:loaded", function() {
         Element.observe(ccCvvElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
     }
 
-//    RMPagSeguro.whenReady = function (){
-//        var iid = setInterval(function()
-//        {
-//            if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
-//                console.log('PagSeguro ready');
-//
-//                clearInterval(iid);
-//                RMPagSeguro.updateSenderHash();
-//                RMPagSeguro.addBrandObserver();
-//                RMPagSeguro.addCardFieldsObserver();
-//            }
-//        }, 4000);
-//    }
+    RMPagSeguro.getInstallments = function(){
+        var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/getGrandTotal';
+        new Ajax.Request(_url, {
+           onSuccess: function(response){
+               var grandTotal = response.responseJSON.total;
 
-//    RMPagSeguro.whenReady();
+               PagSeguroDirectPayment.getInstallments({
+                   amount: grandTotal,
+                   brand: RMPagSeguro.brand.name,
+                   success: function(response) {
+                       var parcelsDrop = document.getElementById('pagseguro_cc_cc_installments');
+                       for( installment in response.installments) break;
+                       console.log(response.installments);
+                       var b = response.installments[RMPagSeguro.brand.name];
+                       parcelsDrop.length = 0;
+                       for(var x=0; x < b.length; x++){
+                           var option = document.createElement('option');
+                           option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toString().replace('.',',');
+                           option.text += (b[x].interestFree)?" sem juros":" com juros";
+                           option.value = b[x].quantity + "|" + b[x].installmentAmount;
+                           parcelsDrop.add(option);
+                       }
+//                       console.log(b[0].quantity);
+//                       console.log(b[0].installmentAmount);
+
+                   },
+                   error: function(response) {
+                       console.log(response);
+                   },
+                   complete: function(response) {
+//                       console.log(response);
+                       RMPagSeguro.reCheckSenderHash();
+                   }
+               });
+           },
+            onFailure: function(response){
+                return 0;
+            }
+        });
+    }
+
+    //verifica se o sender hash foi pego e tenta atualizar denvoo caso não tenha sido.
+    RMPagSeguro.reCheckSenderHash = function()
+    {
+        if($$('input[name="payment[sender_hash]"]').first().value == '')
+        {
+            RMPagSeguro.updateSenderHash();
+        }
+    }
+
 
 });

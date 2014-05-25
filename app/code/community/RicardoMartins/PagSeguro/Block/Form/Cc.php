@@ -40,9 +40,12 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
         //adicionaremos o JS do pagseguro na tela que usará o bloco de cartao logo após o <body>
         $scriptblock = Mage::app()->getLayout()->createBlock('core/text', 'js_pagseguro');
         $scriptblock->setText(sprintf(
-                '<script type="text/javascript" src="%s"></script>
+                '
+                <script type="text/javascript">var RMPagSeguroSiteBaseURL = "%s";</script>
+                <script type="text/javascript" src="%s"></script>
                 <script type="text/javascript" src="%s"></script>
                 ',
+                Mage::getBaseUrl(),
                 Mage::helper('ricardomartins_pagseguro')->getJsUrl(),
                 Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, true) . 'pagseguro/pagseguro.js'
             ));

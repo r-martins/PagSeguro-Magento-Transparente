@@ -64,6 +64,16 @@ $_code=$this->getMethodCode();
             <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
         </div>
     </li>
+    <li id="<?php echo $_code ?>_cc_installments_div">
+        <label for="<?php echo $_code ?>_cc_installments"><?php echo $this->__('Installments') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <select name="payment[ps_cc_installments]" id="<?php echo $_code ?>_cc_installments" class="required">
+                    <option value="">Informe os dados do cartão para calcular</option>
+                </select>
+            </div>
+        </div>
+    </li>
     <?php echo $this->getChildHtml() ?>
     <li>
         <?php /* O selo do PagSeguro deve ser exibido obrigatoriamente. Você pode escolher outra imagem disponivel na pasta 'selo' */ ?>
