@@ -36,7 +36,7 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'currency'  => 'BRL',
             'creditCardToken'   => $payment['additional_information']['credit_card_token'],
             'reference'     => $order->getIncrementId(),
-            'extraAmount'=> number_format($order->getDiscountAmount(),2, '.',''),
+            'extraAmount'=> $phelper->getExtraAmount($order),
             'notificationURL' => Mage::getUrl('ricardomartins_pagseguro/notification'),
         );
         $items = $phelper->getItemsParams($order);

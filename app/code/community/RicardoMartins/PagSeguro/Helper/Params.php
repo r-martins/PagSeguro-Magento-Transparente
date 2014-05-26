@@ -223,6 +223,20 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Calcula o valor "Extra", que será o valor das Taxas subtraído do valor dos impostos
+     * @param Mage_Sales_Model_Order $order
+     *
+     * @return string
+     */
+    public function getExtraAmount($order)
+    {
+        $discount = $order->getDiscountAmount();
+        $tax_amount = $order->getTaxAmount();
+        $extra = $discount+$tax_amount;
+        return number_format($extra,2, '.','');
+    }
+
+    /**
      * Extraí codigo de area e telefone e devolve array com area e number como chave
      * @author Ricardo Martins <ricardo@ricardomartins.net.br>
      * @param string $phone
