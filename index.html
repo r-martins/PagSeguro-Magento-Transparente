@@ -93,7 +93,30 @@ $ modgit clone pagseguro git@github.com:r-martins/PagSeguro-Magento-Transparente
 <li>Limpe o cache</li>
 <li>Solicite autorização para uso da API transparente <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent">aqui</a>
 </li>
-</ul><h2>
+</ul><p>Feito isso, configure seus dados no painel do magento em Sistema-&gt;Configuracao-&gt;Formas de Pagamento. Lembre-se de mapear os atributos de acordo com o que você utiliza na sua loja.</p>
+
+<h3>
+<a name="configura%C3%A7%C3%B5es-no-painel-do-pagseguro" class="anchor" href="#configura%C3%A7%C3%B5es-no-painel-do-pagseguro"><span class="octicon octicon-link"></span></a>Configurações no Painel do PagSeguro</h3>
+
+<ul>
+<li>Integrações-&gt;Pagamentos pela API: desativado</li>
+<li>Integrações-&gt;Notificação de Transações: Ativado. Coloque o url <a href="http://www.SUALOJA.com.br/pseguro/notification">http://www.SUALOJA.com.br/pseguro/notification</a>
+</li>
+<li>Lembre-se de <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent">autorizar sua loja</a> a usar a api transparente.</li>
+</ul><h3>
+<a name="compatibilidade-com-m%C3%B3dulo-do-bruno-assarisse" class="anchor" href="#compatibilidade-com-m%C3%B3dulo-do-bruno-assarisse"><span class="octicon octicon-link"></span></a>Compatibilidade com módulo do Bruno Assarisse</h3>
+
+<p>Sim, é possível usar o módulo em conjunto com o do Bruno Assarisse, que redireciona o usuário pro site do pagseguro e suporta os demais metodos de pagamento. Para isso, realize a configuração do módulo do Bruno normalmente, mas no pagseguro utilize a url de retorno do módulo transparente.
+No seu painel do PagSeguro, configure Integrações-&gt;Retorno Automatico de Dados, a url do Bruno: <a href="http://www.SUALOJA.com.br/pagseguro/pay/return">http://www.SUALOJA.com.br/pagseguro/pay/return</a>.
+Repare que o módulo do Bruno é /pagseguro/ enquanto este é /pseguro/.</p>
+
+<h2>
+<a name="detec%C3%A7%C3%A3o-de-problemas" class="anchor" href="#detec%C3%A7%C3%A3o-de-problemas"><span class="octicon octicon-link"></span></a>Detecção de problemas</h2>
+
+<p>A maior parte dos problemas pode ser identificada ativando o modo debug no painel e vendo o arquivo de log gerado na sua pasta/do/magento/var/log/pagseguro.log. 
+Nota: O modo debug não muda o funcionamento do módulo.</p>
+
+<h2>
 <a name="bugs" class="anchor" href="#bugs"><span class="octicon octicon-link"></span></a>Bugs?</h2>
 
 <ul>
