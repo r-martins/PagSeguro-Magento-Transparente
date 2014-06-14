@@ -1,5 +1,4 @@
 <?php
-$_helper = Mage::helper('ricardomartins_pagseguro');
 $_code=$this->getMethodCode();
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
@@ -30,7 +29,6 @@ $_code=$this->getMethodCode();
             <?php #nao remover os 3 campos abaixo ?>
             <span id="card-brand" style="text-transform: capitalize;"></span>
             <input type="hidden" name="payment[ps_card_type]"/>
-            <input type="hidden" name="payment[sender_hash]"/>
             <input type="hidden" name="payment[credit_card_token]"/>
         </div>
     </li>
@@ -80,20 +78,3 @@ $_code=$this->getMethodCode();
         <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>
     </li>
 </ul>
-
-<script type="text/javascript">
-    //<![CDATA[
-    PagSeguroDirectPayment.setSessionId('<?php echo $_helper->getSessionId();?>');
-    var iid = setInterval(function()
-    {
-        if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
-            console.log('PagSeguro ready');
-
-            clearInterval(iid);
-            RMPagSeguro.updateSenderHash();
-            RMPagSeguro.addBrandObserver();
-            RMPagSeguro.addCardFieldsObserver();
-        }
-    }, 4000);
-    //]]>
-</script>

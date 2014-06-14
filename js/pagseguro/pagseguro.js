@@ -11,6 +11,7 @@ document.observe("dom:loaded", function() {
         if(typeof senderHash != "undefined")
         {
             $$('input[name="payment[sender_hash]"]').first().value = senderHash;
+            $$('input[name="payment[sender_hash]"]').first().enable();
         }
     }
 
@@ -91,7 +92,7 @@ document.observe("dom:loaded", function() {
                    success: function(response) {
                        var parcelsDrop = document.getElementById('pagseguro_cc_cc_installments');
                        for( installment in response.installments) break;
-                       console.log(response.installments);
+//                       console.log(response.installments);
                        var b = response.installments[RMPagSeguro.brand.name];
                        parcelsDrop.length = 0;
                        for(var x=0; x < b.length; x++){

@@ -9,7 +9,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     public function proccessNotificatonResult(SimpleXMLElement $resultXML)
     {
         if(isset($resultXML->error)){
-            Mage::throwException($this->_getHelper()->__('Problemas ao processar seu pagamento. %s(%s)', (string)$resultXML->error->message, (string)$resultXML->error->code));
+            $errMsg = Mage::helper('ricardomartins_pagseguro')->__((string)$resultXML->error->message);
+            Mage::throwException($this->_getHelper()->__('Problemas ao processar seu pagamento. %s(%s)', $errMsg, (string)$resultXML->error->code));
         }
         if(isset($resultXML->reference))
         {
@@ -61,6 +62,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $order->addStatusHistoryComment($message);
             $payment->save();
             $order->save();
+            Mage::dispatchEvent('pagseguro_proccess_notification_after',array(
+                    'order' => $order,
+                    'payment'=> $payment,
+                    'result_xml' => $resultXML,
+                ));
         }else{
             Mage::throwException('Retorno inválido. Referência do pedido não encontrada.');
         }
@@ -143,5 +149,51 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $return->setMessage('Codigo de status inválido retornado pelo PagSeguro. (' . $statusCode . ')');
         }
         return $return;
+    }
+
+    /**
+     * Chama API pra realizar um pagamento
+     * @param $params
+     * @param $payment
+     *
+     * @return SimpleXMLElement
+     */
+    public function callApi($params, $payment)
+    {
+        $helper = Mage::helper('ricardomartins_pagseguro');
+        $client = new Zend_Http_Client($helper->getWsUrl('transactions'));
+        $client->setMethod(Zend_Http_Client::POST);
+        $client->setConfig(array('timeout'=>30));
+
+        $client->setParameterPost($params); //parametros enviados via POST
+
+        $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params,true));
+        try{
+            $response = $client->request(); //faz o request
+        }catch(Exception $e){
+            Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
+        }
+
+        $response = $client->getLastResponse()->getBody();
+        $helper->writeLog('Retorno PagSeguro (/transactions): ' . var_export($response,true));
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($response);
+        if(false === $xml){
+            switch($response){
+                case 'Unauthorized':
+                    $helper->writeLog('Token/email não autorizado pelo PagSeguro. Verifique suas configurações no painel.');
+                    break;
+                case 'Forbidden':
+                    $helper->writeLog('Acesso não autorizado à Api Pagseguro. Verifique se você tem permissão para usar este serviço. Retorno: ' . var_export($response,true));
+                    break;
+                default:
+                    $helper->writeLog('Retorno inesperado do PagSeguro. Retorno: ' . var_export($response,true));
+            }
+            Mage::throwException('Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.');
+        }
+
+
+        return $xml;
     }
 }
