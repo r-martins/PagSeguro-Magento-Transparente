@@ -131,7 +131,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         //atributos de endereço
         /** @var Mage_Sales_Model_Order_Address $address */
-        $address = $type=='shipping' ? $order->getShippingAddress() : $order->getBillingAddress();
+        $address = ($type=='shipping' && !$order->getIsVirtual()) ? $order->getShippingAddress() : $order->getBillingAddress();
         $address_street_attribute = Mage::getStoreConfig('payment/pagseguro/address_street_attribute');
         $address_number_attribute = Mage::getStoreConfig('payment/pagseguro/address_number_attribute');
         $address_complement_attribute = Mage::getStoreConfig('payment/pagseguro/address_complement_attribute');

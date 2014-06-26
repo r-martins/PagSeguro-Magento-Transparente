@@ -30,6 +30,7 @@
         <payment>
             <groups>
                 <pagseguro module="ricardomartins_pagseguro">
+                    <comment><![CDATA[<a href="http://r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Precisa de ajuda?</a><br/> Lembre-se de <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">solicitar acesso</a> à API transparente.]]></comment>
                     <label>PagSeguro - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>110</sort_order>
