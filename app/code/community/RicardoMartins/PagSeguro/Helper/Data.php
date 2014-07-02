@@ -115,8 +115,6 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             }else{
                 Mage::log(var_export($obj, true), Zend_Log::DEBUG, 'pagseguro.log', true);
             }
-        }else{
-            Mage::log(var_export('debug inativo', true), null, 'martins.log', true);
         }
     }
 
