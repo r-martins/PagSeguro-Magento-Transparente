@@ -84,7 +84,16 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
 
         if(isset($xmlRetorno->code)){
-            $payment->setAdditionalInformation(array('transaction_id'=>(string)$xmlRetorno->code));
+
+            $additional = array('transaction_id'=>(string)$xmlRetorno->code);
+            if($existing = $payment->getAdditionalInformation())
+            {
+                if(is_array($existing))
+                {
+                    $additional = array_merge($additional,$existing);
+                }
+            }
+            $payment->setAdditionalInformation($additional);
         }
         return $this;
     }

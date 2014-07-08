@@ -49,7 +49,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
 
         $retorno = array(
-            'senderName'    =>  sprintf('%s %s',$order->getCustomerFirstname(), $order->getCustomerLastname()),
+            'senderName'    =>  sprintf('%s %s',trim($order->getCustomerFirstname()), trim($order->getCustomerLastname())),
             'senderEmail'   => $order->getCustomerEmail(),
             'senderHash'    => $payment['additional_information']['sender_hash'],
             'senderCPF'     => $digits->filter($cpf),
