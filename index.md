@@ -79,7 +79,7 @@ O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realiz
 * Instalação não incluído.
 * Atualizações de correções enviadas por e-mail.
 
-### [Saiba mais &gt;](/pro)
+### [Saiba mais &gt;]({{ site.baseurl }}/pro)
 
 
 
