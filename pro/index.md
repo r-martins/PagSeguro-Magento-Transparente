@@ -44,30 +44,43 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 <table>
 <tr>
 <td>
-Mensal
+Mensal - R$9,90/mês
 </td>
 <td>
-Anual
+<!-- Anual - R$99,00/ano -->
 </td>
 </tr>
 <tr>
 <td>
 <!-- INICIO FORMULARIO BOTAO PAGSEGURO -->
-<form action="https://pagseguro.uol.com.br/v2/pre-approvals/request.html" method="post">
+<form action="https://pagseguro.uol.com.br/v2/pre-approvals/request.html" method="post" target="_blank">
 <!-- NÃO EDITE OS COMANDOS DAS LINHAS ABAIXO -->
-<input type="hidden" name="code" value="9368F96198982C0444FB5FA867E02C9B" />
+<input type="hidden" name="code" value="EBE14E16D9D982CDD4585FA820C46547" />
 <input type="image" src="https://p.simg.uol.com.br/out/pagseguro/i/botoes/assinaturas/120x53-contratar-azul.gif" name="submit" alt="Pague com PagSeguro - é rápido, grátis e seguro!" />
 </form>
 <!-- FINAL FORMULARIO BOTAO PAGSEGURO -->
 </td>
 <td>
-<!-- INICIO FORMULARIO BOTAO PAGSEGURO -->
-<form action="https://pagseguro.uol.com.br/v2/pre-approvals/request.html" method="post">
-<!-- NÃO EDITE OS COMANDOS DAS LINHAS ABAIXO -->
+	<!-- INICIO FORMULARIO BOTAO PAGSEGURO -->
+<!-- <form action="https://pagseguro.uol.com.br/v2/pre-approvals/request.html" method="post"> -->
+	<!-- NÃO EDITE OS COMANDOS DAS LINHAS ABAIXO -->
+<!-- 
 <input type="hidden" name="code" value="95B22D5BF5F51F1EE4A7DF946653AACA" />
-<input type="image" src="https://p.simg.uol.com.br/out/pagseguro/i/botoes/assinaturas/120x53-contratar-azul.gif" name="submit" alt="Pague com PagSeguro - é rápido, grátis e seguro!" />
+<input type="image" src="https://p.simg.uol.com.br/out/pagseguro/i/botoes/assinaturas/120x53-contratar-azul.gif" name="submit" alt="Pague com PagSeguro - é rápido, grátis e seguro!" /> 
 </form>
+-->
 <!-- FINAL FORMULARIO BOTAO PAGSEGURO -->
+</td>
+</tr>
+<tr>
+<td colspan="2">
+Após a contratação e aprovação do pagamento, você receberá um e-mail com o módulo e instruções para instalação em até 48 horas. O e-mail da compra da licença <em>não</em> precisa ser o mesmo e-mail utilizado da sua conta vendedor.
+<br/>
+A chave de ativação do módulo é o <em>código de referência</em> de 6 dígitos fornecido pelo PagSeguro que será autorizado no mesmo prazo.
+<br/><br/>
+<strong>Atualizações</strong>
+<br/>
+As atualizações serão enviadas para seu e-mail conforme forem publicadas/realizadas.
 </td>
 </tr>
 </table>

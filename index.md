@@ -75,8 +75,8 @@ O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realiz
 
 ## PagSeguro PRO (_Novidade_)
 * Suporte a Boleto e TEF transparentes
-* Preço promocional de lançamento R$99,00 (por tempo limitado)
-* Suporte/instalação não incluído.
+* Preço promocional de lançamento R$9,90/mês (por tempo limitado)
+* Instalação não incluído.
 * Atualizações de correções enviadas por e-mail.
 
 ### [Saiba mais &gt;](/pro)
@@ -88,6 +88,10 @@ O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realiz
 * Instalação em lojas com acesso SSH e FTP: R$349,00
 * Não contempla atualização para novas versões nem garantia de ausência de bugs. A última versão do módulo será instalada, e configurada.
 * Entre em contato para maiores detalhes.
+
+
+## Updates
+{% include newsletter.html %}
 
 ## Autor
 [Ricardo Martins](http://ricardomartins.net.br/)  (<pagseguro-transparente@ricardomartins.net.br>)
