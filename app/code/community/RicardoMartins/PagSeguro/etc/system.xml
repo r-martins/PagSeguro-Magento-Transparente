@@ -30,7 +30,7 @@
         <payment>
             <groups>
                 <pagseguro module="ricardomartins_pagseguro">
-                    <comment><![CDATA[<a href="http://r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Precisa de ajuda?</a><br/> Lembre-se de <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">solicitar acesso</a> à API transparente.]]></comment>
+                    <comment><![CDATA[<a href="http://r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Precisa de ajuda?</a><br/> Lembre-se de <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">solicitar acesso</a> à API transparente.<br/>Para suporte a TEF e Boleto, solicite a <a href="http://r-martins.github.io/PagSeguro-Magento-Transparente/pro" target="_blank">versão PRO</a>.]]></comment>
                     <label>PagSeguro - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>110</sort_order>
