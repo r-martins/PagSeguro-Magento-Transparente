@@ -1,6 +1,6 @@
 ---
 layout: default
-title: PagSeguro Pró
+title: PagSeguro Transparente para Magento PRÓ - com TEF e Boleto - by Ricardo Martins
 ---
 
 # PagSeguro Transparente PRÓ

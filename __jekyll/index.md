@@ -1,5 +1,6 @@
 ---
 layout: default
+title: PagSeguro Transparente para Magento - by Ricardo Martins
 ---
 
 # PagSeguro Transparente
@@ -65,7 +66,7 @@ Nota: O modo debug não muda o funcionamento do módulo.
 
 ## Suporte e customizações
 O suporte pode ser obtido nas comunidades magento, ou você pode orçar uma cotação comigo pelo e-mail abaixo.
-Um FAQ será criado com as dúvidas mais frequentes.
+Ou consulte as [*PERGUNTAS FREQUENTES*]({{ site.baseurl }}/faq).
 
 ## Contribua
 Apesar de ser open source e gratuito, o módulo não nasceu sozinho ou com suporte de nenhuma empresa e não tem vínculo com o PagSeguro (maior beneficiado). Considere [**fazer uma doação**](https://pagseguro.uol.com.br/checkout/v2/donation.html?currency=BRL&receiverEmail=ricardo@ricardomartins.info) ou contribuir com melhorias realizando um pull request.
@@ -82,11 +83,10 @@ O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realiz
 ### [Saiba mais &gt;]({{ site.baseurl }}/pro)
 
 
-
 ## Instalação Profissional
 * Instalação em lojas com acesso apenas FTP: R$399,00
 * Instalação em lojas com acesso SSH e FTP: R$349,00
-* Não contempla atualização para novas versões nem garantia de ausência de bugs. A última versão do módulo será instalada, e configurada.
+* Não contempla atualização para novas versões nem garantia de ausência de bugs futuros. A última versão do módulo será instalada, e configurada.
 * Entre em contato para maiores detalhes.
 
 

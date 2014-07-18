@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PagSeguro Transparente para Magento - Perguntas Frequentes</title>
+    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/stylesheets/styles.css">
+    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="/PagSeguro-Magento-Transparente/javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1 onclick="location.href='/PagSeguro-Magento-Transparente/';" style="cursor:pointer">Pagseguro-magento-transparente</h1>
+        <p>Módulo de checkout transparente para Pagseguro - com api v. 2.0</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente" class="button fork"><strong>Ver no GitHub</strong></a>
+        <div class="downloads">
+          <span>PagSeguro Transparente (versão gratuita):</span>
+          <ul>
+            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>        
+        <h1 id="perguntas-frequentes">Perguntas Frequentes</h1>
+<hr />
+
+<h2 id="geral">Geral</h2>
+
+<ul>
+  <li>
+    <p>O que significa <em>transparente</em>? <br />
+Basicamente significa que o usuário não precisa sair da sua loja para realizar o pagamento, o que ocorre usando alguns meios de pagamento.</p>
+  </li>
+  <li>
+    <p>O módulo é mesmo gratuito?<br />
+Sim. É gratuito porém ao usar, você aceita que deverá contribuir divulgando suas melhorias e alterações, preferencialmente fazendo um pull request no projeto.<br />
+A versão gratuita oferece suporte à cartão de crédito.</p>
+  </li>
+  <li>
+    <p>Qual a diferença da versão gratuita e da versão PRÓ (paga)? <br />
+A versão Pró possuí suporte à TEF (Debito online) e Boleto bancário. Veja mais detalhes <a href="/PagSeguro-Magento-Transparente/pro">aqui</a></p>
+  </li>
+  <li>
+    <p>É seguro? <br />
+Sempre há risco. No entanto, nenhum dado de cartão de crédito do seu cliente é armazenado na loja. No momento que o cliente termina de preencher os dados do cartão, estes são enviados via HTTPS (seguro) via JavaScript para o PagSeguro, que devolve uma chave única de segurança para aquela transação. <br />
+Em versões futuras os dados do cartão sequer serão enviados para seu site.</p>
+  </li>
+  <li>
+    <p>O código é aberto?<br />
+Sim, tanto no módulo PRÓ quanto no módulo free, não há criptografia nenhuma no código nem obfuscação de código fonte.</p>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="instalao">Instalação</h2>
+
+<ul>
+  <li>
+    <p>Qual a diferença entre baixar o módulo no Github e fazer a instalação no Magento Connect? <br />
+Fazendo o download no Github (links do topo) você terá a versão mais recente. Isso porque é mais fácil publicar a nova versão aqui do que no Magento Connect.</p>
+  </li>
+  <li>
+    <p>Como sei que versão estou usando? <br />
+Abrindo o arquivo app/code/community/RicardoMartins/PagSeguro/etc/config.xml do seu módulo e vendo o trecho <em><version>XXX</version></em>.</p>
+  </li>
+  <li>
+    <p>Existe suporte para instalação? <br />
+Você pode contratar o serviço de instalação profissional a partir de R$349,00 se possuir acesso ssh ao servidor da loja, ou R$399,00 caso possua apenas FTP.<br />
+A instalação é feita em até 15 dias após a constatação do pagamento e da liberação da conta para uso do checkout transparente pelo PagSeguro. Entre em contato para mais detalhes.</p>
+  </li>
+  <li>
+    <p>Não gostei, não funcionou, deu conflito, não quero mais brincar. Como desinstalo?&lt;/br&gt;
+Basta remover os arquivos do módulo que adicionou. O módulo não altera sua base, nem cria atributos, ou algo assim. Talvez encontre problemas apenas para visualizar pedidos antigos realizados com o módulo, assim como ocorreria com outros métodos de pagamento.</p>
+  </li>
+</ul>
+
+<hr />
+
+<h2 id="problemas-comuns">Problemas comuns</h2>
+
+<h3 id="a-maioria-dos-problemas-podem-ser-diagnosticados-lendo-o-log-do-mdulo-localizado-na-pasta-varlogpagsegurolog">A maioria dos problemas podem ser diagnosticados lendo o log do módulo, localizado na pasta var/log/pagseguro.log.</h3>
+
+<ul>
+  <li>
+    <p>As parcelas/bandeira do cartão não carregam. <br />
+Geralmente ocorre porque sua loja/conta não está autorizada pelo PagSeguro a utilizar o checkout transparente. Uma mensagem constatando esse erro será exibida no arquivo de log.</p>
+  </li>
+  <li>
+    <p>Falha ao obter o token do cartão ou sender_hash.<br />
+Veja se não excluiu os dados de campos hidden no template de cartão, localizado em app/design/frontend/base/default/template/ricardomartins_pagseguro/form/cc.phtml. <br /></p>
+  </li>
+</ul>
+
+
+      </section>
+      <footer>
+		  <p><a href="http://www.magentocommerce.com/certification/directory/dev/314967/" target="_blank"><img src="/PagSeguro-Magento-Transparente/images/middle_developer_logo.png" alt="Módulo desenvolvido por profissional certificado Magento" title="Módulo desenvolvido por profissional certificado Magento" border="0"/></a></p>
+		  <p>Projeto mantido por <a href="https://github.com/r-martins">r-martins</a></p>
+		  <p><small>Hospedado no GitHub Pages &mdash; Tema: <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+		  <p><small>Não possuí vínculo com PagSeguro UOL</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-3314217-5");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
