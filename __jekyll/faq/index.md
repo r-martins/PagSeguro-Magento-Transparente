@@ -54,3 +54,8 @@ Geralmente ocorre porque sua loja/conta não está autorizada pelo PagSeguro a u
 * Falha ao obter o token do cartão ou sender_hash.<br/>
 Veja se não excluiu os dados de campos hidden no template de cartão, localizado em app/design/frontend/base/default/template/ricardomartins_pagseguro/form/cc.phtml. <br/>
 
+* Uso uma tela de sucesso personalizada, e no módulo PRO o botão de impressão de boleto ou TEF não aparece.
+Se você usa o módulo pró, e tem uma tela de sucesso customizada, basta adicionar o trecho de código abaixo no phtml de sucesso de seu tema:
+<pre>
+&lt;?php echo $this->getLayout()->createBlock('ricardomartins_pagseguropro/payment_info', 'paymentInfo')->setTemplate('ricardomartins_pagseguropro/payment/info.phtml')->toHtml();?>
+</pre>
