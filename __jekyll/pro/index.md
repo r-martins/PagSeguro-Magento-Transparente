@@ -23,7 +23,7 @@ title: PagSeguro Transparente para Magento PRÓ - com TEF e Boleto - by Ricardo 
 * Magento CE 1.6.x até 1.9.x (não testado em outras versões)
 
 ## Valor
-* R$9,99/mês ou R$99,00 anuais
+* R$9,99/mês (por tempo limitado)
 * Pagamento via PagSeguro
 * [Contrate já](#contratar)
 
