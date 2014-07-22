@@ -56,7 +56,7 @@ No seu painel do PagSeguro, configure Integrações->Retorno Automatico de Dados
 Repare que o módulo do Bruno é /pagseguro/ enquanto este é /pseguro/.
 Compatibilidade com outros módulos do Pagseguro ainda estão em testes. Considere reportar suas experiências.
 
-## Detecção de problemas
+### Detecção de problemas
 A maior parte dos problemas pode ser identificada ativando o modo debug no painel e vendo o arquivo de log gerado na sua pasta/do/magento/var/log/pagseguro.log. 
 Nota: O modo debug não muda o funcionamento do módulo.
 
@@ -71,8 +71,10 @@ Ou consulte as [*PERGUNTAS FREQUENTES*]({{ site.baseurl }}/faq).
 ## Contribua
 Apesar de ser open source e gratuito, o módulo não nasceu sozinho ou com suporte de nenhuma empresa e não tem vínculo com o PagSeguro (maior beneficiado). Considere [**fazer uma doação**](https://pagseguro.uol.com.br/checkout/v2/donation.html?currency=BRL&receiverEmail=ricardo@ricardomartins.info) ou contribuir com melhorias realizando um pull request.
 
-## Termos de uso
+### Termos de uso
 O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realizada seja publicadas com forks e pull requests. (MIT)
+
+** Não possuí vínculo com PagSeguro UOL. **
 
 ## PagSeguro PRO (_Novidade_)
 * Suporte a Boleto e TEF transparentes

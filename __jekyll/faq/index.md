@@ -54,7 +54,18 @@ Geralmente ocorre porque sua loja/conta não está autorizada pelo PagSeguro a u
 * Falha ao obter o token do cartão ou sender_hash.<br/>
 Veja se não excluiu os dados de campos hidden no template de cartão, localizado em app/design/frontend/base/default/template/ricardomartins_pagseguro/form/cc.phtml. <br/>
 
-* Uso uma tela de sucesso personalizada, e no módulo PRO o botão de impressão de boleto ou TEF não aparece.
+* Meu cartão não está sendo aceito no modo de testes (Sandbox). <br/>
+No modo sandbox utilize cartão visa 4111111111111111 com qualquer cvv de 3 digitos e qualquer data de validade futura. <br/>
+
+* Gostaria de exibir a bandeira dos cartões como imagens. Como faço? <br/>
+No momento o modulo exibe apenas a legenda, você precisa customizar do seu jeito via css por exemplo.<br/>
+Pra facilitar, cada bandeira ganha a própria classe css no objeto que guarda o nome do cartão. Ex: &lt;span id="card-brand" class="visa"... <br/>
+Basta configurar seu css para exibir do jeito que desejar para cada uma das bandeiras.<br/>
+
+* Todos os pagamentos que faço mesmo com meu cartão são negados. Porque?<br/>
+O PagSeguro nega qualquer pedido feito pelo próprio dono da loja. Se o cartão for do mesmo titular do dono, ou se o acesso partir da mesma máquina que um dia logou na administração do pagseguro, eles tendem a recusar e negar a transação. <br/>
+
+* Uso uma tela de sucesso personalizada, e no módulo PRO o botão de impressão de boleto ou TEF não aparece. <br/>
 Se você usa o módulo pró, e tem uma tela de sucesso customizada, basta adicionar o trecho de código abaixo no phtml de sucesso de seu tema:
 <pre>
 &lt;?php echo $this->getLayout()->createBlock('ricardomartins_pagseguropro/payment_info', 'paymentInfo')->setTemplate('ricardomartins_pagseguropro/payment/info.phtml')->toHtml();?>

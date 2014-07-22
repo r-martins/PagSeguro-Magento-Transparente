@@ -81,6 +81,8 @@ A chave de ativação do módulo é o <em>código de referência</em> de 6 dígi
 <strong>Atualizações</strong>
 <br/>
 As atualizações serão enviadas para seu e-mail conforme forem publicadas/realizadas.
+<br/>
+<strong>Obs: Nenhum dos módulos possuí vínculo com PagSeguro UOL ou são módulos oficiais.</strong>
 </td>
 </tr>
 </table>
