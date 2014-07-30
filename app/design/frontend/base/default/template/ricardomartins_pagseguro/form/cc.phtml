@@ -22,6 +22,14 @@ $_code=$this->getMethodCode();
             <?php echo $_dob->toHtml() ?>
         </li>
     <?php endif ?>
+    <?php if($this->isCpfVisible()):?>
+        <li id="<?php echo $_code ?>_cc_cpf_div">
+            <label for="<?php echo $_code ?>_cc_cpf" class="required"><em>*</em><?php echo $this->__('Credit Card Owner\'s CPF') ?></label>
+            <div class="input-box">
+                <input type="text" id="<?php echo $_code ?>_cc_cpf" name="payment[ps_cc_cpf]" title="<?php echo $this->__('Credit Card Owner\'s CPF') ?>" class="input-text required-entry validate-digits" value=""/>
+            </div>
+        </li>
+    <?php endif ?>
     <li>
         <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
         <div class="input-box">

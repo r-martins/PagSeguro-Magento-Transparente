@@ -35,6 +35,12 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                     )));
         }
 
+        //CPF
+        $owner_cpf_attribute = Mage::getStoreConfig('payment/pagseguro_cc/customer_cpf_attribute');
+        if(empty($owner_cpf_attribute)){// pegar o cpf e salvar aí
+            $info->setAdditionalInformation('credit_card_owner_cpf', $data->getPsCcCpf());
+        }
+
         //parcelas
         if($data->getPsCcInstallments())
         {
