@@ -136,4 +136,14 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 
         return Mage::helper('core')->decrypt($token);
     }
+
+    /**
+     * Verifica se o campo CPF deve ser exibido junto com os dados de pagamento
+     * @return bool
+     */
+    public function isCpfVisible()
+    {
+        $customer_cpf_attribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
+        return empty($customer_cpf_attribute);
+    }
 }

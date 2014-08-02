@@ -27,18 +27,17 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             ->setCcType($data->getPsCardType())
             ->setCcLast4(substr($data->getPsCcNumber(), -4));
 
+        //cpf
+        if(Mage::helper('ricardomartins_pagseguro')->isCpfVisible()) {
+            $info->setAdditionalInformation($this->getCode() . '_cpf', $data->getData($this->getCode() . '_cpf'));
+        }
+
         //data de nascimento
         $owner_dob_attribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
         if(empty($owner_dob_attribute)){// pegar o dob e salvar aí
             $info->setAdditionalInformation('credit_card_owner_birthdate', date('d/m/Y',strtotime(
                         $data->getPsCcOwnerBirthdayYear().'/'.$data->getPsCcOwnerBirthdayMonth().'/'.$data->getPsCcOwnerBirthdayDay()
                     )));
-        }
-
-        //CPF
-        $owner_cpf_attribute = Mage::getStoreConfig('payment/pagseguro_cc/customer_cpf_attribute');
-        if(empty($owner_cpf_attribute)){// pegar o cpf e salvar aí
-            $info->setAdditionalInformation('credit_card_owner_cpf', $data->getPsCcCpf());
         }
 
         //parcelas

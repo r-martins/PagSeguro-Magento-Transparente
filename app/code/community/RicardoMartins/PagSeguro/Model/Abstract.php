@@ -27,10 +27,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 }
                 if($order->canCancel())
                 {
-                    $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->cancel();
                     $order->save();
                 }else{
+                    $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->addStatusHistoryComment('Devolvido: o valor foi devolvido ao comprador, mas o pedido encontra-se em um estado que não pode ser cancelado.')
                         ->save();
                 }
@@ -43,7 +43,18 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
             if((int)$resultXML->status == 3) //Quando o pedido foi dado como Pago
             {
-                $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
+                //cria fatura e envia email (se configurado)
+//                $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
+                $invoice = $order->prepareInvoice();
+                $invoice->register()->pay();
+                $msg = sprintf('Pagamento capturado. Identificador da Transação: %s', (string)$resultXML->code);
+                $invoice->addComment($msg);
+                $invoice->sendEmail(Mage::getStoreConfigFlag('payment/pagseguro/send_invoice_email'),'Pagamento recebido com sucesso.');
+                Mage::getModel('core/resource_transaction')
+                    ->addObject($invoice)
+                    ->addObject($invoice->getOrder())
+                    ->save();
+                $order->addStatusHistoryComment(sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId()));
             }
 
             if((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) //Especificamos a fonte do cancelamento do pedido

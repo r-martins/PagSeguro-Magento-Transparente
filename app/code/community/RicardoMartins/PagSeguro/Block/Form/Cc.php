@@ -67,9 +67,4 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
         return empty($owner_dob_attribute);
     }
 
-    public function isCpfVisible()
-    {
-        $customer_cpf_attribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
-        return empty($customer_cpf_attribute);
-    }
 }

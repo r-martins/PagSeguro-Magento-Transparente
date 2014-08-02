@@ -103,15 +103,25 @@
                             <show_in_store>0</show_in_store>
                             <comment>Veja a saída de log em var/log/pagseguro.log</comment>
                         </debug>
+                        <send_invoice_email>
+                            <label>Enviar e-mail de fatura?</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>31</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Dispara o e-mail de fatura da loja ao receber a confirmação de pagamento do PagSeguro.]]></comment>
+                        </send_invoice_email>
                         <customer_cpf_attribute>
                             <label>CPF do cliente</label>
                             <frontend_type>select</frontend_type>
                             <source_model>ricardomartins_pagseguro/source_customer_cpf</source_model>
-                            <sort_order>31</sort_order>
+                            <sort_order>32</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o CPF do cliente, selecione aqui. Caso contrário escolha "Solicitar junto com os outros dados do cartão".]]></comment>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o CPF do cliente, selecione aqui. Caso contrário escolha "Solicitar junto com os outros dados do pagamento".]]></comment>
                         </customer_cpf_attribute>
                         <address_street_attribute>
                             <label>Atributo Rua de entrega</label>

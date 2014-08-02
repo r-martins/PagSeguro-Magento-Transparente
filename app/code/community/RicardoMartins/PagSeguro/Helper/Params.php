@@ -326,7 +326,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     /**
      * Retorna o CPF do cliente baseado na selecao realizada na configuração do modulo
      * @param Mage_Customer_Model_Customer $customer
-     * @param                              $payment
+     * @param Mage_Payment_Model_Method_Abstract $payment
      *
      * @return mixed
      */
@@ -336,13 +336,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         if(empty($customer_cpf_attribute)) //Soliciado ao cliente junto com os dados do cartao
         {
-            if(isset($payment['additional_information']['credit_card_owner_cpf'])){
-                return $payment['additional_information']['credit_card_owner_cpf'];
+            if(isset($payment['additional_information'][$payment->getMethod().'_cpf'])){
+                return $payment['additional_information'][$payment->getMethod().'_cpf'];
             }
         }
 
         $cpf = $customer->getResource()->getAttribute($customer_cpf_attribute)->getFrontend()->getValue($customer);
-
 
         return $cpf;
     }
