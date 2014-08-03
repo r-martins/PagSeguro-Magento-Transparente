@@ -50,7 +50,7 @@ NOTE: Regarding styles - if we leave it this way, we'll move it to boxes.css
  */
 ?>
 <label for="<?php echo $this->getFieldId('month')?>" class="required"><em>*</em><?php echo $this->__('Date of Birth') ?></label>
-<div class="input-box customer-dob">
+<div class="input-box customer-dob ps-cc-owner-dob">
 <?php
     $this->setDateInput('d',
         '<div class="dob-day">
@@ -82,6 +82,6 @@ NOTE: Regarding styles - if we leave it this way, we'll move it to boxes.css
 </div>
 <script type="text/javascript">
 //<![CDATA[
-    var customer_dob = new Varien.DOB('.customer-dob', 'true', '<?php echo $this->getDateFormat() ?>');
+    var ps_cc_owner_dob = new Varien.DOB('.ps-cc-owner-dob', 'true', '<?php echo $this->getDateFormat() ?>');
 //]]>
 </script>
