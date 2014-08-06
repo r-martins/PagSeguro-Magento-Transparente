@@ -146,16 +146,23 @@ Utilize a ferramenta abaixo se desejar.</p>
 
     <p><input type="email" placeholder="email da conta" id="email" />
   <input type="token" placeholder="token" id="token" />
-  <input type="button" onclick="testToken()" value="testar" /></p>
+  <input type="button" onclick="testToken()" value="Testar" />
+  <br />
+  <span id="resultado"></span></p>
 
     <script type="text/javascript">
   var testToken = function(){
       $.ajax({
           url: 'http://ws.ricardomartins.net.br/pspro/v1/token/test/' + $('#email').val() + '/'+ $('#token').val(),
+          dataType: 'json',
           crossDomain: true,
           }).done(function(data){
-              console.log(data);
-      });
+              if(data.valid){
+                  $('#resultado').html('Habilitado. Você já pode usar o checkout transparente.');
+              }else{
+                  $('#resultado').html('Checkout transparente <strong>não habilitado</strong>. Faça sua requisição ou tente novamente amanhã.');
+              }
+      })
   }
   </script>
   </li>
