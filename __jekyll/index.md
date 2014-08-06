@@ -95,5 +95,7 @@ O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realiz
 ## Updates
 {% include newsletter.html %}
 
-## Autor
-[Ricardo Martins](http://ricardomartins.net.br/)  (<pagseguro-transparente@ricardomartins.net.br>)
+## Autor / Suporte
+[Ricardo Martins](http://ricardomartins.net.br/)  (<suporte@pagsegurotransparente.zendesk.com>)
+
+obs: ferramenta de suporte em fase de testes

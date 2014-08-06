@@ -1,6 +1,7 @@
 ---
 layout: default
 title: PagSeguro Transparente para Magento - Perguntas Frequentes
+
 ---
 
 # Perguntas Frequentes
@@ -39,7 +40,7 @@ Abrindo o arquivo app/code/community/RicardoMartins/PagSeguro/etc/config.xml do 
 Você pode contratar o serviço de instalação profissional a partir de R$349,00 se possuir acesso ssh ao servidor da loja, ou R$399,00 caso possua apenas FTP.<br/>
 A instalação é feita em até 15 dias após a constatação do pagamento e da liberação da conta para uso do checkout transparente pelo PagSeguro. Entre em contato para mais detalhes.
 
-* Não gostei, não funcionou, deu conflito, não quero mais brincar. Como desinstalo?</br>
+* Não gostei, não funcionou, deu conflito, não quero mais brincar. Como desinstalo? <br/>
 Basta remover os arquivos do módulo que adicionou. O módulo não altera sua base, nem cria atributos, ou algo assim. Talvez encontre problemas apenas para visualizar pedidos antigos realizados com o módulo, assim como ocorreria com outros métodos de pagamento.
 
 ***
@@ -70,3 +71,34 @@ Se você usa o módulo pró, e tem uma tela de sucesso customizada, basta adicio
 <pre>
 &lt;?php echo $this->getLayout()->createBlock('ricardomartins_pagseguropro/payment_info', 'paymentInfo')->setTemplate('ricardomartins_pagseguropro/payment/info.phtml')->toHtml();?>
 </pre>
+
+* Após algum dos reloads do meu modulo de OneStepCheckout parece que o modulo pára de funcionar. <br/>
+Isso ocorre por uma falha na renderização dos javascripts que ocorre em alguns módulos desse tipo. Basta adicionar a chamada JS na area de 'success' do ajax que atualiza as formas de pagamento.
+<pre>
+RMPagSeguro.addBrandObserver();
+</pre>
+
+* Como sei se minha conta tem suporte ou está habilitada pra usar o checkout transparente? <br/>
+Utilize a ferramenta abaixo se desejar.
+
+	<input type="email" placeholder="email da conta" id="email"/>
+	<input type="token" placeholder="token" id="token"/>
+	<input type="button" onclick="testToken()" value="Testar"/>
+	<br/>
+	<span id="resultado"></span>
+	
+	<script type="text/javascript">
+	var testToken = function(){
+		$.ajax({
+			url: 'http://ws.ricardomartins.net.br/pspro/v1/token/test/' + $('#email').val() + '/'+ $('#token').val(),
+			dataType: 'json',
+			crossDomain: true,
+			}).done(function(data){
+				if(data.valid){
+					$('#resultado').html('Habilitado. Você já pode usar o checkout transparente.');
+				}else{
+					$('#resultado').html('Checkout transparente <strong>não habilitado</strong>. Faça sua requisição ou tente novamente amanhã.');
+				}
+		})
+	}
+	</script>
