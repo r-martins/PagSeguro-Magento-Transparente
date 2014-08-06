@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>

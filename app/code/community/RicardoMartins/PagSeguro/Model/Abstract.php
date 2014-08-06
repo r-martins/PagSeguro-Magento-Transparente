@@ -36,6 +36,20 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 }
             }
 
+            if((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) //Especificamos a fonte do cancelamento do pedido
+            {
+                switch((string)$resultXML->cancellationSource)
+                {
+                    case 'INTERNAL':
+                        $message .= ' O próprio PagSeguro negou ou cancelou a transação.';
+                        break;
+                    case 'EXTERNAL':
+                        $message .= ' A transação foi negada ou cancelada pela instituição bancária.';
+                        break;
+                }
+                $order->cancel();
+            }
+
             if($processedState->getStateChanged())
             {
                 $order->setState($processedState->getState(),true,$processedState->getIsCustomerNotified())->save();
@@ -55,19 +69,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     ->addObject($invoice->getOrder())
                     ->save();
                 $order->addStatusHistoryComment(sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId()));
-            }
-
-            if((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) //Especificamos a fonte do cancelamento do pedido
-            {
-                switch((string)$resultXML->cancellationSource)
-                {
-                    case 'INTERNAL':
-                        $message .= ' O próprio PagSeguro negou ou cancelou a transação.';
-                        break;
-                    case 'EXTERNAL':
-                        $message .= ' A transação foi negada ou cancelada pela instituição bancária.';
-                        break;
-                }
             }
 
             $order->addStatusHistoryComment($message);
