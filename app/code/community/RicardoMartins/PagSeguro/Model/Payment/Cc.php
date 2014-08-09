@@ -63,7 +63,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         if(empty($credit_card_token) || empty($sender_hash))
         {
-            Mage::helper('ricardomartins_pagseguro')->writeLog('Falha ao obter o token do cartao ou sender_hash. Veja se os dados "sender_hash" e "credit_card_token" foram enviados no formulário. Um problema de JavaScript pode ter ocorrido.');
+            Mage::helper('ricardomartins_pagseguro')->writeLog('Falha ao obter o token do cartao ou sender_hash. Veja se os dados "sender_hash" e "credit_card_token" foram enviados no formulário. Um problema de JavaScript pode ter ocorrido. Se esta for apenas uma atualização de blocos via ajax nao se preocupe.');
             Mage::throwException('Falha ao processar pagamento junto ao PagSeguro. Por favor, entre em contato com nossa equipe.');
         }
         return $this;

@@ -26,7 +26,7 @@ class RicardoMartins_PagSeguro_Model_Source_Customer_Address_Attributes_Optional
                         $options[] = array('value' => 'street_'.$i, 'label' => 'Street Line '.$i);
                     }
                 } else {
-                    $options[] = array('value' => $value['attribute_code'], 'label' => $value['frontend_label']);
+                    $options[] = array('value' => $value['attribute_code'], 'label' => $value['frontend_label']. ' (' . $value['attribute_code'] . ')');
                 }
             }
         }

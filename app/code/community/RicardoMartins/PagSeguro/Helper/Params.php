@@ -39,9 +39,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $digits = new Zend_Filter_Digits();
 
-        /** @var Mage_Customer_Model_Customer $customer */
-        $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-        $cpf = $this->_getCustomerCpfValue($customer,$payment);
+        $cpf = $this->_getCustomerCpfValue($order->getCustomer(),$payment);
 
         //telefone
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
@@ -69,13 +67,11 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $digits = new Zend_Filter_Digits();
 
-        /** @var Mage_Customer_Model_Customer $customer */
-        $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-        $cpf = $this->_getCustomerCpfValue($customer,$payment);
+        $cpf = $this->_getCustomerCpfValue($order->getCustomer(),$payment);
 
 
         //dados
-        $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($customer,$payment);
+        $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($order->getCustomer(),$payment);
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
 
 

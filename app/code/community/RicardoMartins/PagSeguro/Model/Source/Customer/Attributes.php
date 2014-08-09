@@ -13,7 +13,7 @@ class RicardoMartins_PagSeguro_Model_Source_Customer_Attributes
 
         foreach($fields as $key => $value) {
             if(!is_null($value['frontend_label'])) {
-                $options[$value['frontend_label']] = array('value' => $value['attribute_code'], 'label' => $value['frontend_label']);
+                $options[$value['frontend_label']] = array('value' => $value['attribute_code'], 'label' => $value['frontend_label'] . ' (' . $value['attribute_code'] . ')');
             }
         }
 
