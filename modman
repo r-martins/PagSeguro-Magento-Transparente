@@ -1,0 +1,7 @@
+#code files
+app/* app
+
+#asset files
+js/* js
+skin/* skin
+
