@@ -4,6 +4,12 @@
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
  * @version 0.2.0
  */
+if (typeof jQuery == 'undefined') {
+    var jq = document.createElement('script');
+    jq.type = 'text/javascript';
+    jq.src = '//ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"';
+    document.getElementsByTagName('head')[0].appendChild(jq);
+}
 document.observe("dom:loaded", function() {
     RMPagSeguro = function RMPagSeguro(){};
     RMPagSeguro.updateSenderHash = function(){
@@ -81,44 +87,38 @@ document.observe("dom:loaded", function() {
     }
 
     RMPagSeguro.getInstallments = function(){
-        var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/getGrandTotal';
-        new Ajax.Request(_url, {
-           onSuccess: function(response){
-               var grandTotal = response.responseJSON.total;
-
-               PagSeguroDirectPayment.getInstallments({
-                   amount: grandTotal,
-                   brand: RMPagSeguro.brand.name,
-                   success: function(response) {
-                       var parcelsDrop = document.getElementById('pagseguro_cc_cc_installments');
-                       for( installment in response.installments) break;
-//                       console.log(response.installments);
-                       var b = response.installments[RMPagSeguro.brand.name];
-                       parcelsDrop.length = 0;
-                       for(var x=0; x < b.length; x++){
-                           var option = document.createElement('option');
-                           option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toString().replace('.',',');
-                           option.text += (b[x].interestFree)?" sem juros":" com juros";
-                           option.value = b[x].quantity + "|" + b[x].installmentAmount;
-                           parcelsDrop.add(option);
-                       }
-//                       console.log(b[0].quantity);
-//                       console.log(b[0].installmentAmount);
-
-                   },
-                   error: function(response) {
-                       console.log(response);
-                   },
-                   complete: function(response) {
-//                       console.log(response);
-                       RMPagSeguro.reCheckSenderHash();
-                   }
-               });
+      var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/getGrandTotal';
+      jQuery.ajax({
+        url: _url,
+        type: 'POST',
+        dataType: 'json',
+        success: function(data, textStatus, xhr) {
+          var grandTotal = data.total;
+          PagSeguroDirectPayment.getInstallments({
+            amount: grandTotal,
+            brand: RMPagSeguro.brand.name,
+            success: function(response) {
+              var parcelsDrop = document.getElementById('pagseguro_cc_cc_installments');
+              for( var installment in response.installments) break;
+                var b = response.installments[RMPagSeguro.brand.name];
+              parcelsDrop.length = 0;
+              for(var x=0; x < b.length; x++){
+                var option = document.createElement('option');
+                option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toString().replace('.',',');
+                option.text += (b[x].interestFree)?" sem juros":" com juros";
+                option.value = b[x].quantity + "|" + b[x].installmentAmount;
+                parcelsDrop.add(option);
+              }
+            },
+            error: function(response) {
+             console.log(response);
            },
-            onFailure: function(response){
-                return 0;
-            }
-        });
+           complete: function(response) {
+             RMPagSeguro.reCheckSenderHash();
+           }
+         });
+        }
+      });
     }
 
     //verifica se o sender hash foi pego e tenta atualizar denvoo caso não tenha sido.

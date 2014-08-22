@@ -21,7 +21,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             for($x=1, $y=0, $c=count($items); $x <= $c; $x++, $y++)
             {
                 $retorno['itemId'.$x] = $items[$y]->getId();
-                $retorno['itemDescription'.$x] = $this->normalizeChars($items[$y]->getName());
+                $retorno['itemDescription'.$x] = $this->normalizeChars(substr($items[$y]->getName(), 0, 100));
                 $retorno['itemAmount'.$x] = number_format($items[$y]->getPrice(),2,'.','');
                 $retorno['itemQuantity'.$x] = $items[$y]->getQtyOrdered();
             }
