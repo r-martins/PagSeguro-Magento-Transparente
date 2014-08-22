@@ -1,0 +1,11 @@
+#code files
+app/code/community/RicardoMartins/* app/code/community/RicardoMartins
+app/design/frontend/base/default/template/* app/design/frontend/base/default/template
+app/design/adminhtml/base/default/template/* app/design/adminhtml/base/default/template
+app/etc/modules/* app/etc/modules
+app/locale/pt_BR/* app/locale/pt_BR
+
+#asset files
+js/pagseguro/* js/pagseguro
+skin/frontend/base/default/* skin/frontend/base/default
+
