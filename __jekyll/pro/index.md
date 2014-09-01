@@ -24,6 +24,7 @@ title: PagSeguro Transparente para Magento PRÓ - com TEF e Boleto - by Ricardo 
 
 ## Valor
 * R$9,99/mês (por tempo limitado)
+* Em breve outras formas de pagamento
 * Pagamento via PagSeguro
 * [Contrate já](#contratar)
 
@@ -44,7 +45,7 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 <table>
 <tr>
 <td>
-Mensal - <del>de R$29,90/mês</del> por R$9,90/mês (para subscrições até 31/08/2014)
+Mensal - <del>de R$29,90/mês</del> por R$9,90/mês (por tempo limitado - mas não será alterado para assinaturas já realizadas neste valor)
 </td>
 <td>
 <!-- Anual - R$99,00/ano -->
@@ -55,7 +56,7 @@ Mensal - <del>de R$29,90/mês</del> por R$9,90/mês (para subscrições até 31/
 <!-- INICIO FORMULARIO BOTAO PAGSEGURO -->
 <form action="https://pagseguro.uol.com.br/v2/pre-approvals/request.html" method="post" target="_blank">
 <!-- NÃO EDITE OS COMANDOS DAS LINHAS ABAIXO -->
-<input type="hidden" name="code" value="EBE14E16D9D982CDD4585FA820C46547" />
+<input type="hidden" name="code" value="566897A711119897742A0FBBCDDDEA26" />
 <input type="image" src="https://p.simg.uol.com.br/out/pagseguro/i/botoes/assinaturas/120x53-contratar-azul.gif" name="submit" alt="Pague com PagSeguro - é rápido, grátis e seguro!" />
 </form>
 <!-- FINAL FORMULARIO BOTAO PAGSEGURO -->
