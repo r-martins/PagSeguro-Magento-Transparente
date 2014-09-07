@@ -86,3 +86,8 @@ $_code=$this->getMethodCode();
         <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>
     </li>
 </ul>
+<script>
+    if(typeof RMPagSeguro != 'undefined') {
+        RMPagSeguro.getInstallments();
+    }
+</script>
