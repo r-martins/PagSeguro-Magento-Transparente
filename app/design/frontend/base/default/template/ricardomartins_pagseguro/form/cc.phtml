@@ -26,14 +26,14 @@ $_code=$this->getMethodCode();
         <li id="<?php echo $_code ?>_cpf_div">
             <label for="<?php echo $_code ?>_cpf" class="required"><em>*</em><?php echo $this->__('Credit Card Owner\'s CPF') ?></label>
             <div class="input-box">
-                <input type="text" id="<?php echo $_code ?>_cpf" name="payment[<?php echo $_code?>_cpf]" title="<?php echo $this->__('Credit Card Owner\'s CPF') ?>" class="input-text required-entry validate-digits" value=""/>
+                <input type="text" id="<?php echo $_code ?>_cpf" name="payment[<?php echo $_code?>_cpf]" title="<?php echo $this->__('Credit Card Owner\'s CPF') ?>" class="input-text required-entry validate-digits" value="" maxlength="11" />
             </div>
         </li>
     <?php endif ?>
     <li>
         <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
         <div class="input-box">
-            <input type="text" id="<?php echo $_code ?>_cc_number" name="payment[ps_cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-cc-number validate-cc-type required-entry" value=""/>
+            <input type="text" id="<?php echo $_code ?>_cc_number" name="payment[ps_cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-cc-number validate-cc-type required-entry" value="" maxlength="16" />
             <?php #nao remover os 3 campos abaixo ?>
             <span id="card-brand" style="text-transform: capitalize;"></span>
             <input type="hidden" name="payment[ps_card_type]"/>
@@ -65,7 +65,7 @@ $_code=$this->getMethodCode();
         <label for="<?php echo $_code ?>_cc_cid" class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
         <div class="input-box">
             <div class="v-fix">
-                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry validate-cc-cvn" id="<?php echo $_code ?>_cc_cid" name="payment[ps_cc_cid]" value="" />
+                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry validate-cc-cvn" id="<?php echo $_code ?>_cc_cid" name="payment[ps_cc_cid]" value="" maxlength="4" />
             </div>
             <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
         </div>
