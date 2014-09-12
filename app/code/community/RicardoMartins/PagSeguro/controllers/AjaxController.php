@@ -11,4 +11,13 @@ class RicardoMartins_PagSeguro_AjaxController extends Mage_Core_Controller_Front
         $this->getResponse()->setHeader('Content-type','application/json');
         $this->getResponse()->setBody(json_encode(array('total'=>$total)));
     }
+
+    public function getSessionIdAction()
+    {
+        $_helper = Mage::helper('ricardomartins_pagseguro');
+        $session_id = $_helper->getSessionId();
+
+        $this->getResponse()->setHeader('Content-type','application/json');
+        $this->getResponse()->setBody(json_encode(array('session_id'=>$session_id)));
+    }
 }
