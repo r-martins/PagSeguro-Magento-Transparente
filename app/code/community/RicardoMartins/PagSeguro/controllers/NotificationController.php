@@ -1,4 +1,5 @@
 <?php
+
 class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controller_Front_Action
 {
     /**
@@ -7,10 +8,14 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
      */
     public function indexAction()
     {
-        /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
-        Mage::helper('ricardomartins_pagseguro')->writeLog('Recebido notificacao do pagseguro com os parametros:'. var_export($this->getRequest()->getParams(),true));
-        $model =  Mage::getModel('ricardomartins_pagseguro/abstract');
-        $response = $model->getNotificationStatus($this->getRequest()->getPost('notificationCode'));
-        $model->proccessNotificatonResult($response);
+        try {
+             /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
+            Mage::helper('ricardomartins_pagseguro')->writeLog('Recebido notificacao do pagseguro com os parametros:' . var_export($this->getRequest()->getParams(), true));
+            $model = Mage::getModel('ricardomartins_pagseguro/abstract');
+            $response = $model->getNotificationStatus($this->getRequest()->getPost('notificationCode'));
+            $model->proccessNotificatonResult($response);
+        } catch (Exception $exception) {
+            Mage::log($exception->getMessage(), null, 'pagseguroException.log', true);
+        }
     }
 }
