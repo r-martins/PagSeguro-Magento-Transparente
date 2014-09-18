@@ -21,7 +21,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             for($x=1, $y=0, $c=count($items); $x <= $c; $x++, $y++)
             {
                 $retorno['itemId'.$x] = $items[$y]->getId();
-                $retorno['itemDescription'.$x] = $this->normalizeChars(substr($items[$y]->getName(), 0, 100));
+                $retorno['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
                 $retorno['itemAmount'.$x] = number_format($items[$y]->getPrice(),2,'.','');
                 $retorno['itemQuantity'.$x] = $items[$y]->getQtyOrdered();
             }
@@ -47,7 +47,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         $retorno = array(
             'senderName'    =>  sprintf('%s %s',trim($order->getCustomerFirstname()), trim($order->getCustomerLastname())),
-            'senderEmail'   => $order->getCustomerEmail(),
+            'senderEmail'   => trim($order->getCustomerEmail()),
             'senderHash'    => $payment['additional_information']['sender_hash'],
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
@@ -140,12 +140,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
 
         $retorno = array(
-            $type.'AddressStreet'     => $this->normalizeChars($addressStreet),
-            $type.'AddressNumber'     => $addressNumber,
-            $type.'AddressComplement' => $this->normalizeChars($addressComplement),
-            $type.'AddressDistrict'   => $this->normalizeChars($addressDistrict),
+            $type.'AddressStreet'     => substr($addressStreet,0,80),
+            $type.'AddressNumber'     => substr($addressNumber,0,20),
+            $type.'AddressComplement' => substr($addressComplement,0,40),
+            $type.'AddressDistrict'   => substr($addressDistrict,0,60),
             $type.'AddressPostalCode' => $addressPostalCode,
-            $type.'AddressCity'       => $this->normalizeChars($addressCity),
+            $type.'AddressCity'       => substr($addressCity,0,60),
             $type.'AddressState'      => $addressState,
             $type.'AddressCountry'    => 'BRA',
          );

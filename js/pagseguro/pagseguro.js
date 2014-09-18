@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 0.2.1
+ * @version 0.2.2
  */
 document.observe("dom:loaded", function() {
     RMPagSeguro = function RMPagSeguro(){};
@@ -46,12 +46,16 @@ document.observe("dom:loaded", function() {
         var ccExpYr = $$('select[name="payment[ps_cc_exp_year]"]').first().value;
         var ccCvv = $$('input[name="payment[ps_cc_cid]"]').first().value;
         var ccTokenElm = $$('input[name="payment[credit_card_token]"]').first();
+        var brandName = '';
+        if(undefined != RMPagSeguro.brand){
+            brandName = RMPagSeguro.brand.name;
+        }
 
         if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
         {
             PagSeguroDirectPayment.createCardToken({
                 cardNumber: ccNum,
-                brand: RMPagSeguro.brand.name,
+                brand: brandName,
                 cvv: ccCvv,
                 expirationMonth: ccExpMo,
                 expirationYear: ccExpYr,

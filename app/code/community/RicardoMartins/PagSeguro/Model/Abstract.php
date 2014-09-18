@@ -173,9 +173,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     public function callApi($params, $payment)
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
+        $params = $this->_convertEnconding($params);
         $client = new Zend_Http_Client($helper->getWsUrl('transactions'));
         $client->setMethod(Zend_Http_Client::POST);
-        $client->setConfig(array('timeout'=>30));
+        $client->setConfig(array('timeout'=>45));
 
         $client->setParameterPost($params); //parametros enviados via POST
 
@@ -207,5 +208,20 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
 
         return $xml;
+    }
+
+    /**
+     * Converte os valores enviados à api para ISO-8859-1
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function _convertEnconding(array $params)
+    {
+        foreach($params as $k => $v)
+        {
+            $params[$k] = utf8_decode($v);
+        }
+        return $params;
     }
 }
