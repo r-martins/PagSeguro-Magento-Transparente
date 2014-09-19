@@ -818,7 +818,7 @@ small {
 nav {
   width: 230px;
   position: fixed;
-  top: 220px;
+  top: 191px;
   left: 50%;
   margin-left: -580px;
   text-align: right;
@@ -851,13 +851,10 @@ nav ul a:hover {
 }
 
 footer {
-  width: 180px;
-  position: fixed;
-  left: 50%;
-  margin-left: -530px;
-  bottom: 20px;
-  text-align: right;
-  line-height: 16px;
+    bottom: 20px;
+    line-height: 16px;
+    text-align: center;
+    width: 620px;
 }
 
 @media print, screen and (max-width: 1060px) {

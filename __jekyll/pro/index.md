@@ -41,6 +41,9 @@ Pode ser cancelado a qualquer momento diretamente no seu painel do PagSeguro na 
 O suporte para customização e resolução de conflitos podem ser solicitado junto às comunidades e foruns magento.
 A instalação profissional também pode ser contratada, com valor a combinar, visando resolver conflitos e afins.
 
+## Loja Demo
+Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.
+
 ## Contratar
 <table>
 <tr>

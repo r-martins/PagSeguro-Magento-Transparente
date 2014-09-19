@@ -19,6 +19,9 @@ title: PagSeguro Transparente para Magento - by Ricardo Martins
 * Não salva dados do cartão, apenas os 4 últimos digitos
 * Calcula parcelas de acordo com o cartão selecionado e regras configuradas no seu painel
 
+## Loja Demo
+Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.
+
 ## Doadores e Empresas Apoiadoras
 * Renato Aleksander
 
@@ -96,6 +99,14 @@ O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realiz
 {% include newsletter.html %}
 
 ## Autor / Suporte
+Antes de enviar um email, veja se sua dúvida já não foi respondida [aqui](faq).<br/>
 [Ricardo Martins](http://ricardomartins.net.br/)  (<suporte@pagsegurotransparente.zendesk.com>)
 
-obs: ferramenta de suporte em fase de testes
+
+
+<script type="text/javascript">
+$(document).ready(function(){
+$("nav ul").append("<li class='tag-faq'><a href='faq'>Perguntas Frequentes</a></li>");
+});
+</script>
+
