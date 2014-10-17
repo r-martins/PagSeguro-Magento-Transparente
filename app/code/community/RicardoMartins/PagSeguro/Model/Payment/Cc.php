@@ -14,6 +14,23 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     protected $_canUseForMultishipping = true;
     protected $_canSaveCc = false;
 
+    public function isAvailable($quote = null)
+    {
+        $is_available = parent::isAvailable ($quote);
+        if (empty($quote)){
+            return $is_available;
+        }
+
+        $current_group_id = $quote->getCustomerGroupId ();
+        $customer_groups = explode (',', $this->_getStoreConfig('customer_groups'));
+
+        if($is_available && in_array($current_group_id, $customer_groups)){
+            return true;
+        }
+
+        return false;
+    }
+
     public function assignData($data)
     {
         if(!($data instanceof Varien_Object)){
@@ -101,6 +118,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $payment->setAdditionalInformation($additional);
         }
         return $this;
+    }
+
+    public function _getStoreConfig ($field)
+    {
+        return Mage::getStoreConfig ("payment/pagseguro_cc/{$field}");
     }
 
 }
