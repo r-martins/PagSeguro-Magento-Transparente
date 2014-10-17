@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>1.0.12</version>
+            <version>1.0.13</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -64,6 +64,7 @@
                 <allowspecific>0</allowspecific>
                 <send_neworder_email>0</send_neworder_email>
                 <!--<specificcountry>BR</specificcountry>-->
+                <group_restriction>0</group_restriction>
             </pagseguro_cc>
             <pagseguro>
                 <customer_cpf_attribute>taxvat</customer_cpf_attribute>

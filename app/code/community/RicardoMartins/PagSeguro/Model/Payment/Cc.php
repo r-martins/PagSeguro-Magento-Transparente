@@ -20,6 +20,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         if (empty($quote)){
             return $is_available;
         }
+        if (Mage::getStoreConfigFlag("payment/pagseguro_cc/group_restriction")
+            == false) {
+            return true;
+        }
 
         $current_group_id = $quote->getCustomerGroupId ();
         $customer_groups = explode (',', $this->_getStoreConfig('customer_groups'));
@@ -120,9 +124,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         return $this;
     }
 
-    public function _getStoreConfig ($field)
+    public function _getStoreConfig($field)
     {
-        return Mage::getStoreConfig ("payment/pagseguro_cc/{$field}");
+        return Mage::getStoreConfig("payment/pagseguro_cc/{$field}");
     }
 
 }

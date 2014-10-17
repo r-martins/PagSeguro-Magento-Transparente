@@ -212,15 +212,6 @@
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[Data de nascimento do dono do cartão de crédito é obrigatório para o PagSeguro.]]></comment>
                         </owner_dob_attribute>
-                        <customer_groups>
-                            <label>Customer Groups</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <source_model>ricardomartins_pagseguro/system_config_source_customer_groups</source_model>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </customer_groups>
                         <sort_order translate="label">
                             <label>Sort Order</label>
                             <frontend_type>text</frontend_type>
@@ -230,6 +221,28 @@
                             <show_in_store>0</show_in_store>
                             <frontend_class>validate-number</frontend_class>
                         </sort_order>
+                        <group_restriction>
+                            <label>Habilitar restrição por grupos</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>50</sort_order>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </group_restriction>
+                        <customer_groups>
+                            <label>Grupos de Cliente</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>ricardomartins_pagseguro/system_config_source_customer_groups</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Grupos de clientes que podem usar este método.]]></comment>
+                            <depends>
+                                <group_restriction>1</group_restriction>
+                            </depends>
+                        </customer_groups>
                     </fields>
                 </pagseguro_cc>
             </groups>
