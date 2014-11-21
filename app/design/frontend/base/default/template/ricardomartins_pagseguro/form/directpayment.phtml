@@ -2,6 +2,8 @@
 $_helper = Mage::helper('ricardomartins_pagseguro');
 ?>
 <input type="hidden" name="payment[sender_hash]"/>
+<!-- Descomente a linha abaixo caso já não utilize o jQuery em sua loja -->
+<!-- <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script> -->
 <script type="text/javascript">
     //<![CDATA[
     PagSeguroDirectPayment.setSessionId('<?php echo $_helper->getSessionId();?>');
@@ -16,5 +18,14 @@ $_helper = Mage::helper('ricardomartins_pagseguro');
             RMPagSeguro.addCardFieldsObserver();
         }
     }, 4000);
+    
+    $j = jQuery.noConflict();
+    $j(document).ready(function(){
+        $j('.sp-methods input[type=radio]').change(function() {
+            if($j(this).attr('id') == 'p_method_pagseguro_cc' && (typeof PagSeguroDirectPayment != 'undefined' && PagSeguroDirectPayment.ready)){
+                RMPagSeguro.getInstallments();
+            }
+        });
+    });
     //]]>
 </script>
