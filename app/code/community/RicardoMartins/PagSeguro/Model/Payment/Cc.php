@@ -20,9 +20,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         if (empty($quote)){
             return $is_available;
         }
-        if (Mage::getStoreConfigFlag("payment/pagseguro_cc/group_restriction")
-            == false) {
-            return true;
+        if (Mage::getStoreConfigFlag("payment/pagseguro_cc/group_restriction") == false) {
+            return $is_available;
         }
 
         $current_group_id = $quote->getCustomerGroupId ();

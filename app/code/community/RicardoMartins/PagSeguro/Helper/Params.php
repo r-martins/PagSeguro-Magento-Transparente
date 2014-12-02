@@ -244,6 +244,11 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $digits = new Zend_Filter_Digits();
         $phone = $digits->filter($phone);
+        //se começar com zero, pula o primeiro digito
+        if(substr($phone,0,1) == '0')
+        {
+            $phone = substr($phone,1,strlen($phone));
+        }
         $original_phone = $phone;
 
         $phone = preg_replace('/^(\d{2})(\d{7,9})$/','$1-$2',$phone);
