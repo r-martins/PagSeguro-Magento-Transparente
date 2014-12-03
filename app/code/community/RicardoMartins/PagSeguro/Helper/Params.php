@@ -53,6 +53,10 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
         );
+        if(strlen($retorno['senderCPF']) > 11){
+            $retorno['senderCNPJ'] = $retorno['senderCPF'];
+            unset($retorno['senderCPF']);
+        }
 
         return $retorno;
     }

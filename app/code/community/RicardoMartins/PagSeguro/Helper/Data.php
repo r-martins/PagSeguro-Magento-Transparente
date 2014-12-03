@@ -146,4 +146,19 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $customer_cpf_attribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
         return empty($customer_cpf_attribute);
     }
+
+    public function __(){
+        $args = func_get_args();
+        $expr = new Mage_Core_Model_Translate_Expr(array_shift($args), $this->_getModuleName());
+        array_unshift($args, $expr);
+
+        $text = $args[0]->getText();
+        preg_match('/(.*)\:(.*)/',$text, $matches);
+        if($matches!==false && isset($matches[1])){
+            array_shift($matches);
+            $matches[0] .= ': %s';
+            $args = $matches;
+        }
+        return Mage::app()->getTranslator()->translate($args);
+    }
 }
