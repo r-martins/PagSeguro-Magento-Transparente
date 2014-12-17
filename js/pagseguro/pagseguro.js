@@ -4,6 +4,8 @@
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
  * @version 0.2.2
  */
+(function(){
+
 document.observe("dom:loaded", function() {
     RMPagSeguro = function RMPagSeguro(){};
     RMPagSeguro.updateSenderHash = function(){
@@ -159,5 +161,6 @@ document.observe("dom:loaded", function() {
             }
         });
     }
-
+    window.RMPagSeguro = RMPagSeguro;
 });
+}());
