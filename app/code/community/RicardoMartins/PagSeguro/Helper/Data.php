@@ -21,26 +21,33 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getSessionId()
     {
-        $client = new Zend_Http_Client($this->getWsUrl('sessions'));
-        $client->setMethod(Zend_Http_Client::POST);
-        $client->setParameterGet('email', $this->getMerchantEmail());
-        $client->setParameterGet('token', $this->getToken());
-        $client->setConfig(array('timeout'=>30));
-        try{
-            $response = $client->request();
-        }catch(Exception $e){
-            Mage::logException($e);
-            return false;
-        }
+        $params = array(
+            'token'=> urlencode($this->getToken()),
+            'email'=> urlencode($this->getMerchantEmail()),
+        );
 
-        $response = $client->getLastResponse()->getBody();
+        $fields_string = '';
+        foreach($params as $key=>$value) {
+            $fields_string .= $key.'='.$value.'&';
+        }
+        $fields_string = rtrim($fields_string, '&');
+        
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL, $this->getWsUrl('sessions'));
+        curl_setopt($ch,CURLOPT_POST, count($params));
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+        
+        $response = curl_exec($ch);
+        curl_close($ch);
 
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($response);
+        $xml = simplexml_load_string(trim($response));
         if(false === $xml){
-            $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados. Retorno pagseguro: ' . $response);
+            $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados. Retorno pagseguro: '. $response);
             return false;
         }
+        
         return (string)$xml->id;
     }
 

@@ -99,9 +99,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 'token'=>$helper->getToken(),
                 'email'=> $helper->getMerchantEmail(),
             ));
+
         $client->request();
-        $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $client->getLastResponse()->getBody()));
-        return simplexml_load_string($client->getLastResponse()->getBody());
+        $resposta = $client->getLastResponse()->getBody();
+        
+        $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $resposta));
+
+        return simplexml_load_string(trim($resposta));
     }
 
     /**
@@ -174,24 +178,27 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
         $params = $this->_convertEnconding($params);
-        $client = new Zend_Http_Client($helper->getWsUrl('transactions'));
-        $client->setMethod(Zend_Http_Client::POST);
-        $client->setConfig(array('timeout'=>45));
-
-        $client->setParameterPost($params); //parametros enviados via POST
-
+        $params_string = $this->_convertToCURLString($params);
+        
         $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params,true));
+        
+        $ch = curl_init();
+        curl_setopt($ch,CURLOPT_URL, $helper->getWsUrl('transactions'));
+        curl_setopt($ch,CURLOPT_POST, count($params));
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch,CURLOPT_POSTFIELDS, $params_string);
+        
         try{
-            $response = $client->request(); //faz o request
+            $response = curl_exec($ch);
+            curl_close($ch);
         }catch(Exception $e){
             Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
         }
 
-        $response = $client->getLastResponse()->getBody();
         $helper->writeLog('Retorno PagSeguro (/transactions): ' . var_export($response,true));
 
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($response);
+        $xml = simplexml_load_string(trim($response));
         if(false === $xml){
             switch($response){
                 case 'Unauthorized':
@@ -201,12 +208,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     $helper->writeLog('Acesso não autorizado à Api Pagseguro. Verifique se você tem permissão para usar este serviço. Retorno: ' . var_export($response,true));
                     break;
                 default:
-                    $helper->writeLog('Retorno inesperado do PagSeguro. Retorno: ' . var_export($response,true));
+                    $helper->writeLog('Retorno inesperado do PagSeguro. Retorno: ' . $response);
             }
             Mage::throwException('Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.');
         }
-
-
+        
         return $xml;
     }
 
@@ -223,5 +229,22 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $params[$k] = utf8_decode($v);
         }
         return $params;
+    }
+    
+    /**
+     * Converte para um única string os valores a serem enviados à api (já convertidos para ISO-8859-1)
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function _convertToCURLString(array $params)
+    {
+        $fields_string = '';
+        foreach($params as $k => $v)
+        {
+            $fields_string .= $k.'='.urlencode($v).'&';
+        }
+        
+        return rtrim($fields_string, '&');
     }
 }
