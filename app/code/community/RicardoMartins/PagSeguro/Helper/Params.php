@@ -38,8 +38,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     public function getSenderParams(Mage_Sales_Model_Order $order, $payment)
     {
         $digits = new Zend_Filter_Digits();
-
-        $cpf = $this->_getCustomerCpfValue($order->getCustomer(),$payment);
+        $cpf = $this->_getCustomerCpfValue($order,$payment);
 
         //telefone
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
@@ -71,7 +70,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $digits = new Zend_Filter_Digits();
 
-        $cpf = $this->_getCustomerCpfValue($order->getCustomer(),$payment);
+        $cpf = $this->_getCustomerCpfValue($order,$payment);
 
 
         //dados
@@ -336,12 +335,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
     /**
      * Retorna o CPF do cliente baseado na selecao realizada na configuração do modulo
-     * @param Mage_Customer_Model_Customer $customer
+     * @param Mage_Sales_Model_Order $order
      * @param Mage_Payment_Model_Method_Abstract $payment
      *
      * @return mixed
      */
-    private function _getCustomerCpfValue(Mage_Customer_Model_Customer $customer, $payment)
+    private function _getCustomerCpfValue(Mage_Sales_Model_Order $order, $payment)
     {
         $customer_cpf_attribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
 
@@ -351,8 +350,18 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 return $payment['additional_information'][$payment->getMethod().'_cpf'];
             }
         }
+        $entity = explode('|',$customer_cpf_attribute);
+        $cpf = '';
+        if(count($entity) == 1 || $entity[0] == 'customer'){
+            if(count($entity) == 2){
+                $customer_cpf_attribute = $entity[1];
+            }
+            $customer = $order->getCustomer();
 
-        $cpf = $customer->getResource()->getAttribute($customer_cpf_attribute)->getFrontend()->getValue($customer);
+            $cpf = $customer->getData($customer_cpf_attribute);
+        }else if(count($entity) == 2 && $entity[0] == 'billing' ){ //billing
+            $cpf = $order->getShippingAddress()->getData($entity[1]);
+        }
 
         return $cpf;
     }
