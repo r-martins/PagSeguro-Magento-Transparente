@@ -25,7 +25,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             'token'=> urlencode($this->getToken()),
             'email'=> urlencode($this->getMerchantEmail()),
         );
-        
+
+        $fields_string = '';
         foreach($params as $key=>$value) {
             $fields_string .= $key.'='.$value.'&';
         }

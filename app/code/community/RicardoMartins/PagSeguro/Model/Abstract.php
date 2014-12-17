@@ -239,6 +239,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      */
     protected function _convertToCURLString(array $params)
     {
+        $fields_string = '';
         foreach($params as $k => $v)
         {
             $fields_string .= $k.'='.urlencode($v).'&';
