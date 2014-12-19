@@ -22,6 +22,9 @@ title: PagSeguro Transparente para Magento - by Ricardo Martins
 ## Loja Demo
 Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.
 
+## Instalando com OneStepCheckout 6
+<iframe width="600" height="450" src="//www.youtube.com/embed/sPyTsXW7JbI?rel=0" frameborder="0" allowfullscreen></iframe>
+
 ## Doadores e Empresas Apoiadoras
 * Renato Aleksander
 
@@ -32,6 +35,7 @@ Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_bla
 ![Backend](http://r-martins.github.io/PagSeguro-Magento-Transparente/images/sshot-backend.png)
 
 ## Instalação
+
 
 ### Instalar com [modgit](https://github.com/jreinke/modgit)
     $ cd path/to/magento
