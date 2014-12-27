@@ -43,7 +43,7 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.
 
 ## Contratar
-<form action="http://ws.ricardomartine.net.br/pspro/v6/app/new" method="POST" target="_blank" id="formAppNew">
+<form action="http://ws.ricardomartins.net.br/pspro/v6/app/new" method="POST" target="_blank" id="formAppNew">
 <table>
 <tr>
 <td>
