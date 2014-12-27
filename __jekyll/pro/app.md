@@ -43,7 +43,7 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.
 
 ## Contratar
-<form action="http://ws.local.com.br/pspro/v6/app/new" method="POST" target="_blank">
+<form action="http://ws.ricardomartine.net.br/pspro/v6/app/new" method="POST" target="_blank" id="formAppNew">
 <table>
 <tr>
 <td>
@@ -73,3 +73,8 @@ URL da Loja:
 *Informar o URL da loja que conterá o Módulo PagSeguro PRÓ com / no final. As notificações de pagamento de
  boletos e TEF serão enviadas para este URL.
 </form>
+<script type="text/javascript">
+if(document.URL.search('0.0.0.0') > 0){
+ document.getElementById("formAppNew").action = "http://ws.local.com.br/pspro/v6/app/new";
+}
+</script>
