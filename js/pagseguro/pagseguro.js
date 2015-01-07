@@ -95,8 +95,8 @@ document.observe("dom:loaded", function() {
         var ccCvvElm = $$('input[name="payment[ps_cc_cid]"]').first();
 
         Element.observe(ccNumElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
-        Element.observe(ccExpMoElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
-        Element.observe(ccExpYrElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
+        Element.observe(ccExpMoElm,'change',function(e){RMPagSeguro.updateCreditCardToken();});
+        Element.observe(ccExpYrElm,'change',function(e){RMPagSeguro.updateCreditCardToken();});
         Element.observe(ccCvvElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
     }
 
