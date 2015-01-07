@@ -4,7 +4,6 @@ $_helper = Mage::helper('ricardomartins_pagseguro');
 <input type="hidden" name="payment[sender_hash]"/>
 <script type="text/javascript">
     //<![CDATA[
-    PagSeguroDirectPayment.setSessionId('<?php echo $_helper->getSessionId();?>');
     var iid = setInterval(function()
     {
         if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
