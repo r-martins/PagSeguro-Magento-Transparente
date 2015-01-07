@@ -159,5 +159,6 @@ document.observe("dom:loaded", function() {
             }
         });
     }
+    RMPagSeguro.updateSessionId();
 
 });
