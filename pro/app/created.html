@@ -48,6 +48,28 @@
 
 <p>Sua chave de acesso, o módulo PagSeguro PRO e instruções foram enviadas pra você para o e-mail informado no primeiro passo.</p>
 
+<p id="chave">
+</p>
+<p><input type="button" onclick="location.href='../../'" value="Voltar" /></p>
+
+<script type="text/javascript">
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+var chave = getParameterByName('publicKey');
+
+if(chave !== null)
+{
+	document.getElementById('chave').innerHTML = 'Se você já tem o módulo PRO instalado, configure a chave a seguir em Formas de Pagamento -> PagSeguro PRO - Licença. <br/><strong>Sua chave: '+ chave + '</strong>';
+}
+
+</script>
+
+
       </section>
       <footer>
 		  <p><a href="http://www.magentocommerce.com/certification/directory/dev/314967/" target="_blank"><img src="/PagSeguro-Magento-Transparente/images/middle_developer_logo.png" alt="Módulo desenvolvido por profissional certificado Magento" title="Módulo desenvolvido por profissional certificado Magento" border="0"/></a></p>

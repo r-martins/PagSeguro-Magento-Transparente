@@ -32,7 +32,7 @@ Não há como realizar estornos das transações e taxas de intermediação. Mas
 da aplicação à sua loja a qualquer momento no painel do PagSeguro.
 
 ## Cancelamento
-Pode ser cancelado a qualquer momento diretamente no seu painel do PagSeguro, removendo o acesso à aplicação. Você
+Pode ser cancelado a qualquer momento diretamente no seu painel do PagSeguro (ou <a href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml" target="_blank">neste link</a>), removendo o acesso à aplicação. Você
 deve remover o módulo da sua loja após tal ação, pois o mesmo não funcionará se não possuir as permissões adequadas.
 
 ## Suporte e customizações
@@ -47,10 +47,10 @@ Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_bla
 <table>
 <tr>
 <td>
-E-mail do Pagseguro:
+E-mail da conta Pagseguro:
 </td>
 <td>
-<input type="email" name="email" id="email"/>
+<input type="email" name="email" id="email"/> *
 </tr>
 
 <tr>
@@ -65,16 +65,36 @@ URL da Loja:
 
 <tr>
 <td colspan="2">
-<input type="submit" value="Prosseguir"/>
+<input type="button" value="Prosseguir" onclick="validateAndSubmit();"/>
 </td>
 </tr>
 
+<tr>
+ <td colspan="2">
+ Para revogar um acesso existente acesse <a href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml" target="_blank">este link</a>.
+ </td>
+</tr>
+
 </table>
-*Informar o URL da loja que conterá o Módulo PagSeguro PRÓ com / no final. As notificações de pagamento de
- boletos e TEF serão enviadas para este URL.
 </form>
 <script type="text/javascript">
 if(document.URL.search('0.0.0.0') > 0){
  document.getElementById("formAppNew").action = "http://ws.local.com.br/pspro/v6/app/new";
+}
+var validateAndSubmit = function(){
+ var email = document.getElementById("email").value;
+ var url = document.getElementById("url").value;
+ if(!validateEmail(email)){alert('Email inválido.'); return false;}
+ if(!validateUrl(url)){alert('URL inválido.'); return false;}
+ document.getElementById("formAppNew").submit();
+}
+var validateEmail = function(email) { 
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+} 
+
+var validateUrl = function(url) {
+ var re = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+ return re.test(url);
 }
 </script>

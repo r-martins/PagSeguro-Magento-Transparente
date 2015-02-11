@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PagSeguro Transparente para Magento PRÓ - com TEF e Boleto - by Ricardo Martins</title>
+    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/stylesheets/styles.css">
+    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="/PagSeguro-Magento-Transparente/javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1 onclick="location.href='/PagSeguro-Magento-Transparente/';" style="cursor:pointer">Pagseguro-magento-transparente</h1>
+        <p>Módulo de checkout transparente para Pagseguro - com api v. 2.0</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente" class="button fork"><strong>Ver no GitHub</strong></a>
+        <div class="downloads">
+          <span>PagSeguro Transparente (versão gratuita):</span>
+          <ul>
+            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>        
+        <h1 id="pagseguro-transparente-pr-app">PagSeguro Transparente PRÓ <em>APP</em></h1>
+<hr />
+
+<h2 id="modelo-de-aplicao-pagseguro">Modelo de aplicação PagSeguro</h2>
+
+<h3 id="definio">Definição</h3>
+<p>Com essa modalidade você não precisa pedir liberação de uso da API transparente para usar o módulo para Magento PRÓ.
+Também é indicado para logistas que não possuem cartão de crédito para realizar a assinatura da versão PRÓ normal.</p>
+
+<p>Na modalidade APP, o Módulo PRÓ para Magento (que suporta Boleto e TEF) é integrado à conta da sua loja utilizando o
+modelo de aplicações do PagSeguro UOL. Diferente do modelo de assinatura, você terá que autorizar a aplicação a
+acessar informações de sua conta no PagSeguro.</p>
+
+<p>A forma de cobrança também muda, passando a ser cobrado uma pequena taxa de intemediação (ver abaixo).</p>
+
+<h2 id="valor">Valor</h2>
+<ul>
+  <li>0,5% de taxa de intermediação sendo repassado pelo PagSeguro automaticamente.</li>
+  <li>Veja detalhes das condições na tela de autorização (após o preenchimento do formulário)</li>
+  <li><a href="#contratar">Contrate já</a></li>
+</ul>
+
+<h2 id="garantia">Garantia</h2>
+<p>As mesmas da versão PRÓ.</p>
+
+<h3 id="poltica-de-devoluo">Política de Devolução</h3>
+<p>Não há como realizar estornos das transações e taxas de intermediação. Mas você pode desinstalar ou remover o acesso
+da aplicação à sua loja a qualquer momento no painel do PagSeguro.</p>
+
+<h2 id="cancelamento">Cancelamento</h2>
+<p>Pode ser cancelado a qualquer momento diretamente no seu painel do PagSeguro (ou <a href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml" target="_blank">neste link</a>), removendo o acesso à aplicação. Você
+deve remover o módulo da sua loja após tal ação, pois o mesmo não funcionará se não possuir as permissões adequadas.</p>
+
+<h2 id="suporte-e-customizaes">Suporte e customizações</h2>
+<p>O suporte para customização e resolução de conflitos podem ser solicitado junto às comunidades e foruns magento.
+A instalação profissional também pode ser contratada, com valor a combinar, visando resolver conflitos e afins.</p>
+
+<h2 id="loja-demo">Loja Demo</h2>
+<p>Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.</p>
+
+<h2 id="contratar">Contratar</h2>
+<form action="http://ws.ricardomartins.net.br/pspro/v6/app/new" method="POST" target="_blank" id="formAppNew">
+<table>
+<tr>
+<td>
+E-mail da conta Pagseguro:
+</td>
+<td>
+<input type="email" name="email" id="email" /> *
+
+
+<tr>
+<td>
+URL da Loja:
+</td>
+<td>
+<input type="url" name="url" id="url" /> *
+<br />
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
+<input type="button" value="Prosseguir" onclick="validateAndSubmit();" />
+</td>
+</tr>
+
+<tr>
+ <td colspan="2">
+ Para revogar o acesso acesse <a href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml" target="_blank">este link</a>.
+ </td>
+</tr>
+
+
+
+<script type="text/javascript">
+if(document.URL.search('0.0.0.0') > 0){
+ document.getElementById("formAppNew").action = "http://ws.local.com.br/pspro/v6/app/new";
+}
+var validateAndSubmit = function(){
+ var email = document.getElementById("email").value;
+ var url = document.getElementById("url").value;
+ if(!validateEmail(email)){alert('Email inválido.'); return false;}
+ if(!validateUrl(url)){alert('URL inválido.'); return false;}
+ document.getElementById("formAppNew").submit();
+}
+var validateEmail = function(email) { 
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+} 
+
+var validateUrl = function(url) {
+ var re = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+ return re.test(url);
+}
+</script>
+</td></tr></table></form>
+
+      </section>
+      <footer>
+		  <p><a href="http://www.magentocommerce.com/certification/directory/dev/314967/" target="_blank"><img src="/PagSeguro-Magento-Transparente/images/middle_developer_logo.png" alt="Módulo desenvolvido por profissional certificado Magento" title="Módulo desenvolvido por profissional certificado Magento" border="0"/></a></p>
+		  <p>Projeto mantido por <a href="https://github.com/r-martins">r-martins</a></p>
+		  <p><small>Hospedado no GitHub Pages &mdash; Tema: <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-3314217-5");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
