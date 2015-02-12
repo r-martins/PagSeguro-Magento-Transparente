@@ -9,9 +9,13 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL  = 'payment/pagseguro/sandbox_merchant_email';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN  = 'payment/pagseguro/sandbox_token';
     const XML_PATH_PAYMENT_PAGSEGURO_WS_URL         = 'payment/pagseguro/ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP     = 'payment/pagseguro/ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_JS_URL         = 'payment/pagseguro/js_url';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL = 'payment/pagseguro/sandbox_ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/pagseguro/sandbox_ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL = 'payment/pagseguro/sandbox_js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_KEY_TYPE       = 'payment/pagseguropro/key_type';
+    const XML_PATH_PAYMENT_PAGSEGURO_KEY       = 'payment/pagseguropro/key';
 
 
     /**
@@ -21,33 +25,30 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getSessionId()
     {
-        $params = array(
-            'token'=> urlencode($this->getToken()),
-            'email'=> urlencode($this->getMerchantEmail()),
-        );
-
-        $fields_string = '';
-        foreach($params as $key=>$value) {
-            $fields_string .= $key.'='.$value.'&';
+        $useapp = $this->getLicenseType() == 'app';
+        $client = new Zend_Http_Client($this->getWsUrl('sessions',$useapp));
+        $client->setMethod(Zend_Http_Client::POST);
+        $client->setParameterPost('email', $this->getMerchantEmail());
+        $client->setParameterPost('token', $this->getToken());
+        if($useapp){
+            $client->setParameterPost('public_key',$this->getPagSeguroProKey());
         }
-        $fields_string = rtrim($fields_string, '&');
-        
-        $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL, $this->getWsUrl('sessions'));
-        curl_setopt($ch,CURLOPT_POST, count($params));
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
-        
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(trim($response));
-        if(false === $xml){
-            $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados. Retorno pagseguro: '. $response);
+        $client->setConfig(array('timeout'=>30));
+        try{
+            $response = $client->request();
+        }catch(Exception $e){
+            Mage::logException($e);
             return false;
         }
-        
+
+        $response = $client->getLastResponse()->getBody();
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($response);
+        if(false === $xml){
+            $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados. Retorno pagseguro: ' . $response);
+            return false;
+        }
         return (string)$xml->id;
     }
 
@@ -67,15 +68,25 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Retorna URL do Webservice do Pagseguro de acordo com o ambiente selecionado
      * @param string $amend acrescenta algo no final
+     * @param bool $useapp usa modelo de aplicacao
      *
      * @return string
      */
-    public function getWsUrl($amend='')
+    public function getWsUrl($amend='', $useapp = false)
     {
         if($this->isSandbox())
         {
-            return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL) . $amend;
+            if($this->getLicenseType()=='app' && $useapp){
+                return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP) . $amend;;
+            }else{
+                return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL) . $amend;
+            }
         }
+
+        if($this->getLicenseType()=='app' && $useapp){
+            return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP) . $amend;
+        }
+
         return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL) . $amend;
     }
 
@@ -154,6 +165,29 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         return empty($customer_cpf_attribute);
     }
 
+    /**
+     * Retorna o tipo de licença (se houver)
+     * @return string
+     */
+    public function getLicenseType()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_KEY_TYPE);
+    }
+
+    /**
+     * Retorna chave do PagSeguro PRO (se houver)
+     * @return string
+     */
+    public function getPagSeguroProKey()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_KEY);
+    }
+
+    /**
+     * Faz a tradução dos termos dinamicos do PagSeguro
+     * @author Ricardo Martins
+     * @return string
+     */
     public function __(){
         $args = func_get_args();
         $expr = new Mage_Core_Model_Translate_Expr(array_shift($args), $this->_getModuleName());

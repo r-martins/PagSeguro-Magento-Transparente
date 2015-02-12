@@ -177,6 +177,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     public function callApi($params, $payment)
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
+        $useapp = $helper->getLicenseType() == 'app';
+        if($useapp){
+            $params['public_key'] = Mage::getStoreConfig('payment/pagseguropro/key');
+        }
         $params = $this->_convertEnconding($params);
         $params_string = $this->_convertToCURLString($params);
         

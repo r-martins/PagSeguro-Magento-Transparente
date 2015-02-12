@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>1.0.17</version>
+            <version>2.0.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -72,8 +72,12 @@
                 <address_number_attribute>street_2</address_number_attribute>
                 <address_neighborhood_attribute>street_2</address_neighborhood_attribute>
                 <ws_url>https://ws.pagseguro.uol.com.br/v2/</ws_url>
+                <ws_url_app>https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/v2/</ws_url_app>
+                <!--<ws_url_app>http://ws.local.com.br/pspro/v6/wspagseguro/v2/</ws_url_app>-->
                 <js_url>https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</js_url>
                 <sandbox_ws_url>https://ws.sandbox.pagseguro.uol.com.br/v2/</sandbox_ws_url>
+                <sandbox_ws_url_app>https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>
+                <!--<sandbox_ws_url_app>http://ws.local.com.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>-->
                 <sandbox_js_url>https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</sandbox_js_url>
             </pagseguro>
         </payment>

@@ -2,8 +2,9 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 0.2.2
+ * @version 2.0.0
  */
+(function() {
 document.observe("dom:loaded", function() {
     RMPagSeguro = function RMPagSeguro(){};
     RMPagSeguro.updateSenderHash = function(){
@@ -95,8 +96,8 @@ document.observe("dom:loaded", function() {
         var ccCvvElm = $$('input[name="payment[ps_cc_cid]"]').first();
 
         Element.observe(ccNumElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
-        Element.observe(ccExpMoElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
-        Element.observe(ccExpYrElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
+        Element.observe(ccExpMoElm,'change',function(e){RMPagSeguro.updateCreditCardToken();});
+        Element.observe(ccExpYrElm,'change',function(e){RMPagSeguro.updateCreditCardToken();});
         Element.observe(ccCvvElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
     }
 
@@ -117,7 +118,7 @@ document.observe("dom:loaded", function() {
                        parcelsDrop.length = 0;
                        for(var x=0; x < b.length; x++){
                            var option = document.createElement('option');
-                           option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toString().replace('.',',');
+                           option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
                            option.text += (b[x].interestFree)?" sem juros":" com juros";
                            option.value = b[x].quantity + "|" + b[x].installmentAmount;
                            parcelsDrop.add(option);
@@ -159,5 +160,7 @@ document.observe("dom:loaded", function() {
             }
         });
     }
-
+    window.RMPagSeguro = RMPagSeguro;
+    RMPagSeguro.updateSessionId();
 });
+}());
