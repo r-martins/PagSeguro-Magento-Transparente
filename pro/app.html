@@ -39,26 +39,33 @@
         <ul></ul>
       </nav>
       <section>        
-        <h1 id="pagseguro-transparente-pr-app">PagSeguro Transparente PRÓ <em>APP</em></h1>
+        <h1 id="pagseguro-transparente-pr-app">PagSeguro Transparente PRÓ APP</h1>
 <hr />
+
+<ul>
+  <li>Sem necessidade de cartão de crédito</li>
+  <li>Mesmos recursos da Versão PRO (suporte boleto e TEF/Débito)</li>
+</ul>
 
 <h2 id="modelo-de-aplicao-pagseguro">Modelo de aplicação PagSeguro</h2>
 
 <h3 id="definio">Definição</h3>
 <p>Com essa modalidade você não precisa pedir liberação de uso da API transparente para usar o módulo para Magento PRÓ.
-Também é indicado para logistas que não possuem cartão de crédito para realizar a assinatura da versão PRÓ normal.</p>
+Também é indicado para lojistas que não possuem cartão de crédito para realizar a assinatura da versão PRÓ normal.</p>
 
 <p>Na modalidade APP, o Módulo PRÓ para Magento (que suporta Boleto e TEF) é integrado à conta da sua loja utilizando o
 modelo de aplicações do PagSeguro UOL. Diferente do modelo de assinatura, você terá que autorizar a aplicação a
 acessar informações de sua conta no PagSeguro.</p>
 
-<p>A forma de cobrança também muda, passando a ser cobrado uma pequena taxa de intemediação (ver abaixo).</p>
+<p>A forma de cobrança também muda, passando a ser cobrado uma pequena taxa de intemediação junto com a taxa do PagSeguro.</p>
+
+<p><img src="/PagSeguro-Magento-Transparente/images/sshot-app.png" alt="Licença Aplicação" /></p>
 
 <h2 id="valor">Valor</h2>
 <ul>
-  <li>0,5% de taxa de intermediação sendo repassado pelo PagSeguro automaticamente.</li>
-  <li>Veja detalhes das condições na tela de autorização (após o preenchimento do formulário)</li>
-  <li><a href="#contratar">Contrate já</a></li>
+  <li>0,5% de taxa de intermediação sendo repassado pelo PagSeguro automaticamente para vendas aprovadas.</li>
+  <li>Veja detalhes das condições na tela de autorização (após o preenchimento do formulário de contratação)</li>
+  <li><a href="#contratar">Vamos lá!</a></li>
 </ul>
 
 <h2 id="garantia">Garantia</h2>
@@ -80,6 +87,14 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 <p>Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.</p>
 
 <h2 id="contratar">Contratar</h2>
+
+<ul>
+  <li>Preencha o formulário abaixo para ser redirecionado ao PagSeguro</li>
+  <li>Revise as condições de taxas aplicadas à sua conta e autorize a aplicação</li>
+  <li>Você receberá o módulo do PagSeguro PRO por e-mail neste momento.</li>
+  <li>Instale, e configure o módulo com a chave fornecida, no modelo de aplicação como mostrado na primeira imagem desta página.</li>
+</ul>
+
 <form action="http://ws.ricardomartins.net.br/pspro/v6/app/new" method="POST" target="_blank" id="formAppNew">
 <table>
 <tr>
@@ -102,13 +117,13 @@ URL da Loja:
 
 <tr>
 <td colspan="2">
-<input type="button" value="Prosseguir" onclick="validateAndSubmit();" />
+<input type="button" value="Avançar" onclick="validateAndSubmit();" />
 </td>
 </tr>
 
 <tr>
  <td colspan="2">
- Para revogar o acesso acesse <a href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml" target="_blank">este link</a>.
+ Para revogar um acesso existente acesse <a href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml" target="_blank">este link</a>.
  </td>
 </tr>
 

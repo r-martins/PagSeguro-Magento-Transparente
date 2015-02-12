@@ -3,26 +3,30 @@ layout: default
 title: PagSeguro Transparente para Magento PRÓ - com TEF e Boleto - by Ricardo Martins
 ---
 
-# PagSeguro Transparente PRÓ *APP*
+# PagSeguro Transparente PRÓ APP
 ***
+
+* Sem necessidade de cartão de crédito
+* Mesmos recursos da Versão PRO (suporte boleto e TEF/Débito)
 
 ## Modelo de aplicação PagSeguro
 
 ### Definição
 Com essa modalidade você não precisa pedir liberação de uso da API transparente para usar o módulo para Magento PRÓ.
-Também é indicado para logistas que não possuem cartão de crédito para realizar a assinatura da versão PRÓ normal.
+Também é indicado para lojistas que não possuem cartão de crédito para realizar a assinatura da versão PRÓ normal.
 
 Na modalidade APP, o Módulo PRÓ para Magento (que suporta Boleto e TEF) é integrado à conta da sua loja utilizando o
 modelo de aplicações do PagSeguro UOL. Diferente do modelo de assinatura, você terá que autorizar a aplicação a
 acessar informações de sua conta no PagSeguro.
 
-A forma de cobrança também muda, passando a ser cobrado uma pequena taxa de intemediação (ver abaixo).
+A forma de cobrança também muda, passando a ser cobrado uma pequena taxa de intemediação junto com a taxa do PagSeguro.
 
+![Licença Aplicação]({{ site.baseurl }}/images/sshot-app.png)
 
 ## Valor
-* 0,5% de taxa de intermediação sendo repassado pelo PagSeguro automaticamente.
-* Veja detalhes das condições na tela de autorização (após o preenchimento do formulário)
-* [Contrate já](#contratar)
+* 0,5% de taxa de intermediação sendo repassado pelo PagSeguro automaticamente para vendas aprovadas.
+* Veja detalhes das condições na tela de autorização (após o preenchimento do formulário de contratação)
+* [Vamos lá!](#contratar)
 
 ## Garantia
 As mesmas da versão PRÓ.
@@ -43,6 +47,12 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_blank">loja de demonstração</a> com Magento 1.9.0.1 e IWD Checkout.
 
 ## Contratar
+
+* Preencha o formulário abaixo para ser redirecionado ao PagSeguro
+* Revise as condições de taxas aplicadas à sua conta e autorize a aplicação
+* Você receberá o módulo do PagSeguro PRO por e-mail neste momento.
+* Instale, e configure o módulo com a chave fornecida, no modelo de aplicação como mostrado na primeira imagem desta página.
+
 <form action="http://ws.ricardomartins.net.br/pspro/v6/app/new" method="POST" target="_blank" id="formAppNew">
 <table>
 <tr>
@@ -65,7 +75,7 @@ URL da Loja:
 
 <tr>
 <td colspan="2">
-<input type="button" value="Prosseguir" onclick="validateAndSubmit();"/>
+<input type="button" value="Avançar" onclick="validateAndSubmit();"/>
 </td>
 </tr>
 

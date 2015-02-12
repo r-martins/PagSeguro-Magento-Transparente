@@ -71,15 +71,20 @@
 <p><a href="https://pagseguro.uol.com.br/checkout/v2/donation.html?currency=BRL&amp;receiverEmail=ricardo@ricardomartins.info">Contribua</a> você também e tenha seu nome ou marca exibidos aqui.</p>
 
 <h2 id="telas">Telas</h2>
-<p><img src="http://r-martins.github.io/PagSeguro-Magento-Transparente/images/sshot-frontend.png" alt="Frontend" />
-<img src="http://r-martins.github.io/PagSeguro-Magento-Transparente/images/sshot-backend.png" alt="Backend" /></p>
+<p>Frontend</p>
+
+<p><img src="/PagSeguro-Magento-Transparente/images/sshot-frontend.png" alt="Frontend" /></p>
+
+<p>Backend</p>
+
+<p><img src="/PagSeguro-Magento-Transparente/images/sshot-backend.png" alt="Backend" /></p>
 
 <h2 id="instalao">Instalação</h2>
 
 <h3 id="instalar-com-modgithttpsgithubcomjreinkemodgit">Instalar com <a href="https://github.com/jreinke/modgit">modgit</a></h3>
 <pre><code>$ cd path/to/magento
 $ modgit init
-$ modgit add pagseguro git@github.com:r-martins/PagSeguro-Magento-Transparente.git
+$ modgit clone pagseguro git@github.com:r-martins/PagSeguro-Magento-Transparente.git
 </code></pre>
 
 <h3 id="ou-faa-manualmente">Ou faça manualmente:</h3>
@@ -88,7 +93,7 @@ $ modgit add pagseguro git@github.com:r-martins/PagSeguro-Magento-Transparente.g
   <li>Faça download da última versão <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/downloads">aqui</a></li>
   <li>Descompacte na raíz da instalação da loja <em>mesclando com as pastas existentes</em></li>
   <li>Limpe o cache</li>
-  <li>Solicite autorização para uso da API transparente <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent">aqui</a></li>
+  <li>Se <strong>não</strong> for utilizar o <a href="/PagSeguro-Magento-Transparente/pro/app.html">modelo de aplicação</a>, é necessário solicitar a autorização para uso da API transparente <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent">neste link</a>.</li>
 </ul>
 
 <p>Feito isso, configure seus dados no painel do magento em Sistema-&gt;Configuracao-&gt;Formas de Pagamento. Lembre-se de mapear os atributos de acordo com o que você utiliza na sua loja.</p>
@@ -97,7 +102,7 @@ $ modgit add pagseguro git@github.com:r-martins/PagSeguro-Magento-Transparente.g
 <ul>
   <li>Integrações-&gt;Pagamentos pela API: desativado</li>
   <li>Integrações-&gt;Notificação de Transações: Ativado. Coloque o url http://www.SUALOJA.com.br/pseguro/notification</li>
-  <li>Lembre-se de <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent">autorizar sua loja</a> a usar a api transparente. Em caso de demora ou dúvidas sobre a liberação ligue na Central de Atendimento do PagSeguro: (11)5627-3440 (Segunda a sábado das 8h às 20h30, exceto feriados). </li>
+  <li><strong>Se você não for utilizar o <a href="/PagSeguro-Magento-Transparente/pro/app.html">modelo de aplicação</a></strong>, lembre-se de <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent">autorizar sua loja</a> a usar a api transparente. Em caso de demora ou dúvidas sobre a liberação ligue na Central de Atendimento do PagSeguro: (11)5627-3440 (Segunda a sábado das 8h às 20h30, exceto feriados). </li>
   <li>Nota: muitas pessoas tem reclamado da demora na aprovação da conta para uso do checkout transparente, e do desconhecimento de membros da equipe do Pagseguro sobre tal API. Sugiro nesses casos, que reforcem seus pedidos através do <a href="https://www.facebook.com/pagseguro">Facebook do PagSeguro</a> via msg privada.</li>
 </ul>
 
@@ -125,27 +130,19 @@ Ou consulte as <a href="/PagSeguro-Magento-Transparente/faq"><em>PERGUNTAS FREQU
 <p>Apesar de ser open source e gratuito, o módulo não nasceu sozinho ou com suporte de nenhuma empresa e não tem vínculo com o PagSeguro (maior beneficiado). Considere <a href="https://pagseguro.uol.com.br/checkout/v2/donation.html?currency=BRL&amp;receiverEmail=ricardo@ricardomartins.info"><strong>fazer uma doação</strong></a> ou contribuir com melhorias realizando um pull request.</p>
 
 <h3 id="termos-de-uso">Termos de uso</h3>
-<p>O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realizada seja publicadas com forks e pull requests. (MIT)</p>
+<p>O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realizada seja publicada com fork e/ou pull request. (MIT)</p>
 
-<p>** Não possuí vínculo com PagSeguro UOL. **</p>
+<p>** Este módulo é uma produção independente, sem vínculo contratual oficial com PagSeguro UOL. **</p>
 
-<h2 id="pagseguro-pro-novidade">PagSeguro PRO (<em>Novidade</em>)</h2>
+<h2 id="pagseguro-proapp">PagSeguro PRO/APP</h2>
 <ul>
-  <li>Suporte a Boleto e TEF transparentes</li>
-  <li>Preço promocional de lançamento R$9,90/mês (por tempo limitado)</li>
+  <li>Suporta pagamentos com Boleto e TEF(Débito) transparentes.</li>
+  <li>Valor R$9,90/mês  <em>ou sem mensalidade no <a href="/PagSeguro-Magento-Transparente/pro/app.html">modelo de aplicação</a> (novidade)</em></li>
   <li>Instalação não incluído.</li>
   <li>Atualizações de correções enviadas por e-mail.</li>
 </ul>
 
 <h3 id="saiba-mais-gtpagseguro-magento-transparentepro"><a href="/PagSeguro-Magento-Transparente/pro">Saiba mais &gt;</a></h3>
-
-<h2 id="instalao-profissional">Instalação Profissional</h2>
-<ul>
-  <li>Instalação em lojas com acesso apenas FTP: R$399,00</li>
-  <li>Instalação em lojas com acesso SSH e FTP: R$349,00</li>
-  <li>Não contempla atualização para novas versões nem garantia de ausência de bugs futuros. A última versão do módulo será instalada, e configurada.</li>
-  <li>Entre em contato para maiores detalhes.</li>
-</ul>
 
 <h2 id="updates">Updates</h2>
 <!-- Begin MailChimp Signup Form -->

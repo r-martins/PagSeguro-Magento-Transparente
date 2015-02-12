@@ -31,8 +31,13 @@ Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_bla
 [Contribua](https://pagseguro.uol.com.br/checkout/v2/donation.html?currency=BRL&receiverEmail=ricardo@ricardomartins.info) você também e tenha seu nome ou marca exibidos aqui.
 
 ##Telas
-![Frontend](http://r-martins.github.io/PagSeguro-Magento-Transparente/images/sshot-frontend.png)
-![Backend](http://r-martins.github.io/PagSeguro-Magento-Transparente/images/sshot-backend.png)
+Frontend
+
+![Frontend]({{ site.baseurl }}/images/sshot-frontend.png)
+
+Backend
+
+![Backend]({{ site.baseurl }}/images/sshot-backend.png)
 
 ## Instalação
 
@@ -47,14 +52,14 @@ Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_bla
 * Faça download da última versão [aqui](https://github.com/r-martins/PagSeguro-Magento-Transparente/downloads)
 * Descompacte na raíz da instalação da loja *mesclando com as pastas existentes*
 * Limpe o cache
-* Solicite autorização para uso da API transparente [aqui](https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent)
+* Se **não** for utilizar o [modelo de aplicação]({{ site.baseurl }}/pro/app.html), é necessário solicitar a autorização para uso da API transparente [neste link](https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent).
 
 Feito isso, configure seus dados no painel do magento em Sistema->Configuracao->Formas de Pagamento. Lembre-se de mapear os atributos de acordo com o que você utiliza na sua loja.
 
 ### Configurações no Painel do PagSeguro
 * Integrações->Pagamentos pela API: desativado
 * Integrações->Notificação de Transações: Ativado. Coloque o url http://www.SUALOJA.com.br/pseguro/notification
-* Lembre-se de [autorizar sua loja](https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent) a usar a api transparente. Em caso de demora ou dúvidas sobre a liberação ligue na Central de Atendimento do PagSeguro: (11)5627-3440 (Segunda a sábado das 8h às 20h30, exceto feriados). 
+* **Se você não for utilizar o [modelo de aplicação]({{ site.baseurl }}/pro/app.html)**, lembre-se de [autorizar sua loja](https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent) a usar a api transparente. Em caso de demora ou dúvidas sobre a liberação ligue na Central de Atendimento do PagSeguro: (11)5627-3440 (Segunda a sábado das 8h às 20h30, exceto feriados). 
 * Nota: muitas pessoas tem reclamado da demora na aprovação da conta para uso do checkout transparente, e do desconhecimento de membros da equipe do Pagseguro sobre tal API. Sugiro nesses casos, que reforcem seus pedidos através do [Facebook do PagSeguro](https://www.facebook.com/pagseguro) via msg privada.
 
 ### Compatibilidade com módulo do Bruno Assarisse
@@ -79,24 +84,17 @@ Ou consulte as [*PERGUNTAS FREQUENTES*]({{ site.baseurl }}/faq).
 Apesar de ser open source e gratuito, o módulo não nasceu sozinho ou com suporte de nenhuma empresa e não tem vínculo com o PagSeguro (maior beneficiado). Considere [**fazer uma doação**](https://pagseguro.uol.com.br/checkout/v2/donation.html?currency=BRL&receiverEmail=ricardo@ricardomartins.info) ou contribuir com melhorias realizando um pull request.
 
 ### Termos de uso
-O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realizada seja publicadas com forks e pull requests. (MIT)
+O módulo pode ser usado com fins comerciais, desde que qualquer melhoria realizada seja publicada com fork e/ou pull request. (MIT)
 
-** Não possuí vínculo com PagSeguro UOL. **
+** Este módulo é uma produção independente, sem vínculo contratual oficial com PagSeguro UOL. **
 
-## PagSeguro PRO (_Novidade_)
-* Suporte a Boleto e TEF transparentes
-* Preço promocional de lançamento R$9,90/mês (por tempo limitado)
+## PagSeguro PRO/APP
+* Suporta pagamentos com Boleto e TEF(Débito) transparentes.
+* Valor R$9,90/mês  *ou sem mensalidade no [modelo de aplicação]({{site.baseurl}}/pro/app.html) (novidade)*
 * Instalação não incluído.
 * Atualizações de correções enviadas por e-mail.
 
 ### [Saiba mais &gt;]({{ site.baseurl }}/pro)
-
-
-## Instalação Profissional
-* Instalação em lojas com acesso apenas FTP: R$399,00
-* Instalação em lojas com acesso SSH e FTP: R$349,00
-* Não contempla atualização para novas versões nem garantia de ausência de bugs futuros. A última versão do módulo será instalada, e configurada.
-* Entre em contato para maiores detalhes.
 
 
 ## Updates
