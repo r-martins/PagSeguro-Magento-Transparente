@@ -60,9 +60,8 @@ Mensal - R$9,90/mês
 <tr>
 <td>
 <!-- INICIO FORMULARIO BOTAO PAGSEGURO -->
-<form action="https://pagseguro.uol.com.br/v2/pre-approvals/request.html" method="post" target="_blank">
+<form action="https://ws.ricardomartins.net.br/pspro/v6/new" method="get" target="_blank">
 <!-- NÃO EDITE OS COMANDOS DAS LINHAS ABAIXO -->
-<input type="hidden" name="code" value="566897A711119897742A0FBBCDDDEA26" />
 <input type="image" src="https://p.simg.uol.com.br/out/pagseguro/i/botoes/assinaturas/120x53-contratar-azul.gif" name="submit" alt="Pague com PagSeguro - é rápido, grátis e seguro!" />
 </form>
 <!-- FINAL FORMULARIO BOTAO PAGSEGURO -->
