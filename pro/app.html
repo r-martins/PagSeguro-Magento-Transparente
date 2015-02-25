@@ -44,8 +44,11 @@
 <hr />
 
 <ul>
+  <li>Desconto de 0,1% na taxa do PagSeguro (<a href="#desconto-na-taxa-do-pagseguro">saiba mais</a>)</li>
   <li>Sem necessidade de cartão de crédito</li>
   <li>Mesmos recursos da Versão PRO (suporte boleto e TEF/Débito)</li>
+  <li>Não precisa pedir liberação de conta transparente ao PagSeguro</li>
+  <li>Liberação imediata. Comece a testar e vender com o módulo em 3 minutos.</li>
 </ul>
 
 <h2 id="modelo-de-aplicao-pagseguro">Modelo de aplicação PagSeguro</h2>
@@ -64,10 +67,20 @@ acessar informações de sua conta no PagSeguro.</p>
 
 <h2 id="valor">Valor</h2>
 <ul>
-  <li>0,5% de taxa de intermediação sendo repassado pelo PagSeguro automaticamente para vendas aprovadas.</li>
+  <li>0,4% de taxa de intermediação sendo repassado pelo PagSeguro automaticamente para vendas aprovadas.</li>
+  <li><strong>A taxa padrão do PagSeguro cai para 4,49%. Com o valor do repasse, o valor da taxa vai para 4,89%. Você usa o pagamento transparente, colabora com o projeto que aumenta suas vendas e ainda economiza 0,1% na taxa padrão do PagSeguro.</strong> (<a href="#desconto-na-taxa-do-pagseguro">saiba mais</a>)</li>
   <li>Veja detalhes das condições na tela de autorização (após o preenchimento do formulário de contratação)</li>
   <li><a href="#contratar">Vamos lá!</a></li>
 </ul>
+
+<h2 id="desconto-na-taxa-do-pagseguro">Desconto na taxa do PagSeguro</h2>
+<p>Agora ao utilizar o modelo de aplicação, a taxa padrão do PagSeguro cai de 4,99% para 4,49% nas transações com Debito, Credito ou Boleto.</p>
+
+<p>Para manter o módulo neste modelo, é repassado 0,4% (taxa de repasse) para o projeto. Ou seja, além de contribuir com o projeto, você ainda tem uma redução de 0,1% na taxa padrão do PagSeguro.</p>
+
+<p>O repasse e as taxas são calculados apenas sob vendas aprovadas feitas pelo módulo PagSeguro Transparente no modelo APP e discriminados nos detalhes de cada pedido no seu painel do PagSeguro.</p>
+
+<p>Nota: O uso do módulo não isenta da tarifa de transação aprovada (R$0,40) cobrada pelo PagSeguro em todas suas transações.</p>
 
 <h2 id="garantia">Garantia</h2>
 <p>As mesmas da versão PRÓ.</p>
@@ -89,11 +102,13 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 
 <h2 id="contratar">Contratar</h2>
 
+<h3 id="passo-a-passo">Passo-a-passo</h3>
 <ul>
   <li>Preencha o formulário abaixo para ser redirecionado ao PagSeguro</li>
   <li>Revise as condições de taxas aplicadas à sua conta e autorize a aplicação</li>
   <li>Você receberá o módulo do PagSeguro PRO por e-mail neste momento.</li>
   <li>Instale, e configure o módulo com a chave fornecida, no modelo de aplicação como mostrado na primeira imagem desta página.</li>
+  <li>Boas vendas!</li>
 </ul>
 
 <form action="http://ws.ricardomartins.net.br/pspro/v6/app/new" method="POST" target="_blank" id="formAppNew">
@@ -103,7 +118,7 @@ A instalação profissional também pode ser contratada, com valor a combinar, v
 E-mail da conta Pagseguro:
 </td>
 <td>
-<input type="email" name="email" id="email" /> *
+<input type="email" name="email" id="email" size="30" /> *
 
 
 <tr>
@@ -111,7 +126,7 @@ E-mail da conta Pagseguro:
 URL da Loja:
 </td>
 <td>
-<input type="url" name="url" id="url" /> *
+<input type="url" name="url" id="url" size="30" /> *
 <br />
 </td>
 </tr>
@@ -127,6 +142,7 @@ URL da Loja:
  Para revogar um acesso existente acesse <a href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml" target="_blank">este link</a>.
  </td>
 </tr>
+
 
 
 
