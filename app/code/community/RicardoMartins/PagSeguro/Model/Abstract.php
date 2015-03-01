@@ -93,7 +93,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     public function getNotificationStatus($notificationCode)
     {
         $helper =  Mage::helper('ricardomartins_pagseguro');
-        $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode);
+        $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode, false);
         $client = new Zend_Http_Client($url);
         $client->setParameterGet(array(
                 'token'=>$helper->getToken(),
@@ -187,11 +187,12 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params,true));
         
         $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL, $helper->getWsUrl('transactions'));
+        curl_setopt($ch,CURLOPT_URL, $helper->getWsUrl('transactions', $useapp));
         curl_setopt($ch,CURLOPT_POST, count($params));
         curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch,CURLOPT_POSTFIELDS, $params_string);
-        
+        curl_setopt($ch,CURLOPT_TIMEOUT, 45);
+
         try{
             $response = curl_exec($ch);
             curl_close($ch);

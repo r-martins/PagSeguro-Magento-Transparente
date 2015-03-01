@@ -7,6 +7,10 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
      */
     public function indexAction()
     {
+        $helper = Mage::helper('ricardomartins_pagseguro');
+        if($helper->isSandbox()){
+            $this->getResponse()->setHeader('access-control-allow-origin','https://sandbox.pagseguro.uol.com.br');
+        }
         /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
         Mage::helper('ricardomartins_pagseguro')->writeLog('Notificação recebida do pagseguro com os parametros:'. var_export($this->getRequest()->getParams(),true));
         $model =  Mage::getModel('ricardomartins_pagseguro/abstract');

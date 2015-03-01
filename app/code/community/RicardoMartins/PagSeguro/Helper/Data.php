@@ -83,7 +83,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             }
         }
 
-        if($this->getLicenseType()=='app' || $useapp){
+        if($this->getLicenseType()=='app' && $useapp){
             return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP) . $amend;
         }
 
