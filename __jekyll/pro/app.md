@@ -72,6 +72,24 @@ Confira a <a href="http://pagseguro-exemplo.ricardomartins.net.br/" target="_bla
 <table>
 <tr>
 <td>
+Seu nome:
+</td>
+<td>
+<input type="text" name="name" id="name" size="30" maxlength="30"/>
+</tr>
+
+<tr>
+<td>
+Telefone:
+</td>
+<td>
+<input type="text" name="phone" id="phone" size="30" maxlenght="30"/>
+</tr>
+
+
+
+<tr>
+<td>
 E-mail da conta Pagseguro:
 </td>
 <td>
