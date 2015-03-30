@@ -79,7 +79,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
 
         $retorno = array(
-            'creditCardHolderName'      =>  $payment['additional_information']['credit_card_owner'],
+            'creditCardHolderName'      =>  str_replace('  ',' ',trim($payment['additional_information']['credit_card_owner'])),
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
             'creditCardHolderCPF'       => $digits->filter($cpf),
             'creditCardHolderAreaCode'  => $phone['area'],

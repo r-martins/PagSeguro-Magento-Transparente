@@ -26,22 +26,35 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function getSessionId()
     {
         $useapp = $this->getLicenseType() == 'app';
-        $client = new Zend_Http_Client($this->getWsUrl('sessions',$useapp));
-        $client->setMethod(Zend_Http_Client::POST);
-        $client->setParameterPost('email', $this->getMerchantEmail());
-        $client->setParameterPost('token', $this->getToken());
+
+        $url = $this->getWsUrl('sessions',$useapp);
+
+        $ch = curl_init($url);
+        $params['email'] = $this->getMerchantEmail();
+        $params['token'] = $this->getToken();
         if($useapp){
-            $client->setParameterPost('public_key',$this->getPagSeguroProKey());
+            $params['public_key'] = $this->getPagSeguroProKey();
         }
-        $client->setConfig(array('timeout'=>30));
+
+        curl_setopt_array($ch, array(
+            CURLOPT_POSTFIELDS  => http_build_query($params),
+            CURLOPT_POST        => count($params),
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_TIMEOUT     => 45,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+
+        ));
+
+        $response = null;
+
         try{
-            $response = $client->request();
+            $response = curl_exec($ch);
         }catch(Exception $e){
             Mage::logException($e);
             return false;
         }
 
-        $response = $client->getLastResponse()->getBody();
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($response);

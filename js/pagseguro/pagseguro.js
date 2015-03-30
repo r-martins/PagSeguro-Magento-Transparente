@@ -11,8 +11,10 @@ document.observe("dom:loaded", function() {
         var senderHash = PagSeguroDirectPayment.getSenderHash();
         if(typeof senderHash != "undefined")
         {
-            $$('input[name="payment[sender_hash]"]').first().value = senderHash;
-            $$('input[name="payment[sender_hash]"]').first().enable();
+            if(typeof $$('input[name="payment[sender_hash]"]').first() != "undefined"){
+                $$('input[name="payment[sender_hash]"]').first().value = senderHash;
+                $$('input[name="payment[sender_hash]"]').first().enable();
+            }
         }
     }
 

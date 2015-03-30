@@ -17,6 +17,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             /** @var Mage_Sales_Model_Order $order */
             $order = Mage::getModel('sales/order')->loadByIncrementId((string)$resultXML->reference);
             $payment = $order->getPayment();
+            $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
             $message = $processedState->getMessage();
 
@@ -52,7 +53,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
             if($processedState->getStateChanged())
             {
-                $order->setState($processedState->getState(),true,$processedState->getIsCustomerNotified())->save();
+                $order->setState($processedState->getState(),true,$message,$processedState->getIsCustomerNotified())->save();
+            }else{
+                $order->addStatusHistoryComment($message);
             }
 
             if((int)$resultXML->status == 3) //Quando o pedido foi dado como Pago
@@ -71,7 +74,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $order->addStatusHistoryComment(sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId()));
             }
 
-            $order->addStatusHistoryComment($message);
             $payment->save();
             $order->save();
             Mage::dispatchEvent('pagseguro_proccess_notification_after',array(
@@ -122,7 +124,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         {
             case '1':
                 $return->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
-                $return->setIsCustomerNotified(true);
+                $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
+                if($this->getCode()=='pagseguro_cc'){
+                    $return->setStateChanged(false);
+                }
                 $return->setMessage('Aguardando pagamento: o comprador iniciou a transação, mas até o momento o PagSeguro não recebeu nenhuma informação sobre o pagamento.');
                 break;
             case '2':
@@ -195,10 +200,14 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         try{
             $response = curl_exec($ch);
-            curl_close($ch);
         }catch(Exception $e){
             Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
         }
+
+        if(curl_error($ch)){
+            Mage::throwException(sprintf('Falha ao tentar enviar parametros ao PagSeguro: %s (%s)', curl_error($ch), curl_errno($ch)));
+        }
+        curl_close($ch);
 
         $helper->writeLog('Retorno PagSeguro (/transactions): ' . var_export($response,true));
 

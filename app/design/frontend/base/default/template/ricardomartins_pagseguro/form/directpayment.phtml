@@ -4,16 +4,20 @@ $_helper = Mage::helper('ricardomartins_pagseguro');
 <input type="hidden" name="payment[sender_hash]"/>
 <script type="text/javascript">
     //<![CDATA[
-    var iid = setInterval(function()
-    {
-        if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
-            console.log('PagSeguro ready');
+    var preparePagSeguro = function(){
+        var iid = setInterval(function()
+        {
+            if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
+                console.log('PagSeguro ready');
 
-            clearInterval(iid);
-            RMPagSeguro.updateSenderHash();
-            RMPagSeguro.addBrandObserver();
-            RMPagSeguro.addCardFieldsObserver();
-        }
-    }, 4000);
+                clearInterval(iid);
+                RMPagSeguro.updateSenderHash();
+                RMPagSeguro.addBrandObserver();
+                RMPagSeguro.addCardFieldsObserver();
+            }
+        }, 4000);
+    }
+    preparePagSeguro();
+
     //]]>
 </script>
