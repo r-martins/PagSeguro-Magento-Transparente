@@ -1,0 +1,35 @@
+#pagseguro-mask {
+    color: #d85909;
+    font-size: 1.1em;
+    font-weight: bold;
+    /* opacity: 0.8; */
+    position: absolute;
+    text-align: center;
+    z-index: 1200;
+}
+
+#pagseguro-mask .loader {
+    background: none repeat scroll 0 0 #fff4e9;
+    border: 2px solid #f1af73;
+    color: #d85909;
+    font-weight: bold;
+    left: 50%;
+    margin-left: -105px;
+    padding: 15px 30px;
+    position: fixed;
+    text-align: center;
+    top: 45%;
+    width: 150px;
+    z-index: 1100;
+}
+
+#pagseguro-overlay {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.35);
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+

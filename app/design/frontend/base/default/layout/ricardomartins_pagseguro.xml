@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addItem" _ifconfig="ricardomartins/fake/active">
+                <type>skin_css</type>
+                <name>css/ricardomartins_pagseguro.css</name>
+            </action>
+            <action method="addItem" _ifconfig="ricardomartins/fake/active">
+                <type>skin_js</type>
+                <script>js/ricardomartins_pagseguro.js</script>
+            </action>
+        </reference>
+    </default>
+    <checkout_onepage_success>
+        <reference name="after_body_start">
+            <block type="page/html" name="ricardomartins_pagseguro_loader">
+                <action method="setTemplate" _ifconfig="ricardomartins/fake/active">
+                    <template>ricardomartins_pagseguro/form/loader.phtml</template>
+                </action>
+            </block>
+        </reference>
+    </checkout_onepage_success>
+    <onestepcheckout_index_index>
+        <reference name="after_body_start">
+            <block type="page/html" name="ricardomartins_pagseguro_loader">
+                <action method="setTemplate" _ifconfig="ricardomartins/fake/active">
+                    <template>ricardomartins_pagseguro/form/loader.phtml</template>
+                </action>
+            </block>
+        </reference>
+    </onestepcheckout_index_index>
+</layout>
+
