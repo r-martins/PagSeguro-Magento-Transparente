@@ -35,27 +35,18 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
         $this->setTemplate('ricardomartins_pagseguro/form/cc.phtml');
     }
 
-    protected function _prepareLayout(){
-//        Mage::app()->getLayout()->getUpdate()->addHandle('pagseguro');
+    /**
+     * Insere o javascript do modulo somente na hora da renderização, caso ainda não tenha sido inserido.
+     * @return Mage_Core_Block_Abstract
+     */
+    protected function _prepareLayout()
+    {
         //adicionaremos o JS do pagseguro na tela que usará o bloco de cartao logo após o <body>
-        $scriptblock = Mage::app()->getLayout()->createBlock('core/text', 'js_pagseguro');
-        $scriptblock->setText(sprintf(
-                '
-                <script type="text/javascript">var RMPagSeguroSiteBaseURL = "%s";</script>
-                <script type="text/javascript" src="%s"></script>
-                <script type="text/javascript" src="%s"></script>
-                ',
-                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK,true),
-                Mage::helper('ricardomartins_pagseguro')->getJsUrl(),
-                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, true) . 'pagseguro/pagseguro.js'
-            ));
         $head = Mage::app()->getLayout()->getBlock('after_body_start');
 
-//        Mage::app()->getLayout()->getBlock('head')->addJs('pagseguro/pagseguro.js');
-
-        if($head)
-        {
-            $head->append($scriptblock);
+        if ($head && false == $head->getChild('js_pagseguro')) {
+            $scriptBlock = Mage::helper('ricardomartins_pagseguro')->getPagSeguroScriptBlock();
+            $head->append($scriptBlock);
         }
 
         return parent::_prepareLayout();
@@ -63,8 +54,8 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
 
     public function isDobVisible()
     {
-        $owner_dob_attribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
-        return empty($owner_dob_attribute);
+        $ownerDobAttribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
+        return empty($ownerDobAttribute);
     }
 
 }

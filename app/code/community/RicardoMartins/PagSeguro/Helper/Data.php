@@ -43,7 +43,6 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             CURLOPT_TIMEOUT     => 45,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
-
         ));
 
         $response = null;
@@ -58,8 +57,12 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string($response);
-        if(false === $xml){
-            $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados. Retorno pagseguro: ' . $response);
+        if (false === $xml) {
+            if (curl_errno($ch) > 0) {
+                $this->writeLog('Falha de comunicação com API do PagSeguro: ' . curl_error($ch));
+            } else {
+                $this->writeLog('Falha na autenticação com API do PagSeguro. Verifique email e token cadastrados. Retorno pagseguro: ' . $response);
+            }
             return false;
         }
         return (string)$xml->id;
@@ -155,6 +158,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getToken()
     {
+        $this->checkTokenIntegrity();
         $token = Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN);
         if($this->isSandbox())
         {
@@ -214,5 +218,45 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             $args = $matches;
         }
         return Mage::app()->getTranslator()->translate($args);
+    }
+
+    /**
+     * Verifica se o campo de token é do tipo password e gera um warning no log caso não seja.
+     * @author Ricardo Martins
+     * @return void
+     */
+    public function checkTokenIntegrity()
+    {
+        $section = Mage::getSingleton('adminhtml/config')->getSection('payment');
+        $frontendType = (string)$section->groups->pagseguro->fields->token->frontend_type;
+
+        if ('obscure' != $frontendType) {
+            $this->writeLog(
+                'O Token não está seguro. Outro módulo PagSeguro pode estar em conflito. Desabilite-os via XML.'
+            );
+        }
+    }
+
+    /**
+     * Gera o HTML dos JS do Modulo
+     * @author Ricardo Martins
+     * @return Mage_Core_Block_Text
+     */
+    public function getPagSeguroScriptBlock()
+    {
+        $scriptblock = Mage::app()->getLayout()->createBlock('core/text', 'js_pagseguro');
+        $scriptblock->setText(
+            sprintf(
+                '
+                <script type="text/javascript">var RMPagSeguroSiteBaseURL = "%s";</script>
+                <script type="text/javascript" src="%s"></script>
+                <script type="text/javascript" src="%s"></script>
+                ',
+                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true),
+                Mage::helper('ricardomartins_pagseguro')->getJsUrl(),
+                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, true) . 'pagseguro/pagseguro.js'
+            )
+        );
+        return $scriptblock;
     }
 }
