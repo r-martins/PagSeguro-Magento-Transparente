@@ -363,7 +363,15 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $cpf = $order->getShippingAddress()->getData($entity[1]);
         }
 
-        return $cpf;
+        $cpfObj = new Varien_Object(array('cpf'=>$cpf));
+
+        Mage::dispatchEvent('ricardomartins_pagseguro_return_cpf_before', array(
+            'order' => $order,
+            'payment' => $payment,
+            'cpf_obj' => $cpfObj,
+        ));
+
+        return $cpfObj->getCpf();
     }
 
 
