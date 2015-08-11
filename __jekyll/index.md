@@ -49,7 +49,7 @@ Backend
 
 ### Ou faça manualmente:
 
-* Faça download da última versão [aqui](https://github.com/r-martins/PagSeguro-Magento-Transparente/downloads)
+* Faça download da última versão [aqui](https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master)
 * Descompacte na raíz da instalação da loja *mesclando com as pastas existentes*
 * Limpe o cache
 * Se **não** for utilizar o [modelo de aplicação]({{ site.baseurl }}/pro/app.html), é necessário solicitar a autorização para uso da API transparente [neste link](https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent).
