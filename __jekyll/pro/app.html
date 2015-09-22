@@ -1,0 +1,166 @@
+---
+layout: pro
+title: Versão PRO - Modelo de Aplicação
+desc: Com o modelo de aplicação para Magento, você usa o checkout transparente do PagSeguro sem precisar aguardar autorização.
+---
+<!-- ******PROMO****** -->
+<section id="promo" class="promo offset-header">
+	<div class="container text-center">
+		<h2 class="title">Versão PRO APP</h2>
+		<p class="intro">Aceite cartões de débito/TEF e Boleto, e ainda ganhe desconto na taxa do PagSeguro.</p>
+		<div class="btns">
+			<a class="btn btn-cta-primary scrollto" href="#contratar" title="Contratar"><i class="fa fa-magic"></i>Autorizar APP</a>
+		</div>
+	</div>
+	<br/>
+</section>
+	<section id="funcionalidades" class="docs section">
+		<div class="container">
+			<div class="docs-inner">
+				<h2 id="recursos" class="title text-center">Recursos</h2>
+				<ul>
+					<li>Desconto de 0,1% na taxa do PagSeguro (<a href="#prerequisitos">saiba mais</a>)</li>
+					<li>Sem mensalidade ou necessidade de cartão de crédito</li>
+					<li>NÃO precisa pedir liberação do checkout transparente com o PagSeguro</li>
+					<li>Mesmos recursos da <a href="../pro">versão PRO</a> - exceto Sandbox</li>
+					<li>Liberação imediata. Comece a testar e vender com o módulo em 3 minutos.</li>
+				</ul>
+				<h3>Tela</h3>
+				<img src="/public/images/sshot5.png" alt="Tela de configuração"/>
+			</div>
+		</div>
+
+		<section id="prerequisitos" class="docs section">
+			<div class="container">
+				<div class="docs-inner">
+					<h2 id="pre-requisitos" class="title text-center">Saiba mais</h2>
+					<p>Com essa modalidade você não precisa pedir liberação de uso da API transparente para usar o módulo para Magento PRÓ. Também é indicado para lojistas que não possuem cartão de crédito para realizar a assinatura da
+						<a href="../pro">versão PRO</a> tradicional.</p>
+					<p>Na modalidade APP, o Módulo PRÓ para Magento (que suporta Boleto e TEF) é integrado à conta da sua loja utilizando o modelo de aplicações do PagSeguro UOL. Diferente do modelo de assinatura, você terá que autorizar a aplicação a acessar informações de sua conta no PagSeguro.</p>
+					<p>A forma de cobrança também muda, passando a ser cobrado uma pequena taxa de intemediação junto com a taxa do PagSeguro. No entanto, a taxa oficial para recebimento em 14 dias, que é de 4,99% passa para 4,49%, que quando somada a taxa de intemediação (0,4%) fica num <em>total de 4,89%</em>, ou seja, um <em>desconto</em> de 0,1% para recebimento em 14 dias.</p>
+					<p>O valor é cobrado apenas das transações aprovadas, e é exibido em detalhes no próprio painel do PagSeguro.</p>
+
+					<h3>Em outras palavras...</h3>
+					<p>Ao utilizar o modelo de aplicação, a taxa padrão do PagSeguro cai de 4,99% para 4,49% nas transações com Debito, Credito ou Boleto.</p>
+
+					<p>Para manter o módulo neste modelo, é repassado 0,4% (taxa de repasse) para o projeto. Ou seja, além de contribuir com este e outros projetos e instituições, você ainda tem uma redução de 0,1% na taxa padrão do PagSeguro.</p>
+
+					<p>O repasse e as taxas são calculados apenas sob vendas aprovadas feitas pelo módulo PagSeguro Transparente no modelo APP, para vendas feitas com cartão, tef ou boleto, e discriminados nos detalhes de cada pedido no seu painel do PagSeguro.</p>
+
+					<p>Se você utiliza recebimento em 30 dias com a taxa de 3,99%, talvez queira optar pelo <a
+							href="../pro">modelo de assinatura</a>.</p>
+
+					<p>Nota: O uso do módulo não isenta da tarifa de transação aprovada (R$0,40) cobrada pelo PagSeguro em todas suas transações.</p>
+				</div>
+			</div>
+		</section>
+
+
+
+		<section id="contratar" class="docs section">
+			<div class="container">
+				<div class="docs-inner">
+					<h2 class="title text-center">Contratar</h2>
+					<p>Siga os passos abaixo, e comece a vender com o Transparente em minutos.</p>
+					<ol>
+						<li>Preencha o formulário abaixo. Você será redirecionado para o PagSeguro.</li>
+						<li>Revise as condições de taxas aplicadas nas vendas realizadas com o módulo.</li>
+						<li>Após autorizar, você receberá o módulo do PagSeguro PRO no <strong>e-mail informado abaixo</strong></li>
+						<li>Instale e configure o módulo PRO em conjunto com o módulo gratuito que pode ser baixado <a
+								href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master">aqui</a></li>
+						<li>Configure o módulo com sua chave enviada por e-mail e boas vendas!</li>
+					</ol>
+
+					<form id="formAppNew" target="_blank" method="POST" action="http://ws.ricardomartins.net.br/pspro/v6/app/new">
+						<table class="table table-stripped table-bordered">
+							<tbody>
+							<tr>
+								<th>
+									Seu nome:
+								</th>
+								<td>
+									<input type="text" maxlength="30" size="30" id="name" name="name">
+
+								</td>
+							</tr>
+							<tr>
+								<th>
+									Telefone:
+								</th>
+								<td>
+									<input type="text" maxlenght="30" size="30" id="phone" name="phone">
+								</td>
+							</tr>
+							<tr>
+								<th>
+									E-mail:
+								</th>
+								<td>
+									<input type="email" size="30" id="email" name="email"> *
+								</td>
+							</tr>
+							<tr>
+								<th>
+									URL da Loja:
+								</th>
+								<td>
+									<input type="url" size="30" id="url" name="url"> *
+								</td>
+							</tr>
+
+							<tr>
+								<td colspan="2">
+									<input type="button" onclick="validateAndSubmit();" value="Avançar" class="btn btn-cta-primary">
+								</td>
+							</tr>
+
+
+
+
+							<script type="text/javascript">
+								if(document.URL.search('0.0.0.0') > 0){
+									document.getElementById("formAppNew").action = "http://ws.local.com.br/pspro/v6/app/new";
+								}
+								var validateAndSubmit = function(){
+									var email = document.getElementById("email").value;
+									var url = document.getElementById("url").value;
+									if(!validateEmail(email)){alert('Email inválido.'); return false;}
+									if(!validateUrl(url)){alert('URL inválido.'); return false;}
+									document.getElementById("formAppNew").submit();
+								}
+								var validateEmail = function(email) {
+									var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+									return re.test(email);
+								}
+
+								var validateUrl = function(url) {
+									var re = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i;
+									return re.test(url);
+								}
+							</script>
+							</tbody>
+						</table>
+					</form>
+
+					<h3>Cancelamento</h3>
+					<p>Pode ser cancelado a qualquer momento diretamente no seu painel do PagSeguro (ou <a
+							href="https://pagseguro.uol.com.br/aplicacao/listarAutorizacoes.jhtml">neste link</a>), removendo o acesso à aplicação. Você deve remover o módulo da sua loja após tal ação, pois o mesmo não funcionará se não possuir as permissões adequadas.</p>
+
+					<h3>Dificuldades?</h3>
+					<p>Está com dificuldades para instalar ou configurar o módulo?</p>
+					<p>Veja algumas dicas de onde obter respostas na <a href="../#suporte">área de suporte</a> com vídeos e tudo mais.</p>
+
+					<h3>Porque é pago?</h3>
+					<p>O valor pago é para suporte do projeto, e para ajudar outros projetos open source e instituições. Tentei fazer de forma 100% gratuita acreditando que iriam existir doações para o projeto, o que não aconteceu. Por esta razão é cobrado este valor simbólico para auxiliar o projeto.</p>
+
+					<h3>Outras opções</h3>
+					<p>Se desejar, você também pode optar pelo <a href="../pro"><strong>modelo de assinatura</strong></a>, que permite escolher outras tarifas de recebimento e usar o modo sandbox para realizar testes de pagamento.</p>
+				</div>
+			</div>
+		</section>
+
+
+
+	</div><!--//container-->
+
+</section><!--//promo-->

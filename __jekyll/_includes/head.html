@@ -1,40 +1,38 @@
-<!doctype html>
-<html>
-  <head>
+<head>
+    <title>
+   {% if page.title == "Home" %}
+   {{ site.title }} &middot; {{ site.tagline }}
+   {% else %}
+   {{ page.title }} &middot; {{ site.title }}
+   {% endif %}
+    </title>
+    <!-- Meta -->
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Pagseguro-magento-transparente by r-martins</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="{{ site.baseurl }}/javascripts/main.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if page.desc %}
+    <meta name="description" content="{{ page.desc }}">
+    {% else %}
+    <meta name="description" content="Módulo PagSeguro transparente para Magento, open source, criado por Ricardo Martins.">
+    {% endif %}
+    <meta name="author" content="Ricardo Martins">
+    <link rel="shortcut icon" href="favicon.ico">  
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'> 
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="{{ site.baseurl }}/public/plugins/bootstrap/css/bootstrap.min.css">
+    <!-- Plugins CSS -->    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/public/plugins/prism/prism.css">
+    <!-- Theme CSS -->  
+    <link id="theme-style" rel="stylesheet" href="{{ site.baseurl }}/public/css/styles.css">
+    {% if page.layout <> 'default' %}
+        <link id="theme-style" rel="stylesheet" href="{{ site.baseurl }}/public/css/internal.css">
+    {% endif %}
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-  </head>
-  <body>
-
-      <header>
-        <h1>Pagseguro-magento-transparente</h1>
-        <p>Módulo de checkout transparente para Pagseguro - com api v. 2.0</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
+    {% include scripts.html %}
+</head>

@@ -1,71 +1,130 @@
-<!doctype html>
-<html>
-  <head>
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="pt-br" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="pt-br" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="pt-br"> <!--<![endif]-->
+<head>
+    <title>
+   
+   Parabéns! &middot; PagSeguro Transparente para Magento
+   
+    </title>
+    <!-- Meta -->
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>PagSeguro Transparente para Magento PRÓ - com TEF e Boleto - by Ricardo Martins</title>
-    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/stylesheets/styles.css">
-    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="/PagSeguro-Magento-Transparente/javascripts/main.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="description" content="Módulo PagSeguro transparente para Magento, open source, criado por Ricardo Martins.">
+    
+    <meta name="author" content="Ricardo Martins">
+    <link rel="shortcut icon" href="favicon.ico">  
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'> 
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/public/plugins/bootstrap/css/bootstrap.min.css">
+    <!-- Plugins CSS -->    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/PagSeguro-Magento-Transparente/public/plugins/prism/prism.css">
+    <!-- Theme CSS -->  
+    <link id="theme-style" rel="stylesheet" href="/PagSeguro-Magento-Transparente/public/css/styles.css">
+    
+        <link id="theme-style" rel="stylesheet" href="/PagSeguro-Magento-Transparente/public/css/internal.css">
+    
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!-- Google Analytics -->
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  </head>
-  <body>
+	ga('create', 'UA-3314217-5', 'auto');
+	ga('send', 'pageview');
 
-      <header>
-        <h1 onclick="location.href='/PagSeguro-Magento-Transparente/';" style="cursor:pointer">Pagseguro-magento-transparente</h1>
-        <p>Módulo de checkout transparente para Pagseguro - com api v. 2.0</p>
-      </header>
+</script>
 
-      <div id="banner">
-        <span id="logo"></span>
+<!-- Start of pagsegurotransparente Zendesk Widget script -->
+<script>/*<![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(c){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var o=this.createElement("script");n&&(this.domain=n),o.id="js-iframe-async",o.src=e,this.t=+new Date,this.zendeskHost=t,this.zEQueue=a,this.body.appendChild(o)},o.write('<body onload="document._l();">'),o.close()}("//assets.zendesk.com/embeddable_framework/main.js","pagsegurotransparente.zendesk.com");/*]]>*/
+zE(function() {
+	zE.setLocale('pt-BR');
+});</script>
+<!-- End of pagsegurotransparente Zendesk Widget script -->
+</head>
 
-        <a href="https://github.com/r-martins/PagSeguro-Magento-Transparente" class="button fork"><strong>Ver no GitHub</strong></a>
-        <div class="downloads">
-          <span>PagSeguro Transparente (versão gratuita):</span>
-          <ul>
-            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/r-martins/PagSeguro-Magento-Transparente/tarball/master" class="button">TAR</a></li>
-          </ul>
+<body data-spy="scroll">
+    <!---//Facebook button code-->
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+    <!-- ******HEADER****** -->
+    <header id="header" class="header">  
+        <div class="container">            
+            <h1 class="logo pull-left">
+                <a href="/PagSeguro-Magento-Transparente/#promo">
+                    <span class="logo-title">PagSeguro transparente para Magento</span>
+                </a>
+            </h1><!--//logo-->
+            <nav id="main-nav" class="main-nav navbar-right" role="navigation">
+                <div class="navbar-header">
+                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-collapse">
+                        <span class="sr-only">Alternar navegação</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button><!--//nav-toggle-->
+                </div><!--//navbar-header-->            
+                <div class="navbar-collapse collapse" id="navbar-collapse">
+
+                    <ul class="nav navbar-nav">
+                        <li class="active nav-item sr-only"><a class="scrollto" href="/PagSeguro-Magento-Transparente/#promo">Home</a></li>
+                        <li class="nav-item"><a class="scrollto" href="#recursos">Recursos</a></li>
+                        <li class="nav-item"><a class="scrollto" href="#pre-requisitos">Pré-requisitos</a></li>
+                        <li class="nav-item last"><a class="scrollto" href="#contratar">Contratar</a></li>
+                    </ul><!--//nav-->
+                </div><!--//navabr-collapse-->
+            </nav><!--//main-nav-->
         </div>
-      </div><!-- end banner -->
+    </header><!--//header-->
 
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-      <section>        
-        <h1 id="pagseguro-transparente-pr-app">PagSeguro Transparente PRÓ <em>APP</em></h1>
-<hr />
+<!-- ******PROMO****** -->
+<section id="promo" class="promo offset-header">
+	<div class="container text-center">
+		<h2 class="title">Parabéns!</h2>
+		<p class="intro">A autorização do módulo foi feita com sucesso.</p>
+		<p>Sua chave de acesso, o módulo PagSeguro PRO e instruções foram enviadas pra você para o e-mail informado no primeiro passo.</p>
+	</div>
+	<br/>
+</section>
 
-<h2 id="aplicao-autorizada">Aplicação autorizada!</h2>
 
-<p>Sua aplicação foi autorizada com sucesso.</p>
+    <!-- ******FOOTER****** --> 
+    <footer class="footer">
+        <div class="container text-center">
+            <small class="copyright">Módulo desenvolvido por Ricardo Martins. Não possuí nenhum vínculo com PagSeguro UOL.</small>
+            <br/>
+            <small class="copyright">Designed with <i class="fa fa-heart"></i> by <a href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a> for developers</small>
+        </div><!--//container-->
+    </footer><!--//footer-->
+     
+    <!-- Javascript -->          
+    <script type="text/javascript" src="/PagSeguro-Magento-Transparente/public/plugins/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/PagSeguro-Magento-Transparente/public/plugins/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="/PagSeguro-Magento-Transparente/public/plugins/jquery.easing.1.3.js"></script>
+    <script type="text/javascript" src="/PagSeguro-Magento-Transparente/public/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/PagSeguro-Magento-Transparente/public/plugins/jquery-scrollTo/jquery.scrollTo.min.js"></script>
+    <script type="text/javascript" src="/PagSeguro-Magento-Transparente/public/plugins/prism/prism.js"></script>
+    <script type="text/javascript" src="/PagSeguro-Magento-Transparente/public/js/main.js"></script>
 
-<p>Sua chave de acesso, o módulo PagSeguro PRO e instruções foram enviadas pra você para o e-mail informado no primeiro passo.</p>
 
-      </section>
-      <footer>
-		  <p><a href="http://www.magentocommerce.com/certification/directory/dev/314967/" target="_blank"><img src="/PagSeguro-Magento-Transparente/images/middle_developer_logo.png" alt="Módulo desenvolvido por profissional certificado Magento" title="Módulo desenvolvido por profissional certificado Magento" border="0"/></a></p>
-		  <p>Projeto mantido por <a href="https://github.com/r-martins">r-martins</a></p>
-		  <p><small>Hospedado no GitHub Pages &mdash; Tema: <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-              <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-3314217-5");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
+</body>
+</html> 
 
-  </body>
-</html>

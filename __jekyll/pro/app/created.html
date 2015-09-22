@@ -1,0 +1,30 @@
+---
+layout: pro
+title: Parabéns!
+---
+<!-- ******PROMO****** -->
+<section id="promo" class="promo offset-header">
+	<div class="container text-center">
+		<h2 class="title">Parabéns!</h2>
+		<p class="intro">A autorização do módulo foi feita com sucesso.</p>
+		<p>Sua chave de acesso, o módulo PagSeguro PRO e instruções foram enviadas pra você para o e-mail informado no primeiro passo.</p>
+		<p id="chave"></p>
+	</div>
+	<br/>
+</section>
+<script type="text/javascript">
+	function getParameterByName(name) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+				results = regex.exec(location.search);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+
+	var chave = getParameterByName('publicKey');
+
+	if(chave !== "")
+	{
+		document.getElementById('chave').innerHTML = 'Se você já tem o módulo PRO instalado, configure a chave a seguir em Formas de Pagamento -> PagSeguro PRO - Licença. <br/><strong>Sua chave: '+ chave + '</strong>';
+	}
+
+</script>

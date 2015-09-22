@@ -1,0 +1,141 @@
+    <!-- ******ABOUT****** --> 
+    <section id="como-funciona" class="about section">
+        <div class="container">
+            <h2 class="title text-center">Como funciona?</h2>
+            <p class="intro text-center">O módulo transparente para Magento permite que o cliente digite os dados de pagamento no seu próprio site. Antes mesmo de finalizar o pedido, esses dados são enviados para o PagSeguro UOL de forma segura, gerando um hash único da transação. Este é o hash transacionado, fazendo com que a transação ainda seja segura em qualquer ambiente, pois seu servidor não armazenará, transmitirá ou processará nenhuma informação sensível do cliente.</p>
+            <div class="row">
+                <div class="item col-md-4 col-sm-6 col-xs-12">
+                    <div class="icon-holder">
+                        <i class="fa fa-heart"></i>
+                    </div>
+                    <div class="content">
+                        <h3 class="sub-title">Desenvolvido para todos</h3>
+                        <p>Criado em meu tempo livre, sem vínculo ou apoio de nenhuma empresa, é um projeto destinado a toda comunidade Magento.</p>
+                    </div><!--//content-->
+                </div><!--//item-->
+                <div class="item col-md-4 col-sm-6 col-xs-12">
+                    <div class="icon-holder">
+                        <i class="fa fa-code"></i>
+                    </div>
+                    <div class="content">
+                        <h3 class="sub-title">Código aberto</h3>
+                        <p>Transparência também no código. Nada de código criptografado ou obfuscado. Você precisa saber o que está acontecendo.</p>
+                    </div><!--//content-->
+                </div><!--//item-->
+                <div class="item col-md-4 col-sm-6 col-xs-12">
+                    <div class="icon-holder">
+                        <i class="fa fa-life-ring"></i>
+                    </div>
+                    <div class="content">
+                        <h3 class="sub-title">Suporte</h3>
+                        <p><a href="https://www.udemy.com/curso-magento/?couponCode=PSPRO-SITE" target="_blank">Aulas</a>, <a href="https://www.youtube.com/watch?v=sPyTsXW7JbI" target="_blank">YouTube</a>, <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Central de Ajuda</a>,
+                            <a href="http://groups.google.com/group/magentobr" target="_blank">Comunidade</a> são algumas das formas pra você não ficar na mão.</p>
+                    </div><!--//content-->
+                </div><!--//item-->           
+                <div class="clearfix visible-md"></div>
+                <div class="item col-md-4 col-sm-6 col-xs-12">
+                    <div class="icon-holder">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <div class="content">
+                        <h3 class="sub-title">Mais de 2000 lojas</h3>
+                        <p>Mais de 2000 downloads via Magento Connect, sem falar nos download diretos via GitHub.</p>
+                    </div><!--//content-->
+                </div><!--//item-->                
+                <div class="item col-md-4 col-sm-6 col-xs-12">
+                    <div class="icon-holder">
+                        <i class="fa fa-usd"></i>
+                    </div>
+                    <div class="content">
+                        <h3 class="sub-title">Gratuito</h3>
+                        <p>Para receber pagamentos com cartões de crédito. Se desejar Boleto e TEF, <a
+                                href="#precos">consulte as opções</a>. Pode sair "mais barato do que de graça".</p>
+                    </div><!--//content-->
+                </div><!--//item-->
+                <div class="item col-md-4 col-sm-6 col-xs-12">
+                    <div class="icon-holder">
+                        <i class="fa fa-globe"></i>
+                    </div>
+                    <div class="content">
+                        <h3 class="sub-title">Por um mundo melhor</h3>
+                        <p>Parte do valor arrecadado com as modalidades pagas são destinadas a entidades humanitárias, de assistência, e para outros projetos OpenSource.</p>
+                    </div><!--//content-->
+                </div><!--//item-->
+            </div><!--//row-->
+            <hr/>
+            <h3>Instalação</h3>
+            <h4>Instalar com <a href="https://github.com/jreinke/modgit" target="_blank">modgit</a></h4>
+            <code>
+                <pre>
+                $ cd pasta/do/magento
+                $ modgit init
+                $ modgit add pagseguro git@github.com:r-martins/PagSeguro-Magento-Transparente.git</pre>
+            </code>
+
+            <h4>Ou manualmente</h4>
+            <ul>
+                <li>Faça download da última versão <a
+                        href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master">aqui</a></li>
+                <li>Descompacte na raíz da instalação da loja mesclando com as pastas existentes</li>
+                <li>Limpe o cache</li>
+                <li>Se não for utilizar o <a href="{{ site.baseurl }}/pro/app.html">modelo de aplicação</a>, é necessário solicitar a autorização para uso da API transparente<a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">neste link</a>.</li>
+                <li>Certifique-se que não exista nenhum outro módulo PagSeguro instalado. Se existir, remova-o ou desative-o <em>via XML</em>.</li>
+            </ul>
+
+            <h4>Configurações no Painel do PagSeguro</h4>
+                <ul>
+                    <li>Integrações->Pagamentos pela API: desativado</li>
+                    <li>Integrações->Notificação de Transações: Ativado. Coloque o url http://www.SUALOJA.com.br/index.php/pseguro/notification</li>
+                    <li>Se você <em>não</em> for utilizar o <a href="{{ site.baseurl }}/pro/app.html">modelo de aplicação</a>, lembre-se de autorizar sua loja a usar a api transparente. Em caso de demora ou dúvidas sobre a liberação ligue na Central de Atendimento do PagSeguro: (11)5627-3440 (Segunda a sábado das 8h às 20h30, exceto feriados).</li>
+                </ul>
+
+            <h4>Detecção de problemas</h4>
+            <p>A maior parte dos problemas pode ser identificada ativando o modo debug no painel do magento e vendo o arquivo de log gerado na sua <strong>pasta/do/magento/var/log/pagseguro.log.</strong></p>
+
+
+            <hr/>
+            <h3>Fique por dentro das novidades</h3>
+            <form action="//github.us3.list-manage.com/subscribe/post?u=abb341031ad2b9fba720e5004&amp;id=a09ded43c6" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+                <p>Cadastre seu e-mail na nossa newsletter.</p>
+                <div class="indicates-required small"><span class="asterisk">*</span> campos obrigatórios</div>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th>
+                            <label for="mce-EMAIL">E-mail  <span class="asterisk">*</span></label>
+                        </th>
+                        <td>
+                            <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="mce-NAME">Nome  <span class="asterisk">*</span></label>
+                        </th>
+                        <td>
+                            <input type="text" value="" name="NAME" class="required" id="mce-NAME" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="mce-STOREURL">URL da Loja </label>
+                        </th>
+                        <td>
+                            <input type="url" value="" name="STOREURL" class=" url" id="mce-STOREURL" />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div id="mce-responses" class="clear">
+                    <div class="response" id="mce-error-response" style="display:none"></div>
+                    <div class="response" id="mce-success-response" style="display:none"></div>
+                </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                <div style="position: absolute; left: -5000px;"><input type="text" name="b_abb341031ad2b9fba720e5004_a09ded43c6" tabindex="-1" value="" /></div>
+                <div class="clear"><input type="submit" value="Cadastrar" name="subscribe" id="mc-embedded-subscribe" class="btn btn-cta-secondary" /></div>
+            </form>
+
+
+
+        </div><!--//container-->
+    </section><!--//about-->
