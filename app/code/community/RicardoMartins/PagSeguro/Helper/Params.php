@@ -1,36 +1,39 @@
 <?php
 /**
- * Class RicardoMartins_PagSeguro_Helper_Params
- * Classe para auxiliar na montagem dos parametros de chamadas da api. Trata telefones, itens, dados do cliente e afins.
+ * PagSeguro Transparente Magento
+ * Params Helper Class - responsible for formatting and grabbing parameters used on PagSeguro API calls
  *
- * @author    Ricardo Martins <ricardo@ricardomartins.net.br>
+ * @category    RicardoMartins
+ * @package     RicardoMartins_PagSeguro
+ * @author      Ricardo Martins
+ * @copyright   Copyright (c) 2015 Ricardo Martins (http://r-martins.github.io/PagSeguro-Magento-Transparente/)
+ * @license     https://opensource.org/licenses/MIT MIT License
  */
 class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 {
 
     /**
-     * Retorna um array com informações dos itens para ser enviado pra API
+     * Return items information, to be send to API
      * @param Mage_Sales_Model_Order $order
      * @return array
      */
     public function getItemsParams(Mage_Sales_Model_Order $order)
     {
-        $retorno = array();
-        if($items = $order->getAllVisibleItems())
-        {
-            for($x=1, $y=0, $c=count($items); $x <= $c; $x++, $y++)
-            {
-                $retorno['itemId'.$x] = $items[$y]->getId();
-                $retorno['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
-                $retorno['itemAmount'.$x] = number_format($items[$y]->getPrice(),2,'.','');
-                $retorno['itemQuantity'.$x] = $items[$y]->getQtyOrdered();
+        $return = array();
+        if ($items = $order->getAllVisibleItems()) {
+            for ($x=1, $y=0, $c=count($items); $x <= $c; $x++, $y++) {
+                $return['itemId'.$x] = $items[$y]->getId();
+                $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
+                $return['itemAmount'.$x] = number_format($items[$y]->getPrice(), 2, '.', '');
+                $return['itemQuantity'.$x] = $items[$y]->getQtyOrdered();
             }
         }
-        return $retorno;
+        return $return;
     }
 
     /**
-     * Retorna um array com informações do Sender(Cliente) para ser enviado pra API
+     * Return an array with Sender(Customer) information to be used on API call
+     *
      * @param Mage_Sales_Model_Order $order
      * @param $payment
      * @return array
@@ -38,30 +41,36 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     public function getSenderParams(Mage_Sales_Model_Order $order, $payment)
     {
         $digits = new Zend_Filter_Digits();
-        $cpf = $this->_getCustomerCpfValue($order,$payment);
+        $cpf = $this->_getCustomerCpfValue($order, $payment);
 
-        //telefone
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
 
 
-        $retorno = array(
-            'senderName'    =>  sprintf('%s %s',trim($order->getCustomerFirstname()), trim($order->getCustomerLastname())),
+        $senderName = sprintf(
+            '%s %s',
+            $this->removeDuplicatedSpaces($order->getCustomerFirstname()),
+            $this->removeDuplicatedSpaces($order->getCustomerLastname())
+        );
+        $senderName = substr($senderName, 0, 50);
+
+        $return = array(
+            'senderName'    => $senderName,
             'senderEmail'   => trim($order->getCustomerEmail()),
             'senderHash'    => $payment['additional_information']['sender_hash'],
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
         );
-        if(strlen($retorno['senderCPF']) > 11){
-            $retorno['senderCNPJ'] = $retorno['senderCPF'];
-            unset($retorno['senderCPF']);
+        if (strlen($return['senderCPF']) > 11) {
+            $return['senderCNPJ'] = $return['senderCPF'];
+            unset($return['senderCPF']);
         }
 
-        return $retorno;
+        return $return;
     }
 
     /**
-     * Retorna um array com informações do dono do Cartao(Cliente) para ser enviado pra API
+     * Returns an array with credit card's owner (Customer) to be used on API
      * @param Mage_Sales_Model_Order $order
      * @param $payment
      * @return array
@@ -70,52 +79,54 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $digits = new Zend_Filter_Digits();
 
-        $cpf = $this->_getCustomerCpfValue($order,$payment);
+        $cpf = $this->_getCustomerCpfValue($order, $payment);
 
-
-        //dados
-        $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($order->getCustomer(),$payment);
+        //data
+        $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($order->getCustomer(), $payment);
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
 
 
-        $retorno = array(
-            'creditCardHolderName'      =>  str_replace('  ',' ',trim($payment['additional_information']['credit_card_owner'])),
+        $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
+        $return = array(
+            'creditCardHolderName'      => $holderName,
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
             'creditCardHolderCPF'       => $digits->filter($cpf),
             'creditCardHolderAreaCode'  => $phone['area'],
             'creditCardHolderPhone'     => $phone['number'],
         );
 
-        return $retorno;
+        return $return;
     }
 
     /**
-     * Retorna um array com informações de parcelamento (Cartao) para ser enviado pra API
+     * Return an array with installment information to be used with API
      * @param Mage_Sales_Model_Order $order
      * @param $payment Mage_Sales_Model_Order_Payment
      * @return array
      */
     public function getCreditCardInstallmentsParams(Mage_Sales_Model_Order $order, $payment)
     {
-        $retorno = array();
-        if($payment->getAdditionalInformation('installment_quantity') && $payment->getAdditionalInformation('installment_value'))
-        {
-            $retorno = array(
+        $return = array();
+        if ($payment->getAdditionalInformation('installment_quantity')
+            && $payment->getAdditionalInformation('installment_value')) {
+            $return = array(
                 'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity'),
-                'installmentValue'      => number_format($payment->getAdditionalInformation('installment_value'),2,'.',''),
+                'installmentValue'      => number_format(
+                    $payment->getAdditionalInformation('installment_value'), 2, '.', ''
+                ),
             );
-        }else{
-            $retorno = array(
+        } else {
+            $return = array(
                 'installmentQuantity'   => '1',
-                'installmentValue'      => number_format($order->getGrandTotal(),2,'.',''),
+                'installmentValue'      => number_format($order->getGrandTotal(), 2, '.', ''),
             );
         }
-        return $retorno;
+        return $return;
     }
 
 
     /**
-     * Retorna um array com informações do endereço de entrega/cobranca para ser enviado pra API
+     * Return an array with address (shipping/billing) information to be used on API
      * @param Mage_Sales_Model_Order $order
      * @param string (billing|shipping) $type
      * @return array
@@ -124,52 +135,57 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $digits = new Zend_Filter_Digits();
 
-        //atributos de endereço
+        //address attributes
         /** @var Mage_Sales_Model_Order_Address $address */
-        $address = ($type=='shipping' && !$order->getIsVirtual()) ? $order->getShippingAddress() : $order->getBillingAddress();
-        $address_street_attribute = Mage::getStoreConfig('payment/pagseguro/address_street_attribute');
-        $address_number_attribute = Mage::getStoreConfig('payment/pagseguro/address_number_attribute');
-        $address_complement_attribute = Mage::getStoreConfig('payment/pagseguro/address_complement_attribute');
-        $address_neighborhood_attribute = Mage::getStoreConfig('payment/pagseguro/address_neighborhood_attribute');
+        $address = ($type=='shipping' && !$order->getIsVirtual()) ?
+            $order->getShippingAddress() : $order->getBillingAddress();
+        $addressStreetAttribute = Mage::getStoreConfig('payment/pagseguro/address_street_attribute');
+        $addressNumberAttribute = Mage::getStoreConfig('payment/pagseguro/address_number_attribute');
+        $addressComplementAttribute = Mage::getStoreConfig('payment/pagseguro/address_complement_attribute');
+        $addressNeighborhoodAttribute = Mage::getStoreConfig('payment/pagseguro/address_neighborhood_attribute');
 
-        //obtendo dados de endereço
-        $addressStreet = $this->_getAddressAttributeValue($address,$address_street_attribute);
-        $addressNumber = $this->_getAddressAttributeValue($address,$address_number_attribute);
-        $addressComplement = $this->_getAddressAttributeValue($address,$address_complement_attribute);
-        $addressDistrict = $this->_getAddressAttributeValue($address,$address_neighborhood_attribute);
+        //gathering address data
+        $addressStreet = $this->_getAddressAttributeValue($address, $addressStreetAttribute);
+        $addressNumber = $this->_getAddressAttributeValue($address, $addressNumberAttribute);
+        $addressComplement = $this->_getAddressAttributeValue($address, $addressComplementAttribute);
+        $addressDistrict = $this->_getAddressAttributeValue($address, $addressNeighborhoodAttribute);
         $addressPostalCode = $digits->filter($address->getPostcode());
         $addressCity = $address->getCity();
-        $addressState = $this->getStateCode( $address->getRegion() );
+        $addressState = $this->getStateCode($address->getRegion());
 
 
-        $retorno = array(
-            $type.'AddressStreet'     => substr($addressStreet,0,80),
-            $type.'AddressNumber'     => substr($addressNumber,0,20),
-            $type.'AddressComplement' => substr($addressComplement,0,40),
-            $type.'AddressDistrict'   => substr($addressDistrict,0,60),
+        $return = array(
+            $type.'AddressStreet'     => substr($addressStreet, 0, 80),
+            $type.'AddressNumber'     => substr($addressNumber, 0, 20),
+            $type.'AddressComplement' => substr($addressComplement, 0, 40),
+            $type.'AddressDistrict'   => substr($addressDistrict, 0, 60),
             $type.'AddressPostalCode' => $addressPostalCode,
-            $type.'AddressCity'       => substr($addressCity,0,60),
+            $type.'AddressCity'       => substr($addressCity, 0, 60),
             $type.'AddressState'      => $addressState,
             $type.'AddressCountry'    => 'BRA',
          );
 
-        //específico pra shipping
-        if($type == 'shipping')
-        {
+        //shipping specific
+        if ($type == 'shipping') {
             $shippingType = $this->_getShippingType($order);
             $shippingCost = $order->getShippingAmount();
-            $retorno['shippingType'] = $shippingType;
-            if($shippingCost > 0)
-            {
-                if($this->_shouldSplit($order)){
+            $return['shippingType'] = $shippingType;
+            if ($shippingCost > 0) {
+                if ($this->_shouldSplit($order)) {
                     $shippingCost -= 0.01;
                 }
-                $retorno['shippingCost'] = number_format($shippingCost,2,'.','');
+                $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
             }
         }
-        return $retorno;
+        return $return;
     }
 
+    /**
+     * Get BR State code even if it was typed manually
+     * @param $state
+     *
+     * @return string
+     */
     public function getStateCode($state)
     {
         if(strlen($state) == 2 && is_string($state))
@@ -181,9 +197,36 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $state = $this->normalizeChars($state);
             $state = trim($state);
             $state = mb_convert_case($state, MB_CASE_UPPER);
-            $codes = array("AC"=>"ACRE", "AL"=>"ALAGOAS", "AM"=>"AMAZONAS", "AP"=>"AMAPA","BA"=>"BAHIA","CE"=>"CEARA","DF"=>"DISTRITO FEDERAL","ES"=>"ESPIRITO SANTO","GO"=>"GOIAS","MA"=>"MARANHAO","MT"=>"MATO GROSSO","MS"=>"MATO GROSSO DO SUL","MG"=>"MINAS GERAIS","PA"=>"PARA","PB"=>"PARAIBA","PR"=>"PARANA","PE"=>"PERNAMBUCO","PI"=>"PIAUI","RJ"=>"RIO DE JANEIRO","RN"=>"RIO GRANDE DO NORTE","RO"=>"RONDONIA","RS"=>"RIO GRANDE DO SUL","RR"=>"RORAIMA","SC"=>"SANTA CATARINA","SE"=>"SERGIPE","SP"=>"SAO PAULO","TO"=>"TOCANTINS");
-            if($code = array_search($state,$codes))
-            {
+            $codes = array(
+                'AC'=>'ACRE',
+                'AL'=>'ALAGOAS',
+                'AM'=>'AMAZONAS',
+                'AP'=>'AMAPA',
+                'BA'=>'BAHIA',
+                'CE'=>'CEARA',
+                'DF'=>'DISTRITO FEDERAL',
+                'ES'=>'ESPIRITO SANTO',
+                'GO'=>'GOIAS',
+                'MA'=>'MARANHAO',
+                'MT'=>'MATO GROSSO',
+                'MS'=>'MATO GROSSO DO SUL',
+                'MG'=>'MINAS GERAIS',
+                'PA'=>'PARA',
+                'PB'=>'PARAIBA',
+                'PR'=>'PARANA',
+                'PE'=>'PERNAMBUCO',
+                'PI'=>'PIAUI',
+                'RJ'=>'RIO DE JANEIRO',
+                'RN'=>'RIO GRANDE DO NORTE',
+                'RO'=>'RONDONIA',
+                'RS'=>'RIO GRANDE DO SUL',
+                'RR'=>'RORAIMA',
+                'SC'=>'SANTA CATARINA',
+                'SE'=>'SERGIPE',
+                'SP'=>'SAO PAULO',
+                'TO'=>'TOCANTINS'
+            );
+            if ($code = array_search($state, $codes)) {
                 return $code;
             }
         }
@@ -196,7 +239,8 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      * @param string $s
      * @return string
      */
-    public static function normalizeChars($s) {
+    public static function normalizeChars($s)
+    {
         $replace = array(
             'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'Ae', 'Å'=>'A', 'Æ'=>'A', 'Ă'=>'A',
             'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'ae', 'å'=>'a', 'ă'=>'a', 'æ'=>'ae',
@@ -221,24 +265,36 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Calcula o valor "Extra", que será o valor das Taxas subtraído do valor dos impostos
+     * Calculates the "Exta" value that corresponds to Tax values minus Discount given
+     * It makes the correct discount to be shown correctly on PagSeguro
      * @param Mage_Sales_Model_Order $order
      *
-     * @return string
+     * @return float
      */
     public function getExtraAmount($order)
     {
         $discount = $order->getDiscountAmount();
-        $tax_amount = $order->getTaxAmount();
-        $extra = $discount+$tax_amount;
-        if($this->_shouldSplit($order)){
+        $taxAmount = $order->getTaxAmount();
+        $extra = $discount + $taxAmount;
+
+        if ($this->_shouldSplit($order)) {
             $extra = $extra+0.01;
         }
-        return number_format($extra,2, '.','');
+        return number_format($extra, 2, '.', '');
     }
 
     /**
-     * Extraí codigo de area e telefone e devolve array com area e number como chave
+     * Remove duplicated spaces from string
+     * @param $string
+     * @return string
+     */
+    public function removeDuplicatedSpaces($string)
+    {
+        return preg_replace('/\s+/', ' ', $string);
+    }
+
+    /**
+     * Extracts phone area code and returns phone number, with area code as key of the returned array
      * @author Ricardo Martins <ricardo@ricardomartins.net.br>
      * @param string $phone
      * @return array
@@ -248,16 +304,15 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $digits = new Zend_Filter_Digits();
         $phone = $digits->filter($phone);
         //se começar com zero, pula o primeiro digito
-        if(substr($phone,0,1) == '0')
-        {
-            $phone = substr($phone,1,strlen($phone));
+        if (substr($phone, 0, 1) == '0') {
+            $phone = substr($phone, 1, strlen($phone));
         }
-        $original_phone = $phone;
+        $originalPhone = $phone;
 
-        $phone = preg_replace('/^(\d{2})(\d{7,9})$/','$1-$2',$phone);
-        if(is_array($phone) && count($phone) == 2)
-        {
-            list($area,$number) = explode('-',$phone);
+        $phone = preg_replace('/^(\d{2})(\d{7,9})$/', '$1-$2', $phone);
+
+        if (is_array($phone) && count($phone) == 2) {
+            list($area, $number) = explode('-', $phone);
             return array(
                 'area' => $area,
                 'number'=>$number
@@ -265,13 +320,13 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         }
 
         return array(
-            'area' => (string)substr($original_phone,0,2),
-            'number'=> (string)substr($original_phone,2,9),
+            'area' => (string)substr($originalPhone, 0, 2),
+            'number'=> (string)substr($originalPhone, 2, 9),
         );
     }
 
     /**
-     * Retorna a forma de envio do produto
+     * Return shipping code based on PagSeguro Documentation
      * 1 – PAC, 2 – SEDEX, 3 - Desconhecido
      * @param Mage_Sales_Model_Order $order
      *
@@ -280,37 +335,37 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     private function _getShippingType(Mage_Sales_Model_Order $order)
     {
         $method =  strtolower($order->getShippingMethod());
-        if(strstr($method,'pac') !== false){
+        if (strstr($method, 'pac') !== false) {
             return '1';
-        }else if(strstr($method,'sedex') !== false)
-        {
+        } else if (strstr($method, 'sedex') !== false) {
             return '2';
         }
         return '3';
     }
 
     /**
-     * Pega um atributo de endereço baseado em um dos Id's vindos de RicardoMartins_PagSeguro_Model_Source_Customer_Address_*
+     * Gets the shipping attribute based on one of the id's from
+     * RicardoMartins_PagSeguro_Model_Source_Customer_Address_*
+     *
      * @param Mage_Sales_Model_Order_Address $address
-     * @param string $attribute_id
+     * @param string $attributeId
+     *
+     * @return string
      */
-    private function _getAddressAttributeValue($address, $attribute_id)
+    private function _getAddressAttributeValue($address, $attributeId)
     {
-        $is_streetline = preg_match('/^street_(\d{1})$/', $attribute_id, $matches);
+        $isStreetline = preg_match('/^street_(\d{1})$/', $attributeId, $matches);
 
-        if($is_streetline !== false && isset($matches[1])) //usa Streetlines
-        {
+        if ($isStreetline !== false && isset($matches[1])) { //uses streetlines
             return $address->getStreet(intval($matches[1]));
-        }
-        else if($attribute_id == '') //Nao informar ao pagseguro
-        {
+        } else if ($attributeId == '') { //do not tell pagseguro
             return '';
         }
-        return (string)$address->getData($attribute_id);
+        return (string)$address->getData($attributeId);
     }
 
     /**
-     * Retorna a Data de Nascimento do cliente baseado na selecao realizada na configuração do Cartao de credito do modulo
+     * Returns customer's date of birthday, based on your module configuration
      * @param Mage_Customer_Model_Customer $customer
      * @param                              $payment
      *
@@ -318,23 +373,22 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     private function _getCustomerCcDobValue(Mage_Customer_Model_Customer $customer, $payment)
     {
-        $cc_dob_attribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
+        $ccDobAttribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
 
-        if(empty($cc_dob_attribute)) //Soliciado ao cliente junto com os dados do cartao
-        {
-            if(isset($payment['additional_information']['credit_card_owner_birthdate'])){
+        if (empty($ccDobAttribute)) { //when asked with payment data
+            if (isset($payment['additional_information']['credit_card_owner_birthdate'])) {
                 return $payment['additional_information']['credit_card_owner_birthdate'];
             }
         }
 
-        $dob = $customer->getResource()->getAttribute($cc_dob_attribute)->getFrontend()->getValue($customer);
+        $dob = $customer->getResource()->getAttribute($ccDobAttribute)->getFrontend()->getValue($customer);
 
 
         return date('d/m/Y', strtotime($dob));
     }
 
     /**
-     * Retorna o CPF do cliente baseado na selecao realizada na configuração do modulo
+     * Returns customer's CPF based on your module configuration
      * @param Mage_Sales_Model_Order $order
      * @param Mage_Payment_Model_Method_Abstract $payment
      *
@@ -342,44 +396,47 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     private function _getCustomerCpfValue(Mage_Sales_Model_Order $order, $payment)
     {
-        $customer_cpf_attribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
+        $customerCpfAttribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
 
-        if(empty($customer_cpf_attribute)) //Soliciado ao cliente junto com os dados do cartao
-        {
-            if(isset($payment['additional_information'][$payment->getMethod().'_cpf'])){
-                return $payment['additional_information'][$payment->getMethod().'_cpf'];
+        if (empty($customerCpfAttribute)) { //Asked with payment data
+            if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
+                return $payment['additional_information'][$payment->getMethod() . '_cpf'];
             }
         }
-        $entity = explode('|',$customer_cpf_attribute);
+        $entity = explode('|', $customerCpfAttribute);
         $cpf = '';
-        if(count($entity) == 1 || $entity[0] == 'customer'){
-            if(count($entity) == 2){
-                $customer_cpf_attribute = $entity[1];
+        if (count($entity) == 1 || $entity[0] == 'customer') {
+            if (count($entity) == 2) {
+                $customerCpfAttribute = $entity[1];
             }
             $customer = $order->getCustomer();
 
-            $cpf = $customer->getData($customer_cpf_attribute);
-        }else if(count($entity) == 2 && $entity[0] == 'billing' ){ //billing
+            $cpf = $customer->getData($customerCpfAttribute);
+        } else if (count($entity) == 2 && $entity[0] == 'billing' ) { //billing
             $cpf = $order->getShippingAddress()->getData($entity[1]);
         }
 
         $cpfObj = new Varien_Object(array('cpf'=>$cpf));
 
-        Mage::dispatchEvent('ricardomartins_pagseguro_return_cpf_before', array(
-            'order' => $order,
-            'payment' => $payment,
-            'cpf_obj' => $cpfObj,
-        ));
+        //you can create a module to get customer's CPF from somewhere else
+        Mage::dispatchEvent(
+            'ricardomartins_pagseguro_return_cpf_before',
+            array(
+                'order' => $order,
+                'payment' => $payment,
+                'cpf_obj' => $cpfObj,
+                )
+        );
 
         return $cpfObj->getCpf();
     }
 
 
     /**
-     * Se deve ou não dividir o frete.. Se o total de produtos for igual o
-     * totalde desconto, o modulo diminuirá 1 centavo do frete e adicionará
-     * ao valor dos itens, pois o PagSeguro não aceita que os produtos custem
-     * zero.
+     * Should split shipping? If grand total is equal to discount total.
+     * PagSeguro needs to receive product values > R$0,00, even if you need to invoice only shipping
+     * and would like to give producs for free.
+     * In these cases, splitting will add R$0,01 for each product, reducing R$0,01 from shipping total.
      *
      * @param $order
      *
@@ -388,11 +445,11 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     private function _shouldSplit($order)
     {
         $discount = $order->getDiscountAmount();
-        $tax_amount = $order->getTaxAmount();
-        $extraAmount = $discount+$tax_amount;
+        $taxAmount = $order->getTaxAmount();
+        $extraAmount = $discount + $taxAmount;
 
         $totalAmount = 0;
-        foreach($order->getAllVisibleItems() as $item){
+        foreach ($order->getAllVisibleItems() as $item) {
             $totalAmount += $item->getRowTotal();
         }
         return (abs($extraAmount) == $totalAmount);

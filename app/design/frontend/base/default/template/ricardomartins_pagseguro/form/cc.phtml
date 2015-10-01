@@ -1,4 +1,5 @@
 <?php
+/** @var RicardoMartins_PagSeguro_Block_Form_Cc $this */
 $_code=$this->getMethodCode();
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
@@ -87,3 +88,10 @@ $_code=$this->getMethodCode();
         <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>
     </li>
 </ul>
+<script type="text/javascript">
+//<![CDATA[
+    if ('undefined' !== typeof RMPagSeguro) {
+        RMPagSeguro.getInstallments();
+    }
+//]]
+</script>

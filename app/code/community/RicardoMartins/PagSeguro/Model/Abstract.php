@@ -1,19 +1,34 @@
 <?php
+/**
+ * PagSeguro Transparente Magento
+ * PagSeguro Abstract Model Class - Used on processing and sending information to/from PagSeguro
+ *
+ * @category    RicardoMartins
+ * @package     RicardoMartins_PagSeguro
+ * @author      Ricardo Martins
+ * @copyright   Copyright (c) 2015 Ricardo Martins (http://r-martins.github.io/PagSeguro-Magento-Transparente/)
+ * @license     https://opensource.org/licenses/MIT MIT License
+ */
 class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_Abstract
 {
     /**
-     * Processa o XML de retorno da notificação. O XML é enviado no ato do pedido, e depois nas consultas de atualizacao de pedido.
+     * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      * @see https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-notificacoes.html#v2-item-servico-de-notificacoes
      * @param SimpleXMLElement $resultXML
      */
     public function proccessNotificatonResult(SimpleXMLElement $resultXML)
     {
-        if(isset($resultXML->error)){
+        if (isset($resultXML->error)) {
             $errMsg = Mage::helper('ricardomartins_pagseguro')->__((string)$resultXML->error->message);
-            Mage::throwException($this->_getHelper()->__('Problemas ao processar seu pagamento. %s(%s)', $errMsg, (string)$resultXML->error->code));
+            Mage::throwException(
+                $this->_getHelper()->__(
+                    'Problemas ao processar seu pagamento. %s(%s)',
+                    $errMsg,
+                    (string)$resultXML->error->code
+                )
+            );
         }
-        if(isset($resultXML->reference))
-        {
+        if (isset($resultXML->reference)) {
             /** @var Mage_Sales_Model_Order $order */
             $order = Mage::getModel('sales/order')->loadByIncrementId((string)$resultXML->reference);
             $payment = $order->getPayment();
@@ -21,24 +36,24 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $processedState = $this->processStatus((int)$resultXML->status);
             $message = $processedState->getMessage();
 
-            if((int)$resultXML->status == 6) //valor devolvido (gera credit memo e tenta cancelar o pedido)
-            {
+            if ((int)$resultXML->status == 6) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
                 if ($order->canUnhold()) {
                     $order->unhold();
                 }
-                if($order->canCancel())
-                {
+                if ($order->canCancel()) {
                     $order->cancel();
                     $order->save();
-                }else{
+                } else {
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
-                    $order->addStatusHistoryComment('Devolvido: o valor foi devolvido ao comprador, mas o pedido encontra-se em um estado que não pode ser cancelado.')
-                        ->save();
+                    $order->addStatusHistoryComment(
+                        'Devolvido: o valor foi devolvido ao comprador, mas o
+                        pedido encontra-se em um estado que não pode ser cancelado.'
+                    )->save();
                 }
             }
 
-            if((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) //Especificamos a fonte do cancelamento do pedido
-            {
+            if ((int)$resultXML->status == 7 && isset($resultXML->cancellationSource)) {
+                //Especificamos a fonte do cancelamento do pedido
                 switch((string)$resultXML->cancellationSource)
                 {
                     case 'INTERNAL':
@@ -51,22 +66,28 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $order->cancel();
             }
 
-            if($processedState->getStateChanged())
-            {
-                $order->setState($processedState->getState(),true,$message,$processedState->getIsCustomerNotified())->save();
-            }else{
+            if ($processedState->getStateChanged()) {
+                $order->setState(
+                    $processedState->getState(),
+                    true,
+                    $message,
+                    $processedState->getIsCustomerNotified()
+                )->save();
+            } else {
                 $order->addStatusHistoryComment($message);
             }
 
-            if((int)$resultXML->status == 3) //Quando o pedido foi dado como Pago
-            {
+            if ((int)$resultXML->status == 3) { //Quando o pedido foi dado como Pago
                 //cria fatura e envia email (se configurado)
 //                $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
                 $invoice = $order->prepareInvoice();
                 $invoice->register()->pay();
                 $msg = sprintf('Pagamento capturado. Identificador da Transação: %s', (string)$resultXML->code);
                 $invoice->addComment($msg);
-                $invoice->sendEmail(Mage::getStoreConfigFlag('payment/pagseguro/send_invoice_email'),'Pagamento recebido com sucesso.');
+                $invoice->sendEmail(
+                    Mage::getStoreConfigFlag('payment/pagseguro/send_invoice_email'),
+                    'Pagamento recebido com sucesso.'
+                );
                 Mage::getModel('core/resource_transaction')
                     ->addObject($invoice)
                     ->addObject($invoice->getOrder())
@@ -76,18 +97,21 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
             $payment->save();
             $order->save();
-            Mage::dispatchEvent('pagseguro_proccess_notification_after',array(
+            Mage::dispatchEvent(
+                'pagseguro_proccess_notification_after',
+                array(
                     'order' => $order,
                     'payment'=> $payment,
                     'result_xml' => $resultXML,
-                ));
-        }else{
+                )
+            );
+        } else {
             Mage::throwException('Retorno inválido. Referência do pedido não encontrada.');
         }
     }
 
     /**
-     * Pega um codigo de notificacao (enviado pelo pagseguro quando algo acontece com o pedido) e consulta o que mudou no status
+     * Grab statuses changes when receiving a new notification code
      * @param $notificationCode
      *
      * @return SimpleXMLElement
@@ -97,10 +121,12 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         $helper =  Mage::helper('ricardomartins_pagseguro');
         $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode, false);
         $client = new Zend_Http_Client($url);
-        $client->setParameterGet(array(
+        $client->setParameterGet(
+            array(
                 'token'=>$helper->getToken(),
                 'email'=> $helper->getMerchantEmail(),
-            ));
+            )
+        );
 
         $client->request();
         $resposta = $client->getLastResponse()->getBody();
@@ -111,7 +137,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     }
 
     /**
-     * Processa o status do pedido devolvendo informacoes como status e state do pedido
+     * Processes order status and return information about order status and state
+     * Doesn' change anything to the order. Just returns an object showing what to do.
      * @param $statusCode
      * @return Varien_Object
      */
@@ -125,24 +152,36 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             case '1':
                 $return->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
                 $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
-                if($this->getCode()=='pagseguro_cc'){
+                if ($this->getCode()=='pagseguro_cc') {
                     $return->setStateChanged(false);
                 }
-                $return->setMessage('Aguardando pagamento: o comprador iniciou a transação, mas até o momento o PagSeguro não recebeu nenhuma informação sobre o pagamento.');
+                $return->setMessage(
+                    'Aguardando pagamento: o comprador iniciou a transação,
+                mas até o momento o PagSeguro não recebeu nenhuma informação sobre o pagamento.'
+                );
                 break;
             case '2':
                 $return->setState(Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW);
                 $return->setIsCustomerNotified(true);
-                $return->setMessage('Em análise: o comprador optou por pagar com um cartão de crédito e o PagSeguro está analisando o risco da transação.');
+                $return->setMessage(
+                    'Em análise: o comprador optou por pagar com um cartão de crédito e
+                    o PagSeguro está analisando o risco da transação.'
+                );
                 break;
             case '3':
                 $return->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
                 $return->setIsCustomerNotified(true);
-                $return->setMessage('Paga: a transação foi paga pelo comprador e o PagSeguro já recebeu uma confirmação da instituição financeira responsável pelo processamento.');
+                $return->setMessage(
+                    'Paga: a transação foi paga pelo comprador e o PagSeguro já recebeu uma confirmação
+                    da instituição financeira responsável pelo processamento.'
+                );
                 $return->setIsTransactionPending(false);
                 break;
             case '4':
-                $return->setMessage('Disponível: a transação foi paga e chegou ao final de seu prazo de liberação sem ter sido retornada e sem que haja nenhuma disputa aberta.');
+                $return->setMessage(
+                    'Disponível: a transação foi paga e chegou ao final de seu prazo de liberação sem
+                    ter sido retornada e sem que haja nenhuma disputa aberta.'
+                );
                 $return->setIsCustomerNotified(false);
                 $return->setStateChanged(false);
                 $return->setIsTransactionPending(false);
@@ -151,7 +190,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $return->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
-                $return->setMessage('Em disputa: o comprador, dentro do prazo de liberação da transação, abriu uma disputa.');
+                $return->setMessage(
+                    'Em disputa: o comprador, dentro do prazo de liberação da transação,
+                    abriu uma disputa.'
+                );
                 break;
             case '6':
                 $return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
@@ -173,7 +215,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     }
 
     /**
-     * Chama API pra realizar um pagamento
+     * Call PagSeguro API to place an order (/transactions)
      * @param $params
      * @param $payment
      *
@@ -182,23 +224,23 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     public function callApi($params, $payment)
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
-        $useapp = $helper->getLicenseType() == 'app';
-        if($useapp){
+        $useApp = $helper->getLicenseType() == 'app';
+        if ($useApp) {
             $params['public_key'] = Mage::getStoreConfig('payment/pagseguropro/key');
         }
-        $params = $this->_convertEnconding($params);
-        $params_string = $this->_convertToCURLString($params);
+        $params = $this->_convertEncoding($params);
+        $paramsString = $this->_convertToCURLString($params);
         
-        $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params,true));
+        $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params, true));
         
         $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL, $helper->getWsUrl('transactions', $useapp));
-        curl_setopt($ch,CURLOPT_POST, count($params));
-        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $params_string);
-        curl_setopt($ch,CURLOPT_TIMEOUT, 45);
-        curl_setopt($ch,CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_URL, $helper->getWsUrl('transactions', $useApp));
+        curl_setopt($ch, CURLOPT_POST, count($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $paramsString);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
         try{
             $response = curl_exec($ch);
@@ -206,61 +248,68 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
         }
 
-        if(curl_error($ch)){
-            Mage::throwException(sprintf('Falha ao tentar enviar parametros ao PagSeguro: %s (%s)', curl_error($ch), curl_errno($ch)));
+        if (curl_error($ch)) {
+            Mage::throwException(
+                sprintf('Falha ao tentar enviar parametros ao PagSeguro: %s (%s)', curl_error($ch), curl_errno($ch))
+            );
         }
         curl_close($ch);
 
-        $helper->writeLog('Retorno PagSeguro (/transactions): ' . var_export($response,true));
+        $helper->writeLog('Retorno PagSeguro (/transactions): ' . var_export($response, true));
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(trim($response));
-        if(false === $xml){
+        if (false === $xml) {
             switch($response){
                 case 'Unauthorized':
-                    $helper->writeLog('Token/email não autorizado pelo PagSeguro. Verifique suas configurações no painel.');
+                    $helper->writeLog(
+                        'Token/email não autorizado pelo PagSeguro. Verifique suas configurações no painel.'
+                    );
                     break;
                 case 'Forbidden':
-                    $helper->writeLog('Acesso não autorizado à Api Pagseguro. Verifique se você tem permissão para usar este serviço. Retorno: ' . var_export($response,true));
+                    $helper->writeLog(
+                        'Acesso não autorizado à Api Pagseguro. Verifique se você tem permissão para
+                         usar este serviço. Retorno: ' . var_export($response, true)
+                    );
                     break;
                 default:
                     $helper->writeLog('Retorno inesperado do PagSeguro. Retorno: ' . $response);
             }
-            Mage::throwException('Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.');
+            Mage::throwException(
+                'Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.'
+            );
         }
         
         return $xml;
     }
 
     /**
-     * Converte os valores enviados à api para ISO-8859-1
+     * Convert array values to utf-8
      * @param array $params
      *
      * @return array
      */
-    protected function _convertEnconding(array $params)
+    protected function _convertEncoding(array $params)
     {
-        foreach($params as $k => $v)
-        {
+        foreach ($params as $k => $v) {
             $params[$k] = utf8_decode($v);
         }
         return $params;
     }
     
     /**
-     * Converte para um única string os valores a serem enviados à api (já convertidos para ISO-8859-1)
+     * Convert API params (already ISO-8859-1) to url format (curl string)
      * @param array $params
      *
      * @return string
      */
     protected function _convertToCURLString(array $params)
     {
-        $fields_string = '';
-        foreach($params as $k => $v)
-        {
-            $fields_string .= $k.'='.urlencode($v).'&';
+        $fieldsString = '';
+        foreach ($params as $k => $v) {
+            $fieldsString .= $k.'='.urlencode($v).'&';
         }
         
-        return rtrim($fields_string, '&');
+        return rtrim($fieldsString, '&');
     }
 }

@@ -1,11 +1,18 @@
 <?php
 /**
- * Payment Method Codes
+ * PagSeguro Transparente Magento
  *
- * @author    Ricardo Martins <ricardo@ricardomartins.net.br>
+ * @category    RicardoMartins
+ * @package     RicardoMartins_PagSeguro
+ * @author      Ricardo Martins
+ * @copyright   Copyright (c) 2015 Ricardo Martins (http://r-martins.github.io/PagSeguro-Magento-Transparente/)
+ * @license     https://opensource.org/licenses/MIT MIT License
  */
 class RicardoMartins_PagSeguro_Model_Source_Paymentmethods
 {
+    /**
+     * @return array
+     */
     public function toOptionArray()
     {
         $options = array();

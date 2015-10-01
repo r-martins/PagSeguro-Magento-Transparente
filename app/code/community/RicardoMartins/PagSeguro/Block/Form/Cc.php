@@ -1,29 +1,14 @@
 <?php
 /**
- * Magento
+ * PagSeguro Transparente Magento
+ * Form CC Block Class
  *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Magento to newer
- * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
- *
- * @category    Mage
- * @package     Mage_Paygate
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category    RicardoMartins
+ * @package     RicardoMartins_PagSeguro
+ * @author      Ricardo Martins
+ * @copyright   Copyright (c) 2015 Ricardo Martins (http://r-martins.github.io/PagSeguro-Magento-Transparente/)
+ * @license     https://opensource.org/licenses/MIT MIT License
  */
-
 class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
 {
     /**
@@ -36,7 +21,7 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
     }
 
     /**
-     * Insere o javascript do modulo somente na hora da renderização, caso ainda não tenha sido inserido.
+     * Insert module's javascript on rendering, only if it wasn't inserted before
      * @return Mage_Core_Block_Abstract
      */
     protected function _prepareLayout()
@@ -52,6 +37,11 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
         return parent::_prepareLayout();
     }
 
+    /**
+     * Check if Date of Birthday should be visible
+     * You can set up it on Payment Methods->PagSeguro Cartão de Crédito
+     * @return bool
+     */
     public function isDobVisible()
     {
         $ownerDobAttribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
