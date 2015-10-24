@@ -46,11 +46,10 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
 
 
-        $senderName = sprintf(
-            '%s %s',
-            $this->removeDuplicatedSpaces($order->getCustomerFirstname()),
-            $this->removeDuplicatedSpaces($order->getCustomerLastname())
+        $senderName = $this->removeDuplicatedSpaces(
+            sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
         );
+
         $senderName = substr($senderName, 0, 50);
 
         $return = array(
