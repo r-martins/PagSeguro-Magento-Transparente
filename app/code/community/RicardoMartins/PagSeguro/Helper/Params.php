@@ -289,7 +289,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function removeDuplicatedSpaces($string)
     {
-        return preg_replace('/\s+/', ' ', $string);
+        return preg_replace('/\s+/', ' ', trim($string));
     }
 
     /**
