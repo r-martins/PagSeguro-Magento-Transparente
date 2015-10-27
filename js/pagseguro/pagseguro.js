@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 2.0.0
+ * @version 2.1.0
  */
 (function() {
 document.observe("dom:loaded", function() {
@@ -29,6 +29,8 @@ document.observe("dom:loaded", function() {
                     success: function(psresponse){
                         RMPagSeguro.brand= psresponse.brand;
                         $('card-brand').innerHTML = psresponse.brand.name;
+                        /*Se preferir, comente a linha abaixo para exibir somente o nome do cartao. Voce tambem pode trocar 42x20 por 68x30 para obter um tamanho maior.*/
+                        $('card-brand').innerHTML = '<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>';
                         $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*/g,'');
                         $$('input[name="payment[ps_card_type]"]').first().value = psresponse.brand.name;
                         RMPagSeguro.getInstallments();
@@ -38,6 +40,9 @@ document.observe("dom:loaded", function() {
                         $('card-brand').innerHTML = 'Cartão inválido';
                     }
                 });
+            }else{
+                $('card-brand').innerHTML = '';
+                $('card-brand').className = '';
             }
         });
     }
