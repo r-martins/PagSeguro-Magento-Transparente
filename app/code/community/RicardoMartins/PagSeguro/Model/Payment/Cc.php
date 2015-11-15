@@ -157,6 +157,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             }
             Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
         }
+        if (isset($returnXml->error)) {
+            $error = $returnXml->error;
+            $errMsg[] = (string)$error->message . ' (' . $error->code . ')';
+            Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+        }
 
         $payment->setSkipOrderProcessing(true);
 

@@ -133,7 +133,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         
         $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $resposta));
 
-        return simplexml_load_string(trim($resposta));
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string(trim($resposta));
+        if (false === $xml) {
+            $helper->writeLog('Retorno de notificacao XML PagSeguro em formato não esperado. Retorno: ' . $resposta);
+        }
+
+        return $xml;
     }
 
     /**

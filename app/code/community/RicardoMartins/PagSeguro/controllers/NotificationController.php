@@ -30,6 +30,11 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
             );
         $model =  Mage::getModel('ricardomartins_pagseguro/abstract');
         $response = $model->getNotificationStatus($this->getRequest()->getPost('notificationCode'));
+        if (false === $response) {
+            Mage::throwException('Falha ao processar retorno XML do PagSeguro.');
+        }
         $model->proccessNotificatonResult($response);
+
+
     }
 }
