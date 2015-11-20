@@ -195,6 +195,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         {
             $state = $this->normalizeChars($state);
             $state = trim($state);
+            $state = $this->stripAccents($state);
             $state = mb_convert_case($state, MB_CASE_UPPER);
             $codes = array(
                 'AC'=>'ACRE',
@@ -249,6 +250,17 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             'š'=>'s', 'Ş'=>'S', 'ș'=>'s', 'Ș'=>'S', 'ş'=>'s', 'ț'=>'t', 'Ț'=>'T', 'ÿ'=>'y', 'Ž'=>'Z', 'ž'=>'z'
         );
         return preg_replace('/[^0-9A-Za-zÃÁÀÂÇÉÊÍÕÓÔÚÜãáàâçéêíõóôúü.\-\/ ]/u', '', strtr($s, $replace));
+    }
+
+    /**
+     * Replace accented characters
+     * @param $string
+     *
+     * @return string
+     */
+    public function stripAccents($string)
+    {
+        return preg_replace('/[`^~\'"]/', null, iconv('UTF-8', 'ASCII//TRANSLIT', $string));
     }
 
     /**
