@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>2.3.3</version>
+            <version>2.4.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -52,6 +52,15 @@
             </core_block_abstract_to_html_after>
         </events>
     </frontend>
+    <adminhtml>
+        <layout>
+            <updates>
+                <ricardomartins_pagseguro>
+                    <file>ricardomartins_pagseguro/pagseguro.xml</file>
+                </ricardomartins_pagseguro>
+            </updates>
+        </layout>
+    </adminhtml>
     <default>
         <payment>
             <pagseguro_cc>

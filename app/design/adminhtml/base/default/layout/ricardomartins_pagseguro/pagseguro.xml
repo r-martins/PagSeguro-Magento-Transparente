@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_sales_order_create_index>
+        <reference name="billing_method">
+            <action method="append">
+                <block helper="ricardomartins_pagseguro/getPagSeguroScriptBlock"/>
+            </action>
+        </reference>
+    </adminhtml_sales_order_create_index>
+</layout>

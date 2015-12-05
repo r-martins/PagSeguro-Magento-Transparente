@@ -8,7 +8,7 @@ $_helper = Mage::helper('ricardomartins_pagseguro');
     var iid = setInterval(function()
     {
         if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
-            console.log('PagSeguro ready boleto');
+            console.log('PagSeguro ready');
 
             clearInterval(iid);
             RMPagSeguro.updateSenderHash();
