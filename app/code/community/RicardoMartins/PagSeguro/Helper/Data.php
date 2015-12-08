@@ -257,16 +257,26 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $scriptBlock = Mage::app()->getLayout()->createBlock('core/text', 'js_pagseguro');
         $secure = Mage::getStoreConfigFlag('web/secure/use_in_frontend');
+        $directPaymentBlock = '';
+
+        if (Mage::app()->getLayout()->getArea() == 'adminhtml') {
+            $directPaymentBlock = Mage::app()->getLayout()
+                ->createBlock('ricardomartins_pagseguro/form_directpayment')
+                ->toHtml();
+        }
+
         $scriptBlock->setText(
             sprintf(
                 '
                 <script type="text/javascript">var RMPagSeguroSiteBaseURL = "%s";</script>
                 <script type="text/javascript" src="%s"></script>
                 <script type="text/javascript" src="%s"></script>
+                %s
                 ',
                 Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, $secure),
                 Mage::helper('ricardomartins_pagseguro')->getJsUrl(),
-                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, $secure) . 'pagseguro/pagseguro.js'
+                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, $secure) . 'pagseguro/pagseguro.js',
+                $directPaymentBlock
             )
         );
         return $scriptBlock;
