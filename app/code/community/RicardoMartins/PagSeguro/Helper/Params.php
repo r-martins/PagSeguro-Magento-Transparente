@@ -296,6 +296,23 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Retrieve array of available years
+     *
+     * @return array
+     */
+    public function getYears()
+    {
+        $years = array();
+        $first = date("Y");
+
+        for ($index=0; $index <= 20; $index++) {
+            $year = $first + $index;
+            $years[$year] = $year;
+        }
+        return $years;
+    }
+
+    /**
      * Extracts phone area code and returns phone number, with area code as key of the returned array
      * @author Ricardo Martins <ricardo@ricardomartins.net.br>
      * @param string $phone
