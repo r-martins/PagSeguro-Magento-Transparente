@@ -1,11 +1,7 @@
-#code files
-app/code/community/RicardoMartins/* app/code/community/RicardoMartins
-app/design/frontend/base/default/template/* app/design/frontend/base/default/template
-app/design/adminhtml/base/default/template/* app/design/adminhtml/base/default/template
-app/etc/modules/* app/etc/modules
-app/locale/pt_BR/* app/locale/pt_BR
-
-#asset files
-js/pagseguro/* js/pagseguro
-skin/frontend/base/default/* skin/frontend/base/default
-
+app/code/community/RicardoMartins/PagSeguro/* app/code/community/RicardoMartins/PagSeguro/
+app/design/frontend/base/default/template/ricardomartins_pagseguro/* app/design/frontend/base/default/template/ricardomartins_pagseguro/
+app/design/adminhtml/base/default/layout/ricardomartins_pagseguro/* app/design/adminhtml/base/default/layout/ricardomartins_pagseguro/
+app/etc/modules/RicardoMartins_PagSeguro.xml app/etc/modules/RicardoMartins_PagSeguro.xml
+app/locale/pt_BR/RicardoMartins_PagSeguro.csv app/locale/pt_BR/RicardoMartins_PagSeguro.csv
+js/pagseguro/pagseguro.js js/pagseguro/pagseguro.js
+skin/frontend/base/default/pagseguro/selo/* skin/frontend/base/default/pagseguro/selo/
