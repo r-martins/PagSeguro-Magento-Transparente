@@ -14,6 +14,7 @@ $_helper = Mage::helper('ricardomartins_pagseguro');
                 RMPagSeguro.updateSenderHash();
                 RMPagSeguro.addBrandObserver();
                 RMPagSeguro.addCardFieldsObserver();
+                RMPagSeguro.removeUnavailableBanks();
             }
         }, 4000);
     }

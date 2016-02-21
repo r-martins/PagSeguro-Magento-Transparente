@@ -145,6 +145,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         //will grab data to be send via POST to API inside $params
         $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
+        $rmHelper = Mage::helper('ricardomartins_pagseguro');
 
         //call API
         $returnXml = $this->callApi($params, $payment);
@@ -153,13 +154,13 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         if (isset($returnXml->errors)) {
             $errMsg = array();
             foreach ($returnXml->errors as $error) {
-                $errMsg[] = (string)$error->message . '(' . $error->code . ')';
+                $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
             }
             Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
         }
         if (isset($returnXml->error)) {
             $error = $returnXml->error;
-            $errMsg[] = (string)$error->message . ' (' . $error->code . ')';
+            $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
             Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
         }
 

@@ -2,11 +2,15 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 2.1.0
+ * @version 2.5.0
  */
 (function() {
 document.observe("dom:loaded", function() {
-    RMPagSeguro = function RMPagSeguro(){};
+    RMPagSeguro = function RMPagSeguro(){
+        this.init = function() {
+            this.grandTotal = 0;
+        }
+    };
     RMPagSeguro.updateSenderHash = function(){
         var senderHash = PagSeguroDirectPayment.getSenderHash();
         if(typeof senderHash != "undefined")
@@ -108,43 +112,55 @@ document.observe("dom:loaded", function() {
         Element.observe(ccCvvElm,'keyup',function(e){RMPagSeguro.updateCreditCardToken();});
     }
 
-    RMPagSeguro.getInstallments = function(){
+    RMPagSeguro.getGrandTotal = function(){
         var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/getGrandTotal';
         new Ajax.Request(_url, {
+            asynchronous: false,
            onSuccess: function(response){
-               var grandTotal = response.responseJSON.total;
+               RMPagSeguro.grandTotal =  response.responseJSON.total;
+           },
+            onFailure: function(response){
+                return false;
+            }
+        });
+    }
 
-               PagSeguroDirectPayment.getInstallments({
-                   amount: grandTotal,
-                   brand: RMPagSeguro.brand.name,
-                   success: function(response) {
-                       var parcelsDrop = document.getElementById('pagseguro_cc_cc_installments');
-                       for( installment in response.installments) break;
+    RMPagSeguro.getInstallments = function(){
+        var brandName = "";
+        if(typeof RMPagSeguro.brand == "undefined"){
+            return;
+        }
+        this.getGrandTotal();
+        if(false == RMPagSeguro.grandTotal){
+            return 0;
+        }
+        brandName = RMPagSeguro.brand.name;
+        PagSeguroDirectPayment.getInstallments({
+            amount: this.grandTotal,
+            brand: brandName,
+            success: function(response) {
+                var parcelsDrop = document.getElementById('pagseguro_cc_cc_installments');
+                for( installment in response.installments) break;
 //                       console.log(response.installments);
-                       var b = response.installments[RMPagSeguro.brand.name];
-                       parcelsDrop.length = 0;
-                       for(var x=0; x < b.length; x++){
-                           var option = document.createElement('option');
-                           option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
-                           option.text += (b[x].interestFree)?" sem juros":" com juros";
-                           option.value = b[x].quantity + "|" + b[x].installmentAmount;
-                           parcelsDrop.add(option);
-                       }
+                var b = response.installments[RMPagSeguro.brand.name];
+                parcelsDrop.length = 0;
+                for(var x=0; x < b.length; x++){
+                    var option = document.createElement('option');
+                    option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
+                    option.text += (b[x].interestFree)?" sem juros":" com juros";
+                    option.value = b[x].quantity + "|" + b[x].installmentAmount;
+                    parcelsDrop.add(option);
+                }
 //                       console.log(b[0].quantity);
 //                       console.log(b[0].installmentAmount);
 
-                   },
-                   error: function(response) {
-                       console.log(response);
-                   },
-                   complete: function(response) {
+            },
+            error: function(response) {
+                console.log(response);
+            },
+            complete: function(response) {
 //                       console.log(response);
-                       RMPagSeguro.reCheckSenderHash();
-                   }
-               });
-           },
-            onFailure: function(response){
-                return 0;
+                RMPagSeguro.reCheckSenderHash();
             }
         });
     }
@@ -166,6 +182,40 @@ document.observe("dom:loaded", function() {
                 PagSeguroDirectPayment.setSessionId(session_id);
             }
         });
+    }
+
+    RMPagSeguro.removeUnavailableBanks = function(){
+        if($('pseguro_tef_bank')){
+            PagSeguroDirectPayment.getPaymentMethods({
+                amount: RMPagSeguro.grandTotal,
+                success: function(response){
+                    if(response.error == true){
+                        console.log('Não foi possível obter os meios de pagamento que estão funcionando no momento.');
+                        return;
+                    }
+
+                    try{
+                        for (y in response.paymentMethods.ONLINE_DEBIT.options){
+                            if(response.paymentMethods.ONLINE_DEBIT.options[y].status == 'UNAVAILABLE'){
+                                var valueName = response.paymentMethods.ONLINE_DEBIT.options[y].name.toString().toLowerCase();
+                                RMPagSeguro.removeOptionByValue($('pseguro_tef_bank'), valueName);
+                                console.log(response.paymentMethods.ONLINE_DEBIT.options[y].displayName + ' encontra-se indisponível e foi removido.');
+                            }
+                        }
+                    }catch (err){
+                        console.log(err.message);
+                    }
+                }
+            })
+        }
+    }
+    RMPagSeguro.removeOptionByValue = function(selectObj, value){
+        for (x in selectObj.options) {
+            if(selectObj.options[x].value == value){
+                selectObj.options[x] = null;
+                break;
+            }
+        }
     }
     window.RMPagSeguro = RMPagSeguro;
     RMPagSeguro.updateSessionId();
