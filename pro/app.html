@@ -137,7 +137,9 @@ zE(function() {
 
 					<p>Para manter o módulo neste modelo, é repassado 0,4% (taxa de repasse) para o projeto. Ou seja, além de contribuir com este e outros projetos e instituições, você ainda tem uma redução de 0,1% na taxa padrão do PagSeguro.</p>
 
-					<p>O repasse e as taxas são calculados apenas sob vendas aprovadas feitas pelo módulo PagSeguro Transparente no modelo APP, para vendas feitas com cartão, tef ou boleto, e discriminados nos detalhes de cada pedido no seu painel do PagSeguro.</p>
+					<p>O repasse e as taxas são calculados apenas sob vendas aprovadas feitas pelo módulo PagSeguro Transparente no modelo APP, para vendas feitas com cartão, tef ou boleto, e discriminados nos detalhes de cada pedido no seu painel do PagSeguro, como mostra o exemplo abaixo:</p>
+					<p><img src="/PagSeguro-Magento-Transparente/public/images/print-pedido.jpg" border="0" width="100%" title="Exemplo real extraído dos detalhes da transação no painel do PagSeguro." alt="Exemplo real extraído dos detalhes da transação no painel do PagSeguro."/></p>
+					<p>A taxa de intermediacão normal para esta transação seria de R$8,75, se não utilizasse este módulo no sistema de aplicação. Utilizando o módulo, a taxa de repasse junto com a taxa de intermediação passa a ser R$8,57 (7,87+0,7). Uma <strong>economia de R$0,18 apenas nessa simulação</strong>.</p>
 
 					<p>Se você utiliza recebimento em 30 dias com a taxa de 3,99%, talvez queira optar pelo <a
 							href="../pro">modelo de assinatura</a>.</p>
@@ -149,18 +151,20 @@ zE(function() {
 
 
 
-		<section id="contratar" class="docs section">
+		<section id="contratar" class="section">
 			<div class="container">
 				<div class="docs-inner">
 					<h2 class="title text-center">Contratar</h2>
 					<p>Siga os passos abaixo, e comece a vender com o Transparente em minutos.</p>
 					<ol>
 						<li>Preencha o formulário abaixo. Você será redirecionado para o PagSeguro.</li>
+						<li>Se você já tem conta no PagSeguro, na próxima tela clique em "Já tenho conta..", no final da página.</li>
 						<li>Revise as condições de taxas aplicadas nas vendas realizadas com o módulo.</li>
 						<li>Após autorizar, você receberá o módulo do PagSeguro PRO no <strong>e-mail informado abaixo</strong></li>
 						<li>Instale e configure o módulo PRO em conjunto com o módulo gratuito que pode ser baixado <a
 								href="https://github.com/r-martins/PagSeguro-Magento-Transparente/zipball/master">aqui</a></li>
-						<li>Configure o módulo com sua chave enviada por e-mail e boas vendas!</li>
+						<li>Configure o módulo com sua chave enviada por e-mail e boas vendas! Se tiver dúvidas na instalação, <a
+								href="/PagSeguro-Magento-Transparente/#suporte">clique aqui</a>.</li>
 					</ol>
 
 					<form id="formAppNew" target="_blank" method="POST" action="http://ws.ricardomartins.net.br/pspro/v6/app/new">
@@ -243,10 +247,10 @@ zE(function() {
 					<p>Veja algumas dicas de onde obter respostas na <a href="../#suporte">área de suporte</a> com vídeos e tudo mais.</p>
 
 					<h3>Porque é pago?</h3>
-					<p>O valor pago é para suporte do projeto, e para ajudar outros projetos open source e instituições. Tentei fazer de forma 100% gratuita acreditando que iriam existir doações para o projeto, o que não aconteceu. Por esta razão é cobrado este valor simbólico para auxiliar o projeto.</p>
+					<p>O valor pago é para suporte do projeto, e para ajudar outros projetos open source e instituições. Tentei fazer de forma 100% gratuita acreditando que iriam existir doações para o projeto, o que não aconteceu. Por esta razão é cobrado este valor simbólico para auxiliar o projeto. <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/208158763-Porque-o-m%C3%B3dulo-PRO-%C3%A9-pago-" target="_blank">Saiba mais.</a></p>
 
 					<h3>Outras opções</h3>
-					<p>Se desejar, você também pode optar pelo <a href="../pro"><strong>modelo de assinatura</strong></a>, que permite escolher outras tarifas de recebimento e usar o modo sandbox para realizar testes de pagamento.</p>
+					<p>Se desejar, você também pode optar pelo <a href="../pro"><strong>modelo de assinatura</strong></a>, que permite escolher outras tarifas de recebimento e usar o modo sandbox para realizar testes de pagamento. Ideal para quem possui taxas personalizadas junto ao PagSeguro, ou para quem deseja realizar testes em ambiente Sandbox.</p>
 				</div>
 			</div>
 		</section>
