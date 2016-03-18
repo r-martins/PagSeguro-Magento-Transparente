@@ -7,7 +7,7 @@ desc: Com o modelo de aplicação para Magento, você usa o checkout transparent
 <section id="promo" class="promo offset-header">
 	<div class="container text-center">
 		<h2 class="title">Versão PRO APP</h2>
-		<p class="intro">Aceite cartões de débito/TEF e Boleto, e ainda ganhe desconto na taxa do PagSeguro.</p>
+		<p class="intro">Aceite cartões de débito/TEF e Boleto, e ainda ganhe desconto na taxa do PagSeguro <sup><small>*</small></sup>.</p>
 		<div class="btns">
 			<a class="btn btn-cta-primary scrollto" href="#contratar" title="Contratar"><i class="fa fa-magic"></i>Autorizar APP</a>
 		</div>
@@ -17,13 +17,36 @@ desc: Com o modelo de aplicação para Magento, você usa o checkout transparent
 	<section id="funcionalidades" class="docs section">
 		<div class="container">
 			<div class="docs-inner">
+				<h2 id="indicado" class="title text-center">Pra quem é indicado</h2>
+				<ul>
+					<li>Pra quem não possuí acordos com taxas diferenciadas junto ao PagSeguro</li>
+					<li>Pra quem não tem cartão de crédito para assinar o <a href="../pro">modelo de assinatura</a>.</li>
+					<li>Pra quem não quer correr o risco de ter o modulo suspenso no caso de falha no pagamento do <a href="../pro">modelo de assinatura</a>.</li>
+					<li>Pra quem quer começar a vender agora com PagSeguro sem ter que esperar liberação da autorização transparente.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="docs-inner">
+				<h2 id="nao-indicado" class="title text-center">Pra quem <strong>não</strong> é indicado</h2>
+				<ul>
+					<li>Pra quem possuí acordos com taxas diferenciadas junto ao PagSeguro</li>
+					<li>Pra quem precisa testar o módulo ou o pagamento em ambiente de Sandbox (ou não quer testar com um pagamento de R$1,00 - por exemplo - em ambiente final).</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="docs-inner">
 				<h2 id="recursos" class="title text-center">Recursos</h2>
 				<ul>
-					<li>Desconto de 0,1% na taxa do PagSeguro (<a href="#prerequisitos">saiba mais</a>)</li>
+					<li>Recebimento em 14 dias: Desconto de 0,1% na taxa do PagSeguro(<a href="#prerequisitos">saiba mais</a>)</li>
+					<li>Recebimento em 30 dias: Mesma tarifa do PagSeguro (3,99%), sem custos adicionais</li>
 					<li>Sem mensalidade ou necessidade de cartão de crédito</li>
-					<li>NÃO precisa pedir liberação do checkout transparente com o PagSeguro</li>
+					<li>NÃO precisa pedir liberação do checkout transparente ao PagSeguro</li>
 					<li>Mesmos recursos da <a href="../pro">versão PRO</a> - exceto Sandbox</li>
-					<li>Liberação imediata. Comece a testar e vender com o módulo em 3 minutos.</li>
+					<li>Liberação imediata. Comece a vender em 3 minutos.</li>
 				</ul>
 				<h3>Tela</h3>
 				<img src="../public/images/sshot5.png" alt="Tela de configuração"/>
@@ -41,7 +64,7 @@ desc: Com o modelo de aplicação para Magento, você usa o checkout transparent
 					<p>O valor é cobrado apenas das transações aprovadas, e é exibido em detalhes no próprio painel do PagSeguro.</p>
 
 					<h3>Em outras palavras...</h3>
-					<p>Ao utilizar o modelo de aplicação, a taxa padrão do PagSeguro cai de 4,99% para 4,49% nas transações com Debito, Credito ou Boleto.</p>
+					<p>Ao utilizar o modelo de aplicação (14 dias), a taxa padrão do PagSeguro cai de 4,99% para 4,49% nas transações com Debito, Credito ou Boleto.</p>
 
 					<p>Para manter o módulo neste modelo, é repassado 0,4% (taxa de repasse) para o projeto. Ou seja, além de contribuir com este e outros projetos e instituições, você ainda tem uma redução de 0,1% na taxa padrão do PagSeguro.</p>
 
@@ -49,10 +72,17 @@ desc: Com o modelo de aplicação para Magento, você usa o checkout transparent
 					<p><img src="{{ site.baseurl}}/public/images/print-pedido.jpg" border="0" width="100%" title="Exemplo real extraído dos detalhes da transação no painel do PagSeguro." alt="Exemplo real extraído dos detalhes da transação no painel do PagSeguro."/></p>
 					<p>A taxa de intermediacão normal para esta transação seria de R$8,75, se não utilizasse este módulo no sistema de aplicação. Utilizando o módulo, a taxa de repasse junto com a taxa de intermediação passa a ser R$8,57 (7,87+0,7). Uma <strong>economia de R$0,18 apenas nessa simulação</strong>.</p>
 
-					<p>Se você utiliza recebimento em 30 dias com a taxa de 3,99%, talvez queira optar pelo <a
-							href="../pro">modelo de assinatura</a>.</p>
+					<h3>Recebimento em 30 dias (novidade)</h3>
+					<p>Se você utiliza recebimento em 30 dias com a taxa de 3,99%, agora é possível, sem nenhum acréscimo sob a taxa padrão. Nessa modalidade, as taxas ficarão divididas da seguuinte maneira:</p>
+					<ul class="list-unstyled">
+						<li></li>
+						<li><strong>Tarifas do PagSeguro:</strong> 3,69% cobrado sobre todas as transações aprovadas</li>
+						<li><strong>Taxa de Repasse:</strong> 0,3% de repasse para o projeto do módulo - entenda <a
+								href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/208158763">porque é pago</a>?</li>
+					</ul>
+					<p>Nota: O uso do módulo não isenta da tarifa de transação aprovada (R$0,40) cobrada pelo PagSeguro em todas suas transações independente de ser 14 ou 30 dias.</p>
+					<p><a href="https://pagseguro.uol.com.br/taxas-e-tarifas.jhtml" target="_blank">Compare/Veja as taxas do PagSeguro.</a> (nova janela)</p>
 
-					<p>Nota: O uso do módulo não isenta da tarifa de transação aprovada (R$0,40) cobrada pelo PagSeguro em todas suas transações.</p>
 				</div>
 			</div>
 		</section>
@@ -66,7 +96,7 @@ desc: Com o modelo de aplicação para Magento, você usa o checkout transparent
 					<p>Siga os passos abaixo, e comece a vender com o Transparente em minutos.</p>
 					<ol>
 						<li>Preencha o formulário abaixo. Você será redirecionado para o PagSeguro.</li>
-						<li>Se você já tem conta no PagSeguro, na próxima tela clique em "Já tenho conta..", no final da página.</li>
+						<li>Se você já tem conta no PagSeguro, na próxima tela clique em "Já tenho conta..", no final da próxima página.</li>
 						<li>Revise as condições de taxas aplicadas nas vendas realizadas com o módulo.</li>
 						<li>Após autorizar, você receberá o módulo do PagSeguro PRO no <strong>e-mail informado abaixo</strong></li>
 						<li>Instale e configure o módulo PRO em conjunto com o módulo gratuito que pode ser baixado <a
@@ -111,6 +141,17 @@ desc: Com o modelo de aplicação para Magento, você usa o checkout transparent
 									<input type="url" size="30" id="url" name="url"> *
 								</td>
 							</tr>
+							<tr>
+								<th>
+									Modelo de recebimento:
+								</th>
+								<td>
+									<select name="app_type" id="app_type">
+										<option value="pagseguro" selected>Recebimento em 14 dias: 4,89% (4,49% + 0,4%)</option>
+										<option value="pagseguro-30">Recebimento em 30 dias: 4,99% (3,69% + 0,3%)</option>
+									</select> *
+								</td>
+							</tr>
 
 							<tr>
 								<td colspan="2">
@@ -153,6 +194,9 @@ desc: Com o modelo de aplicação para Magento, você usa o checkout transparent
 					<h3>Dificuldades?</h3>
 					<p>Está com dificuldades para instalar ou configurar o módulo?</p>
 					<p>Veja algumas dicas de onde obter respostas na <a href="../#suporte">área de suporte</a> com vídeos e tudo mais.</p>
+
+					<h3>Troca do modelo de recebimento</h3>
+					<p>Você pode trocar o modelo de recebimento (14 ou 30 dias) a qualquer momento. Basta autorizar sua conta no outro modelo. Uma nova chave será gerada. Feito isso, basta trocar a chave no seu painel Magento (Licença).</p>
 
 					<h3>Porque é pago?</h3>
 					<p>O valor pago é para suporte do projeto, e para ajudar outros projetos open source e instituições. Tentei fazer de forma 100% gratuita acreditando que iriam existir doações para o projeto, o que não aconteceu. Por esta razão é cobrado este valor simbólico para auxiliar o projeto. <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/208158763-Porque-o-m%C3%B3dulo-PRO-%C3%A9-pago-" target="_blank">Saiba mais.</a></p>
