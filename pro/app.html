@@ -240,7 +240,7 @@ zE(function() {
 								<td>
 									<select name="app_type" id="app_type">
 										<option value="pagseguro" selected>Recebimento em 14 dias: 4,89% (4,49% + 0,4%)</option>
-										<option value="pagseguro-30">Recebimento em 30 dias: 4,99% (3,69% + 0,3%)</option>
+										<option value="pagseguro-30">Recebimento em 30 dias: 3,99% (3,69% + 0,3%)</option>
 									</select> *
 								</td>
 							</tr>
@@ -255,7 +255,7 @@ zE(function() {
 
 
 							<script type="text/javascript">
-								if(document.URL.search('0.0.0.0') > 0){
+								if(document.URL.search('127.0.0.1') > 0){
 									document.getElementById("formAppNew").action = "http://ws.local.com.br/pspro/v6/app/new";
 								}
 								var validateAndSubmit = function(){
