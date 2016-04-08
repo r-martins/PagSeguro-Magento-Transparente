@@ -2,3 +2,5 @@
 
 Site oficial do Módulo:
 http://r-martins.github.io/PagSeguro-Magento-Transparente/
+
+Sugestões de melhoria? [Clique aqui e contribua](https://ricardomartins.typeform.com/to/PtUFcS).
