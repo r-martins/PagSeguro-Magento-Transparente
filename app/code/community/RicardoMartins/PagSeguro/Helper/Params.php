@@ -435,6 +435,10 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $cpf = $order->getShippingAddress()->getData($entity[1]);
         }
 
+        if ($order->getCustomerIsGuest() && empty($cpf)) {
+            $cpf = $order->getData('customer_' . $customerCpfAttribute);
+        }
+
         $cpfObj = new Varien_Object(array('cpf'=>$cpf));
 
         //you can create a module to get customer's CPF from somewhere else
