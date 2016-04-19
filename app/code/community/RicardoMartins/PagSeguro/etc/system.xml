@@ -30,7 +30,7 @@
         <payment>
             <groups>
                 <pagseguro module="ricardomartins_pagseguro">
-                    <comment><![CDATA[<a href="http://r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Precisa de ajuda?</a><br/> Lembre-se de <a href="https://pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">solicitar acesso</a> à API transparente ou <a href="http://r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html"><strong>autorize sua conta</strong></a> com o modelo de aplicação.<br/>Para suporte a TEF e Boleto, solicite a versão PRO <a href="http://r-martins.github.io/PagSeguro-Magento-Transparente/pro" target="_blank">aqui</a> ou autorize sua conta para o modelo de aplicação.<a href="http://r-martins.github.io/PagSeguro-Magento-Transparente"></a>]]></comment>
+                    <comment><![CDATA[Precisa de ajuda? - <a href="http://r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Site oficial do módulo</a> | <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Central de Ajuda</a></href><br/> Lembre-se de <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html#contratar" target="_blank"><strong>autorizar sua conta</strong></a> com a aplicação do módulo para liberar o checkout transparente junto ao PagSeguro. Ao fazer isso você também receberá o módulo PRO gratuitamente no e-mail informado, com suporte a boleto e TEF.<br/>Se preferir não utilizar a aplicação, <a href="//pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">solicite ao PagSeguro</a> a liberação da sua conta manualmente. E se desejar receber o módulo PRO com suporte a boleto e tef sem autorizar a aplicação, <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">faça uma assinatura</a>.]]></comment>
                     <label>PagSeguro - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>110</sort_order>
@@ -57,6 +57,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
+                            <comment>O token é obtido no seu painel do PagSeguro. Ao salvar esta página, ele será criptografado, aparentando ter um tamanho menor.</comment>
                         </token>
                         <sandbox translate="label">
                             <label>Ambiente de testes?</label>
@@ -139,7 +140,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment>Veja a saída de log em var/log/pagseguro.log</comment>
+                            <comment>Veja a saída de log em var/log/pagseguro.log. É recomendável habilitar o log para obter informações sobre eventuais problemas.</comment>
                         </debug>
                         <send_invoice_email>
                             <label>Enviar e-mail de fatura?</label>

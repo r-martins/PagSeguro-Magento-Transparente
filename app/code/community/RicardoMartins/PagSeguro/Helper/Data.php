@@ -23,7 +23,6 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/pagseguro/sandbox_ws_url';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/pagseguro/sandbox_ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/pagseguro/sandbox_js_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_KEY_TYPE           = 'payment/pagseguropro/key_type';
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
 
     /**
@@ -193,12 +192,17 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get license type (if any)
-     * @return string
+     * Get license type
+     * @return string 'app' or ''
      */
     public function getLicenseType()
     {
-        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_KEY_TYPE);
+        $key = Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_KEY);
+        if (!$key || strlen($key) <= 6) {
+            return '';
+        }
+
+        return 'app';
     }
 
     /**
