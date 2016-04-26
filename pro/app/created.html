@@ -100,8 +100,9 @@ zE(function() {
 	<div class="container text-center">
 		<h2 class="title">Parabéns!</h2>
 		<p class="intro">A autorização do módulo foi feita com sucesso.</p>
-		<p>Sua chave de acesso, o módulo PagSeguro PRO e instruções foram enviadas pra você para o e-mail informado no primeiro passo. A chave é válida apenas para esta conta do PagSeguro.</p>
-		<p>Lembre-se: você deve instalar o <a href="https://www.magentocommerce.com/magento-connect/pagseguro-transparente.html" target="_blank">módulo principal</a> em conjunto com o módulo PRO, enviado para seu e-mail.</p>
+		<p>Sua chave de acesso, o módulo PagSeguro PRO e instruções foram enviadas pra você para o e-mail informado no primeiro passo. </p>
+		<p>A chave é válida apenas para esta conta do PagSeguro.</p>
+		<p>Lembre-se: você deve instalar o <a href="https://www.magentocommerce.com/magento-connect/pagseguro-transparente.html" target="_blank" style="color: #fff; font-weight: bold">módulo principal</a> em conjunto com o módulo PRO, enviado para seu e-mail.</p>
 		<p id="chave"></p>
 	</div>
 	<br/>
@@ -118,7 +119,7 @@ zE(function() {
 
 	if(chave !== "")
 	{
-		document.getElementById('chave').innerHTML = 'Se você já tem o módulo PRO instalado, configure a chave a seguir em Formas de Pagamento -> PagSeguro PRO - Licença. <br/><strong>Sua chave: '+ chave + '</strong>';
+		document.getElementById('chave').innerHTML = 'Após instalar o módulo enviado para seu e-mail, configure sua chave em <strong>Formas de Pagamento -> PagSeguro PRO - Licença</strong>. <br/><h4 style="color: #fff">Sua chave é: '+ chave + '</h4>';
 	}
 
 </script>
