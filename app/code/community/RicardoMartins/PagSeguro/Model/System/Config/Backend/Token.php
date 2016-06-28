@@ -8,12 +8,14 @@
  * @author      Ricardo Martins
  * @copyright   Copyright (c) 2015 Ricardo Martins (http://r-martins.github.io/PagSeguro-Magento-Transparente/)
  * @license     https://opensource.org/licenses/MIT MIT License
+ * @deprecated  2.5.3 There is no official method to validate token at PagSeguro.
  */
 class RicardoMartins_PagSeguro_Model_System_Config_Backend_Token
     extends Mage_Adminhtml_Model_System_Config_Backend_Encrypted
 {
     /**
      * Decrypt and test current saved token
+     * @deprecated 2.5.3 There is no official method to validate token at PagSeguro.
      */
     public function _afterSave()
     {
@@ -32,6 +34,7 @@ class RicardoMartins_PagSeguro_Model_System_Config_Backend_Token
      * Test token by calling PagSeguro session API
      * @param $email
      * @param $token
+     * @deprecated 2.5.3 There is no official method to validate token at PagSeguro.
      *
      * @return bool|string
      */
