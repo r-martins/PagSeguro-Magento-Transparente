@@ -1,5 +1,6 @@
 app/code/community/RicardoMartins/PagSeguro/* app/code/community/RicardoMartins/PagSeguro/
 app/design/frontend/base/default/template/ricardomartins_pagseguro/* app/design/frontend/base/default/template/ricardomartins_pagseguro/
+app/design/adminhtml/base/default/template/ricardomartins_pagseguro/* app/design/adminhtml/base/default/template/ricardomartins_pagseguro/
 app/design/adminhtml/base/default/layout/ricardomartins_pagseguro/* app/design/adminhtml/base/default/layout/ricardomartins_pagseguro/
 app/etc/modules/RicardoMartins_PagSeguro.xml app/etc/modules/RicardoMartins_PagSeguro.xml
 app/locale/pt_BR/RicardoMartins_PagSeguro.csv app/locale/pt_BR/RicardoMartins_PagSeguro.csv
