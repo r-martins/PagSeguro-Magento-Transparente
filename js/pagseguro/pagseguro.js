@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 2.5.0
+ * @version 2.5.4
  */
 (function() {
 document.observe("dom:loaded", function() {
@@ -171,6 +171,10 @@ document.observe("dom:loaded", function() {
         if($$('input[name="payment[sender_hash]"]').first().value == '')
         {
             RMPagSeguro.updateSenderHash();
+        }
+        if($$('input[name="payment[credit_card_token]"]').first().value == '')
+        {
+            RMPagSeguro.updateCreditCardToken();
         }
     }
 
