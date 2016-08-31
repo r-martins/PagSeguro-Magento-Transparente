@@ -2,10 +2,11 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 2.5.4
+ * @version 2.5.5
  */
 (function() {
 document.observe("dom:loaded", function() {
+    var errors = false;
     RMPagSeguro = function RMPagSeguro(){
         this.init = function() {
             this.grandTotal = 0;
@@ -91,6 +92,7 @@ document.observe("dom:loaded", function() {
                     }
                     console.log('Falha ao obter o token do cartao.');
                     console.log(psresponse.errors);
+                    errors = true;
                 },
                 complete: function(psresponse){
                     //console.log(psresponse);
@@ -172,7 +174,7 @@ document.observe("dom:loaded", function() {
         {
             RMPagSeguro.updateSenderHash();
         }
-        if($$('input[name="payment[credit_card_token]"]').first().value == '')
+        if($$('input[name="payment[credit_card_token]"]').first().value == '' && !errors)
         {
             RMPagSeguro.updateCreditCardToken();
         }

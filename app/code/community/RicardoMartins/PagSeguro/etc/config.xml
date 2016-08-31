@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>2.5.4</version>
+            <version>2.5.5</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -90,4 +90,11 @@
             </pagseguro>
         </payment>
     </default>
+    <phpunit>
+        <suite>
+            <modules>
+                <RicardoMartins_PagSeguro />
+            </modules>
+        </suite>
+    </phpunit>
 </config>
