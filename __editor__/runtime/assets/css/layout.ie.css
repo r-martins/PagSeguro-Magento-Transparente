@@ -1,0 +1,13 @@
+#marker-start-L2xheW91dC5pZS5jc3M.L3Byb3RvdHlwZXMvQ29udGVudExheW91dENvcmVDb21tb24 {}
+/* Content Layout */
+@media (min-width: 768px) {
+  .bd-flex-horizontal.bd-flex-wide {
+    display: table;
+    width: 100%;
+  }
+  .bd-flex-horizontal.bd-flex-wide > * {
+    display: table-cell;
+    vertical-align: top;
+  }
+}
+#marker-end-L2xheW91dC5pZS5jc3M.L3Byb3RvdHlwZXMvQ29udGVudExheW91dENvcmVDb21tb24 {}

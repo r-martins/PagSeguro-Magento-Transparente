@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+    
+	<script>
+    var themeHasJQuery = !!window.jQuery;
+</script>
+<script type="text/javascript" src="../assets/js/jquery.js?1.0.843"></script>
+<script>
+    window._$ = jQuery.noConflict(themeHasJQuery);
+</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../assets/css/bootstrap.css?1.0.843" media="screen" />
+<script type="text/javascript" src="../assets/js/bootstrap.min.js?1.0.843"></script>
+<!--[if lte IE 9]>
+<link rel="stylesheet" href="../assets/css/layout.ie.css?1.0.843">
+<script src="../assets/js/layout.ie.js?1.0.843"></script>
+<![endif]-->
+<link class="data-control-id-9" href='http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="../assets/js/layout.core.js"></script>
+<script src="../assets/js/CloudZoom.js?1.0.843"></script>
+	
+    <title>PagSeguro Transparente - Módulo para Magento - por Ricardo Martins</title>
+	<link rel="stylesheet" href="../assets/css/style.css?1.0.843">
+	<script src="../assets/js/script.js?1.0.843"></script>
+    <meta charset="utf-8">
+    
+    <!-- Start of pagsegurotransparente Zendesk Widget script -->
+<script>/*<![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(c){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var o=this.createElement("script");n&&(this.domain=n),o.id="js-iframe-async",o.src=e,this.t=+new Date,this.zendeskHost=t,this.zEQueue=a,this.body.appendChild(o)},o.write('<body onload="document._l();">'),o.close()}("//assets.zendesk.com/embeddable_framework/main.js","pagsegurotransparente.zendesk.com");/*]]>*/
+zE(function() {
+	zE.setLocale('pt-BR');
+});</script>
+<!-- End of pagsegurotransparente Zendesk Widget script -->
+
+<!-- Google Analytics -->
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-3314217-5', 'auto');
+	ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+    
+ <meta name="keywords" content="HTML, CSS, JavaScript">
+
+    
+ <style>a {
+  transition: color 250ms linear;
+}
+</style>
+</head>
+<body class="data-control-id-13 bootstrap bd-body-1 
+ bd-homepage bd-pagebackground bd-margins">
+    <header class="data-control-id-936270 bd-headerarea-1 bd-margins">
+        <section class="data-control-id-2153708 bd-section-15 bd-page-width bd-tagstyles " id="section15" data-section-title="2 Columns">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2153742 bd-layoutcontainer-11 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row ">
+                <div class="data-control-id-2153747 bd-columnwrapper-17 
+ col-sm-6">
+    <div class="bd-layoutcolumn-17 bd-column" ><div class="bd-vertical-align-wrapper"><img class="bd-imagelink-6 bd-own-margins bd-imagestyles   data-control-id-2153772"  src="../assets/images/2582783ce12174e9654bec6c791dc980_dc0dlLU4nkfTNkoCRnNKWAlogopagsegurotransparente3b.png"></div></div>
+</div>
+	
+		<div class="data-control-id-2153752 bd-columnwrapper-19 
+ col-sm-6">
+    <div class="bd-layoutcolumn-19 bd-column" ><div class="bd-vertical-align-wrapper">
+    
+    <nav class="data-control-id-2143725 bd-hmenu-3" data-responsive-menu="true" data-responsive-levels="">
+        
+            <div class="data-control-id-2143724 bd-responsivemenu-2 collapse-button">
+    <div class="bd-container-inner">
+        <div class="bd-menuitem-2 data-control-id-2200914">
+            <a  data-toggle="collapse"
+                data-target=".bd-hmenu-3 .collapse-button + .navbar-collapse"
+                href="#" onclick="return false;">
+                    <span>Menu</span>
+            </a>
+        </div>
+    </div>
+</div>
+            <div class="navbar-collapse collapse">
+            
+            <div class="data-control-id-2143713 bd-horizontalmenu-1 clearfix">
+                <div class="bd-container-inner">
+                    
+                    <ul class="data-control-id-2143924 bd-menu-1 nav nav-pills nav-center">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+                        
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a 
+ class="active" title="PagSeguro Transparente - Módulo para Magento - por Ricardo Martins" href="./index.html" >Início</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="Download e Instalação" href="./download.html" >Download</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="New Page" href="http://pagseguro-exemplo.ricardomartins.net.br/" 
+ target="_blank">Demo</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="Perguntas Frequentes" href="./faq.html" >Suporte</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="Sobre Ricardo Martins" href="./sobre.html" >Sobre</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                    </ul>
+                    
+                </div>
+            </div>
+            
+        
+            </div>
+    </nav></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+</header>
+	
+		<div id="carousel-2" class="bd-slider-2 bd-page-width  bd-slider bd-no-margins data-control-id-2153830 carousel slide bd-carousel-left" >
+    
+
+    
+    <div class="bd-container-inner">
+
+    
+        
+    <div class="bd-sliderindicators-2 data-control-id-2153829 bd-slider-indicators" >
+    <ol class="bd-indicators bd-no-margins data-control-id-2153828" >
+        
+        <li><a class="
+ active" href="#" data-target="#carousel-2" data-slide-to="0"></a></li>
+        <li><a class="" href="#" data-target="#carousel-2" data-slide-to="1"></a></li>
+        <li><a class="" href="#" data-target="#carousel-2" data-slide-to="2"></a></li>
+    </ol>
+    </div>
+
+    <div class="bd-slides carousel-inner">
+        <div class="data-control-id-2153849 bd-slide-8 bd-slide item"
+    
+ data-url="download.html"
+    
+ data-target="_self"
+    >
+    <div class="bd-container-inner">
+        <div class="bd-container-inner-wrapper">
+            <h1 class="data-control-id-2153994 bd-textblock-4 bd-content-element">
+    PagSeguro Transparente<br>para Magento
+</h1>
+	
+		<p class="data-control-id-2154221 bd-textblock-17 bd-content-element">
+    Aceite todos os pagamentos sem sair da loja&nbsp;<br>e aumente suas vendas
+</p>
+	
+		<img class="bd-imagelink-9 bd-own-margins bd-imagestyles   data-control-id-2154482"  src="../assets/images/c04a1b3db7655b7cd18fe03d0cb04a66_printbanner.png">
+        </div>
+    </div>
+</div>
+	
+		<div class="data-control-id-2153896 bd-slide-11 bd-textureoverlay bd-textureoverlay-1 bd-slide item"
+    
+ data-url="#motivos"
+    
+ data-target="_self"
+    >
+    <div class="bd-container-inner">
+        <div class="bd-container-inner-wrapper">
+            <p class="data-control-id-2154959 bd-textblock-20 bd-content-element">
+    100% código aberto<br>100% transparente<br>sem surpresas
+</p>
+        </div>
+    </div>
+</div>
+	
+		<div class="data-control-id-2153851 bd-slide-10 bd-slide item"
+    
+ data-url="pro/app.html"
+    
+ data-target="_self"
+    >
+    <div class="bd-container-inner">
+        <div class="bd-container-inner-wrapper">
+            <p class="data-control-id-2159866 bd-textblock-29 bd-content-element">
+    Agora você <b>não paga&nbsp;</b><br><b>nada a mais</b> por isso.
+</p>
+	
+		<p class="data-control-id-2160604 bd-textblock-31 bd-content-element">
+    Se você não &nbsp;possuí nenhuma taxa especial junto ao PagSeguro<br>poderá até ganhar descontos na taxa.
+</p>
+        </div>
+    </div>
+</div>
+    </div>
+
+    
+        <div class="bd-left-button">
+    <a class="data-control-id-2153826 bd-carousel" href="#">
+        <span class="bd-icon"></span>
+    </a>
+</div>
+
+<div class="bd-right-button">
+    <a class="data-control-id-2153826 bd-carousel" href="#">
+        <span class="bd-icon"></span>
+    </a>
+</div>
+
+    
+    </div>
+
+    
+
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        if ('undefined' !== typeof initSlider) {
+            initSlider(
+                '.bd-slider-2',
+                {
+                    leftButtonSelector: 'bd-left-button',
+                    rightButtonSelector: 'bd-right-button',
+                    navigatorSelector: '.bd-carousel',
+                    indicatorsSelector: '.bd-indicators',
+                    carouselInterval: 5000,
+                    carouselPause: "hover",
+                    carouselWrap: true,
+                    carouselRideOnStart: true
+                }
+            );
+        }
+        /* ]]> */
+    </script>
+</div>
+	
+		<div class="data-control-id-2126876 bd-stretchtobottom-1 bd-stretch-to-bottom" data-control-selector=".bd-contentlayout-1">
+<div class="bd-contentlayout-1 bd-page-width   bd-sheetstyles data-control-id-2126815 bd-no-margins bd-margins" >
+    <div class="bd-container-inner">
+
+        <div class="bd-flex-vertical bd-stretch-inner bd-no-margins">
+            
+            <div class="bd-flex-horizontal bd-flex-wide bd-no-margins">
+                
+                <div class="bd-flex-vertical bd-flex-wide bd-no-margins">
+                    
+
+                    <div class="data-control-id-2126813 bd-layoutitemsbox-1 bd-flex-wide bd-margins">
+    <div class="data-control-id-369604 bd-content-13">
+    
+    <div class="data-control-id-1391054 bd-htmlcontent-1 bd-margins" 
+ data-page-id="page.0">
+    <section class="data-control-id-2144551 bd-section-8 bd-background-width bd-tagstyles " id="section4" data-section-title="Four Columns With Header">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2144561 bd-layoutcontainer-6 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row 
+ bd-row-flex 
+ bd-row-align-middle">
+                <div class="data-control-id-2144569 bd-columnwrapper-10 
+ col-xs-12">
+    <div class="bd-layoutcolumn-10 bd-column" ><div class="bd-vertical-align-wrapper"><h3 class="data-control-id-2144575 bd-textblock-14 bd-no-margins bd-content-element">
+    Como funciona
+</h3>
+	
+		<h1 class="data-control-id-2144578 bd-textblock-16 bd-content-element">
+    Passo a passo
+</h1>
+	
+		<div class="bd-separator-2 data-control-id-2144704 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+	
+		<p class="data-control-id-2144744 bd-textblock-18 bd-content-element">
+    Veja como é simples começar a vender com checkout transparente agora mesmo, <b>sem pagar nada a mais por isso</b>.
+</p>
+	
+		<p class="data-control-id-2171401 bd-textblock-21 bd-content-element">
+    *Se você possuí um acordo, com taxas diferenciadas junto ao pagseguro, <a href="pro/index.html">clique aqui</a>.
+</p></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<div class="bd-containereffect-2 container-effect container data-control-id-2171834"><section class="data-control-id-2145692 bd-section-10 bd-tagstyles " id="section4" data-section-title="Business Four Steps">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2145704 bd-layoutcontainer-9 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row 
+ bd-row-flex 
+ bd-row-align-top">
+                <div class="data-control-id-2145709 bd-columnwrapper-22 
+ col-md-3
+ col-sm-6">
+    <div class="bd-layoutcolumn-22 bd-column" ><div class="bd-vertical-align-wrapper"><h4 class="data-control-id-2145713 bd-textblock-43 bd-content-element">
+    01
+</h4>
+	
+		<h3 class="data-control-id-2145716 bd-textblock-45 bd-content-element">
+    Instale o módulo principal
+</h3>
+	
+		<img class="bd-imagelink-7 bd-imagescaling bd-imagescaling-3 bd-own-margins bd-imagestyles   data-control-id-2145723"  src="../assets/images/2110078_bd_media_id_370860e506bc5ea2baadfe5f2e28425d.jpeg">
+	
+		<div class="data-control-id-2145735 bd-spacer-7 clearfix"></div>
+	
+		<p class="data-control-id-2145738 bd-textblock-47 bd-content-element">
+    Você pode fazer download no Magento Connect ou no github.<br>
+</p>
+	
+		<a 
+ href="http://www.magentocommerce.com/magento-connect/pagseguro-transparente.html" class="bd-linkbutton-11 data-control-id-2145951 bd-button bd-icon bd-icon-49 bd-own-margins bd-content-element"  
+ target="_blank"  >
+    Magento Connect
+</a>
+	
+		<div class="data-control-id-2148341 bd-spacer-14 clearfix"></div>
+	
+		<a 
+ href="https://github.com/r-martins/PagSeguro-Magento-Transparente/" class="bd-linkbutton-12 data-control-id-2146095 bd-button bd-icon bd-icon-50 bd-own-margins bd-content-element"  
+ target="_blank"  >
+    Github
+</a></div></div>
+</div>
+	
+		<div class="data-control-id-2145743 bd-columnwrapper-24 
+ col-md-3
+ col-sm-6">
+    <div class="bd-layoutcolumn-24 bd-column" ><div class="bd-vertical-align-wrapper"><h4 class="data-control-id-2145747 bd-textblock-49 bd-content-element">
+    02
+</h4>
+	
+		<h3 class="data-control-id-2145750 bd-textblock-51 bd-content-element">
+    Autorize a aplicação
+</h3>
+	
+		<img class="bd-imagelink-10 bd-imagescaling bd-imagescaling-6 bd-own-margins bd-imagestyles   data-control-id-2145757"  src="../assets/images/1904956_bd_media_id_5735c5e11310de8201edb308a9fc51ed.jpeg">
+	
+		<div class="data-control-id-2145765 bd-spacer-9 clearfix"></div>
+	
+		<p class="data-control-id-2145768 bd-textblock-53 bd-content-element">
+    Após autorizar a aplicação a realizar transações, você receberá o módulo PRO no e-mail informado.
+</p>
+	
+		<a 
+ href="download.html#autorizar" class="bd-linkbutton-13 data-control-id-2146663 bd-button bd-icon bd-icon-51 bd-own-margins bd-content-element"  
+ target="_self"  >
+    Autorizar aplicação
+</a></div></div>
+</div>
+	
+		<div class="data-control-id-2145773 bd-columnwrapper-26 
+ col-md-3
+ col-sm-6">
+    <div class="bd-layoutcolumn-26 bd-column" ><div class="bd-vertical-align-wrapper"><h4 class="data-control-id-2145777 bd-textblock-55 bd-content-element">
+    03
+</h4>
+	
+		<h3 class="data-control-id-2145780 bd-textblock-57 bd-content-element">
+    Configure os módulos
+</h3>
+	
+		<img class="bd-imagelink-12 bd-imagescaling bd-imagescaling-8 bd-own-margins bd-imagestyles   data-control-id-2145787"  src="../assets/images/2326422_bd_media_id_f36a9deb7723e8e599fadcb1e133a9d3.jpeg">
+	
+		<div class="data-control-id-2145795 bd-spacer-11 clearfix"></div>
+	
+		<p class="data-control-id-2145798 bd-textblock-59 bd-content-element">
+    Após instalar os dois módulos anteriores, configure seu magento e a url de retorno no PagSeguro.
+</p>
+	
+		<a 
+ href="download.html#configurar" class="bd-linkbutton-14 data-control-id-2146826 bd-button  bd-own-margins bd-content-element"    >
+    Saiba mais
+</a></div></div>
+</div>
+	
+		<div class="data-control-id-2145803 bd-columnwrapper-28 
+ col-md-3
+ col-sm-6">
+    <div class="bd-layoutcolumn-28 bd-column" ><div class="bd-vertical-align-wrapper"><h4 class="data-control-id-2145807 bd-textblock-61 bd-content-element">
+    04
+</h4>
+	
+		<h3 class="data-control-id-2145810 bd-textblock-63 bd-content-element">
+    Comece a vender agora!
+</h3>
+	
+		<img class="bd-imagelink-14 bd-imagescaling bd-imagescaling-10 bd-own-margins bd-imagestyles   data-control-id-2145817"  src="../assets/images/1648223_bd_media_id_27f424e0633d512dfc3f81cb83d107ec.jpeg">
+	
+		<div class="data-control-id-2145825 bd-spacer-13 clearfix"></div>
+	
+		<p class="data-control-id-2145828 bd-textblock-65 bd-content-element">
+    Comece a vender sem sair da loja, aumentando sua conversão e satisfação de seus clientes.
+</p></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section></div>
+</div>
+</div>
+</div>
+
+                    
+                </div>
+                
+            </div>
+            
+        </div>
+
+    </div>
+</div></div>
+	
+		<section class="data-control-id-2164550 bd-section-16 bd-background-width bd-tagstyles " id="motivos" data-section-title="Six Columns With Header">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2164560 bd-layoutcontainer-16 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row 
+ bd-row-flex 
+ bd-row-align-top">
+                <div class="data-control-id-2164565 bd-columnwrapper-29 
+ col-xs-12">
+    <div class="bd-layoutcolumn-29 bd-column" ><div class="bd-vertical-align-wrapper"><h1 class="data-control-id-2164569 bd-textblock-38 bd-no-margins bd-content-element">
+    Porque utilizar?
+</h1>
+	
+		<h2 class="data-control-id-2164572 bd-textblock-42 bd-no-margins bd-content-element">
+    Bom para sua loja. Melhor ainda para o mundo.
+</h2></div></div>
+</div>
+	
+		<div class="data-control-id-2164577 bd-columnwrapper-31 
+ col-md-4
+ col-sm-6">
+    <div class="bd-layoutcolumn-31 bd-background-width  bd-column" ><div class="bd-vertical-align-wrapper"><span class="bd-iconlink-3 bd-own-margins bd-icon-22 bd-icon data-control-id-2165049"></span>
+	
+		<h4 class="data-control-id-2164599 bd-textblock-46 bd-content-element">
+    <a href="#">
+    C</a>om amor, para todos
+</h4>
+	
+		<div class="data-control-id-2164602 bd-spacer-2 clearfix"></div>
+	
+		<p class="data-control-id-2164606 bd-textblock-50 bd-content-element">
+    Criado em meu tempo livre, sem vínculo ou apoio de nenhuma empresa, é um projeto destinado a toda comunidade Magento.
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2164615 bd-columnwrapper-35 
+ col-md-4
+ col-sm-6">
+    <div class="bd-layoutcolumn-35 bd-column" ><div class="bd-vertical-align-wrapper"><span class="bd-iconlink-10 bd-own-margins bd-icon-31 bd-icon data-control-id-2165473"></span>
+	
+		<h4 class="data-control-id-2164631 bd-textblock-54 bd-content-element">
+    <a href="#">
+    C</a>ódigo aberto
+</h4>
+	
+		<div class="data-control-id-2164634 bd-spacer-6 clearfix"></div>
+	
+		<p class="data-control-id-2164637 bd-textblock-58 bd-content-element">
+    Transparência também no código. Nada de código criptografado ou obfuscado. Você precisa saber o que está acontecendo.
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2164642 bd-columnwrapper-37 
+ col-md-4
+ col-sm-6">
+    <div class="bd-layoutcolumn-37 bd-column" ><div class="bd-vertical-align-wrapper"><span class="bd-iconlink-12 bd-own-margins bd-icon-35 bd-icon data-control-id-2165684"></span>
+	
+		<h4 class="data-control-id-2164658 bd-textblock-62 bd-content-element">
+    <a href="faq.html">
+    Suporte
+</a>
+</h4>
+	
+		<div class="data-control-id-2164661 bd-spacer-10 clearfix"></div>
+	
+		<p class="data-control-id-2164664 bd-textblock-66 bd-content-element">
+    <a href="https://www.udemy.com/curso-magento/?couponCode=PSPRO2016-SITE" target="_blank">Aulas</a>, <a href="https://www.youtube.com/watch?v=sPyTsXW7JbI" target="_blank">YouTube</a>, <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Central de Ajuda</a>,
+                            <a href="http://groups.google.com/group/magentobr" target="_blank">Comunidade</a> são algumas das formas pra você não ficar na mão.<br>
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2164669 bd-columnwrapper-39 
+ col-md-4
+ col-sm-6">
+    <div class="bd-layoutcolumn-39 bd-column" ><div class="bd-vertical-align-wrapper"><span class="bd-iconlink-13 bd-own-margins bd-icon-37 bd-icon data-control-id-2165897"></span>
+	
+		<h4 class="data-control-id-2164685 bd-textblock-68 bd-content-element">
+    <a href="#">
+    M</a>ais de 4700 lojas
+</h4>
+	
+		<div class="data-control-id-2164688 bd-spacer-15 clearfix"></div>
+	
+		<p class="data-control-id-2164691 bd-textblock-70 bd-content-element">
+    Mais de 4700 downloads via Magento Connect, sem falar nos download diretos via GitHub.
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2164696 bd-columnwrapper-45 
+ col-md-4
+ col-sm-6">
+    <div class="bd-layoutcolumn-45 bd-column" ><div class="bd-vertical-align-wrapper"><span class="bd-iconlink-15 bd-own-margins bd-icon-42 bd-icon data-control-id-2166095"></span>
+	
+		<h4 class="data-control-id-2164712 bd-textblock-72 bd-content-element">
+    <a href="#">
+    G</a>ratuito
+</h4>
+	
+		<div class="data-control-id-2164715 bd-spacer-17 clearfix"></div>
+	
+		<p class="data-control-id-2164718 bd-textblock-74 bd-content-element">
+    Em parceria com o PagSeguro, parte da sua receita remunera o projeto. Mas você não paga nada a mais por isso. &nbsp;
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2164723 bd-columnwrapper-47 
+ col-md-4
+ col-sm-6">
+    <div class="bd-layoutcolumn-47 bd-column" ><div class="bd-vertical-align-wrapper"><span class="bd-iconlink-17 bd-own-margins bd-icon-44 bd-icon data-control-id-2166302"></span>
+	
+		<h4 class="data-control-id-2164739 bd-textblock-76 bd-content-element">
+    <a href="#">
+    P</a>or um mundo melhor
+</h4>
+	
+		<div class="data-control-id-2164742 bd-spacer-19 clearfix"></div>
+	
+		<p class="data-control-id-2164745 bd-textblock-78 bd-content-element">
+    Parte do valor arrecadado é destinado a 
+entidades humanitárias, de assistência social, e para outros projetos 
+OpenSource e contribuidores Magento.
+                            <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/208158763-Porque-o-m%C3%B3dulo-PRO-%C3%A9-pago-" target="_blank">Saiba mais.</a><br>
+</p></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<div class="bd-containereffect-3 container-effect container data-control-id-2167321"><div class="bd-separator-7  data-control-id-2167268 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+</div>
+	
+		<section class="data-control-id-2166693 bd-section-17 bd-page-width bd-tagstyles " id="section4" data-section-title="Two Columns With Image">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2166705 bd-layoutcontainer-20 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row 
+ bd-row-flex 
+ bd-row-align-middle">
+                <div class="data-control-id-2166710 bd-columnwrapper-49 
+ col-md-6">
+    <div class="bd-layoutcolumn-49 bd-column" ><div class="bd-vertical-align-wrapper"><div class="data-control-id-2166716 bd-layoutbox-6 bd-no-margins clearfix">
+    <div class="bd-container-inner">
+        <span class="bd-iconlink-19 bd-no-margins bd-own-margins bd-icon-47 bd-icon data-control-id-2166736"></span>
+	
+		<h4 class="data-control-id-2166739 bd-textblock-80 bd-content-element">
+    parcelamento nos cartões
+</h4>
+	
+		<p class="data-control-id-2166742 bd-textblock-82 bd-content-element">
+    Aceite todos os tipos de cartão do PagSeguro, exibindo as parcelas de acordo com as configurações da sua conta.
+</p>
+	
+		<div class="data-control-id-2166745 bd-spacer-21 clearfix"></div>
+    </div>
+</div>
+	
+		<div class="data-control-id-2166750 bd-layoutbox-13 bd-no-margins clearfix">
+    <div class="bd-container-inner">
+        <span class="bd-iconlink-21 bd-no-margins bd-own-margins bd-icon-54 bd-icon data-control-id-2166768"></span>
+	
+		<h4 class="data-control-id-2166771 bd-textblock-84 bd-content-element">
+    Tef e Cartão de Débito
+</h4>
+	
+		<p class="data-control-id-2166774 bd-textblock-86 bd-content-element">
+    Aceite transferência eletrônica e débito dos principais bancos do Brasil
+</p>
+	
+		<div class="data-control-id-2166777 bd-spacer-23 clearfix"></div>
+	
+		<div class="data-control-id-2166782 bd-layoutbox-20 bd-no-margins clearfix">
+    <div class="bd-container-inner">
+        <span class="bd-iconlink-23 bd-no-margins bd-own-margins bd-icon-57 bd-icon data-control-id-2166800"></span>
+	
+		<h4 class="data-control-id-2166803 bd-textblock-88 bd-content-element">
+    Boleto
+</h4>
+	
+		<p class="data-control-id-2166806 bd-textblock-90 bd-content-element">
+    Vendas com boleto, disponível para impressão ao final do pedido, no e-mail e no painel de controle.
+</p>
+	
+		<div class="data-control-id-2166809 bd-spacer-25 clearfix"></div>
+	
+		<div class="data-control-id-2166814 bd-layoutbox-24 bd-no-margins clearfix">
+    <div class="bd-container-inner">
+        <span class="bd-iconlink-25 bd-no-margins bd-own-margins bd-icon-62 bd-icon data-control-id-2166832"></span>
+	
+		<h4 class="data-control-id-2166835 bd-textblock-92 bd-content-element">
+    Retorno automático
+</h4>
+	
+		<p class="data-control-id-2166838 bd-textblock-94 bd-content-element">
+    Permite receber atualizações de status de seus pedidos de acordo com o andamento do pagamento no PagSeguro.
+</p>
+    </div>
+</div>
+    </div>
+</div>
+    </div>
+</div></div></div>
+</div>
+	
+		<div class="data-control-id-2166843 bd-columnwrapper-51 
+ col-md-6">
+    <div class="bd-layoutcolumn-51 bd-column" ><div class="bd-vertical-align-wrapper"><h1 class="data-control-id-2166847 bd-textblock-96 bd-content-element">
+    Outras funcionalidades
+</h1>
+	
+		<div class="bd-separator-4 data-control-id-2166976 bd-separator-left bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+	
+		<div class="data-control-id-2167016 bd-spacer-27 clearfix"></div>
+	
+		<p class="data-control-id-2167019 bd-textblock-100 bd-content-element">
+    - Mapeamento de atributos como CPF, Data de Nascimento, baseado nos atributos já existentes.<br>- Modo debug com logs detalhados.<br>- Cálculo automático de parcelas de acordo com o cartão selecionado e as regras definidas no seu PagSeguro.<br>- Token criptografado nas configurações.<br>- Não salva dados do cartão. Apenas os últimos 4 dígitos.<br>- Compatível com os principais checkouts do mercado.<br>
+</p>
+	
+		<div class="data-control-id-2167022 bd-spacer-29 clearfix"></div>
+	
+		<a 
+ href="pro/app.html" class="bd-linkbutton-8 data-control-id-2167044 bd-button-13  bd-own-margins bd-content-element"  
+ target="_self"  >
+    Começar
+</a></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<div class="bd-containereffect-4 container-effect container data-control-id-2168230"><div class="data-control-id-2168228 bd-spacer-31  clearfix"></div></div>
+	
+		<div class="bd-containereffect-1 container-effect container data-control-id-2171538"><div class="bd-separator-5  data-control-id-2171485 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+                <div class="bd-separator-content-45 bd-tagstyles bd-no-margins data-control-id-2171484 bd-separator-content" >
+                    
+                        <span class="bd-content-element">Fique por dentro das novidades</span>
+                </div>
+        </div>
+    </div>
+</div>
+</div>
+	
+		<section class="data-control-id-2171587 bd-section-14 bd-background-width bd-tagstyles " id="section14" data-section-title="Container">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2171641 bd-customhtml-1 bd-background-width bd-tagstyles ">
+    <div class="bd-container-inner bd-content-element">
+        <form action="//github.us3.list-manage.com/subscribe/post?u=abb341031ad2b9fba720e5004&amp;id=a09ded43c6" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="">
+                <p>Cadastre seu e-mail e fique por dentro das novidades e dicas de e-commerce.</p>
+                <div class="indicates-required small"><span class="asterisk">*</span> campos obrigatórios</div>
+                <table class="table">
+                    <tbody>
+                    <tr>
+                        <th>
+                            <label for="mce-EMAIL">E-mail  <span class="asterisk">*</span></label>
+                        </th>
+                        <td>
+                            <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="mce-NAME">Nome  <span class="asterisk">*</span></label>
+                        </th>
+                        <td>
+                            <input type="text" value="" name="NAME" class="required" id="mce-NAME">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <label for="mce-STOREURL">URL da Loja </label>
+                        </th>
+                        <td>
+                            <input type="url" value="" name="STOREURL" class=" url" id="mce-STOREURL">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div id="mce-responses" class="clear">
+                    <div class="response" id="mce-error-response" style="display:none"></div>
+                    <div class="response" id="mce-success-response" style="display:none"></div>
+                </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                <div style="position: absolute; left: -5000px;"><input type="text" name="b_abb341031ad2b9fba720e5004_a09ded43c6" tabindex="-1" value=""></div>
+                <div class="clear"><input type="submit" value="Cadastrar" name="subscribe" id="mc-embedded-subscribe" class="btn btn-cta-secondary"></div>
+            </form>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<div class="bd-containereffect-6 container-effect container data-control-id-2171875"><div class="data-control-id-2171873 bd-spacer-3  clearfix"></div></div>
+	
+		<footer class="data-control-id-936277 bd-footerarea-1 bd-margins">
+        <section class="data-control-id-2143525 bd-section-1 bd-page-width bd-tagstyles " id="section4" data-section-title="Footer Two Columns">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2163355 bd-layoutcontainer-13 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row 
+ bd-row-flex 
+ bd-row-align-top">
+                <div class="data-control-id-2163360 bd-columnwrapper-21 
+ col-md-6
+ col-sm-12">
+    <div class="bd-layoutcolumn-21 bd-column" ><div class="bd-vertical-align-wrapper"><p class="data-control-id-2143634 bd-textblock-8 bd-content-element">
+    <br><b>Links Rápidos</b><br><a href="http://www.magentocommerce.com/magento-connect/pagseguro-transparente.html">Download do módulo principal</a><br><a href="http://r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html">Autorizar aplicação</a><br><a href="http://r-martins.github.io/PagSeguro-Magento-Transparente/pro/">Modelo de assinatura mensal</a><br><a href="https://pagsegurotransparente.zendesk.com/hc/pt-br">Central de ajuda</a>
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2163470 bd-columnwrapper-25 
+ col-md-6
+ col-sm-12">
+    <div class="bd-layoutcolumn-25 bd-column" ><div class="bd-vertical-align-wrapper">
+    
+    <nav class="data-control-id-2163498 bd-hmenu-2" data-responsive-menu="false" data-responsive-levels="">
+        
+            
+            <div class="data-control-id-2163486 bd-horizontalmenu-2 clearfix">
+                <div class="bd-container-inner">
+                    
+                    <ul class="data-control-id-2163563 bd-menu-3 nav nav-pills navbar-left">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+                        
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a 
+ class="active" title="PagSeguro Transparente - Módulo para Magento - por Ricardo Martins" href="./index.html" >Início</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="Download e Instalação" href="./download.html" >Download</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="New Page" href="http://pagseguro-exemplo.ricardomartins.net.br/" 
+ target="_blank">Demo</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="Perguntas Frequentes" href="./faq.html" >Suporte</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  title="Sobre Ricardo Martins" href="./sobre.html" >Sobre</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                    </ul>
+                    
+                </div>
+            </div>
+            
+        
+    </nav></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<section class="data-control-id-2115024 bd-section-2 bd-page-width bd-tagstyles " id="section2" data-section-title="">
+    <div class="bd-container-inner bd-margins clearfix">
+        <p class="data-control-id-2163641 bd-textblock-36 bd-background-width  bd-content-element">
+    <small class="copyright">Módulo desenvolvido por Ricardo Martins. Não possuí nenhum vínculo com PagSeguro UOL.</small>
+</p>
+	
+		<div class="data-control-id-2201600 bd-pagefooter-1">
+    <div class="bd-container-inner">
+        
+            <a href='http://www.themler.com/html-templates' target="_blank">HTML Template</a> created with <a href='http://themler.com' target="_blank">Themler</a>.
+    </div>
+</div>
+    </div>
+</section>
+</footer>
+	
+		<div data-smooth-scroll data-animation-time="250" class="data-control-id-520690 bd-smoothscroll-3"><a href="#" class="data-control-id-2787 bd-backtotop-1 ">
+    <span class="bd-icon-67 bd-icon data-control-id-2786"></span>
+</a></div>
+</body>
+</html>
