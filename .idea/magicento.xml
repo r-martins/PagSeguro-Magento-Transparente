@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MagicentoSettings">
+    <option name="pathToMage" value="/private/var/www/paypalpuro/app/Mage.php" />
+    <option name="phpEnabled" value="true" />
+    <option name="pathToPhp" value="" />
+    <option name="urlToMagento" value="http://paypalfirecheckout.local.com.br/" />
+    <option name="packages" value="" />
+    <option name="themes" value="" />
+    <option name="basicAuthUsername" value="" />
+    <option name="basicAuthPassword" value="" />
+    <option name="pathsToMagentoSerialized" value="/private/var/www/paypalpuro" />
+    <option name="modmanProjectChecked" value="true" />
+  </component>
+</project>
