@@ -14453,7 +14453,8 @@ html[dir="ltr"] [data-responsive-menu="false"] .bd-horizontalmenu-1 .bd-menuitem
   letter-spacing: 1px;
   font-size: 13px;
   text-transform: uppercase;
-  background-color: #0777a3;
+  background-color: #a00808;
+  font-style: italic;
   padding: 8px 30px;
   line-height: 18.57142858px;
   background-image: none;
