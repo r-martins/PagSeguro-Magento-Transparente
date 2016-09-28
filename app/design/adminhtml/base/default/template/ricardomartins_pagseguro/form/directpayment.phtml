@@ -1,7 +1,7 @@
 <?php
 $_helper = Mage::helper('ricardomartins_pagseguro');
 ?>
-<input type="hidden" name="payment[sender_hash]"/>
+<input type="hidden" name="payment[sender_hash]" id="admin_sender_hash"/>
 <script type="text/javascript">
     //<![CDATA[
     PagSeguroDirectPayment.setSessionId('<?php echo $_helper->getSessionId();?>');
@@ -14,5 +14,6 @@ $_helper = Mage::helper('ricardomartins_pagseguro');
             RMPagSeguro.updateSenderHash();
         }
     }, 4000);
+    document.getElementById('edit_form').appendChild(document.getElementById('admin_sender_hash'));
     //]]>
 </script>
