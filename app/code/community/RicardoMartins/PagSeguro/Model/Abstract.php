@@ -18,6 +18,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      */
     public function proccessNotificatonResult(SimpleXMLElement $resultXML)
     {
+        // prevent this event from firing twice
+        if(Mage::registry('sales_order_invoice_save_after_event_triggered'))
+        {
+            return $this; // this method has already been executed once in this request
+        }
+        Mage::register('sales_order_invoice_save_after_event_triggered', true);
+
         if (isset($resultXML->error)) {
             $errMsg = Mage::helper('ricardomartins_pagseguro')->__((string)$resultXML->error->message);
             Mage::throwException(
@@ -34,20 +41,21 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $payment = $order->getPayment();
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
+
             $message = $processedState->getMessage();
 
             if ((int)$resultXML->status == 6) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
                 if ($order->canUnhold()) {
                     $order->unhold();
                 }
+
                 if ($order->canCancel()) {
                     $order->cancel();
                     $order->save();
                 } else {
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->addStatusHistoryComment(
-                        'Devolvido: o valor foi devolvido ao comprador, mas o
-                        pedido encontra-se em um estado que não pode ser cancelado.'
+                        'Devolvido: o valor foi devolvido ao comprador.'
                     )->save();
                 }
             }
@@ -67,12 +75,16 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             }
 
             if ($processedState->getStateChanged()) {
-                $order->setState(
-                    $processedState->getState(),
-                    true,
-                    $message,
-                    $processedState->getIsCustomerNotified()
-                )->save();
+                // somente para o status 6 que edita o status do pedido - Weber
+                if ((int)$resultXML->status != 6) {
+                    $order->setState(
+                        $processedState->getState(),
+                        true,
+                        $message,
+                        $processedState->getIsCustomerNotified()
+                    )->save();
+                }
+
             } else {
                 $order->addStatusHistoryComment($message);
             }
@@ -155,6 +167,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         $return = new Varien_Object();
         $return->setStateChanged(true);
         $return->setIsTransactionPending(true); //payment is pending?
+
         switch($statusCode)
         {
             case '1':
@@ -204,7 +217,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 );
                 break;
             case '6':
-                $return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
+                //$return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
+                $return->setData('state', Mage_Sales_Model_Order::STATE_CLOSED);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
                 $return->setMessage('Devolvida: o valor da transação foi devolvido para o comprador.');
