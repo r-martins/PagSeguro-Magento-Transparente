@@ -11,6 +11,7 @@
  */
 class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_Abstract
 {
+
     /**
      * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      * @see https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-notificacoes.html#v2-item-servico-de-notificacoes
@@ -39,6 +40,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             /** @var Mage_Sales_Model_Order $order */
             $order = Mage::getModel('sales/order')->loadByIncrementId((string)$resultXML->reference);
             $payment = $order->getPayment();
+
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
 
@@ -90,8 +92,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             }
 
             if ((int)$resultXML->status == 3) { //Quando o pedido foi dado como Pago
-                //cria fatura e envia email (se configurado)
-//                $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
+                // cria fatura e envia email (se configurado)
+                // $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
                 if(!$order->hasInvoices()){
                     $invoice = $order->prepareInvoice();
                     $invoice->register()->pay();
@@ -101,6 +103,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                         Mage::getStoreConfigFlag('payment/pagseguro/send_invoice_email'),
                         'Pagamento recebido com sucesso.'
                     );
+
+                    // salva o transaction id na invoice
+                    $invoice->setTransactionId((string)$resultXML->code)->save();
+
                     Mage::getModel('core/resource_transaction')
                         ->addObject($invoice)
                         ->addObject($invoice->getOrder())
@@ -144,7 +150,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         $client->request();
         $resposta = $client->getLastResponse()->getBody();
-        
+
         $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $resposta));
 
         libxml_use_internal_errors(true);
@@ -243,7 +249,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      *
      * @return SimpleXMLElement
      */
-    public function callApi($params, $payment)
+    public function callApi($params, $payment, $type='transactions')
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
         $useApp = $helper->getLicenseType() == 'app';
@@ -252,11 +258,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         $params = $this->_convertEncoding($params);
         $paramsString = $this->_convertToCURLString($params);
-        
-        $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params, true));
-        
+
+        $helper->writeLog('Parametros sendo enviados para API (/'.$type.'): '. var_export($params, true));
+
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $helper->getWsUrl('transactions', $useApp));
+        curl_setopt($ch, CURLOPT_URL, $helper->getWsUrl($type, $useApp));
         curl_setopt($ch, CURLOPT_POST, count($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $paramsString);
@@ -277,10 +283,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         curl_close($ch);
 
-        $helper->writeLog('Retorno PagSeguro (/transactions): ' . var_export($response, true));
+        $helper->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(trim($response));
+
         if (false === $xml) {
             switch($response){
                 case 'Unauthorized':
@@ -301,7 +308,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 'Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.'
             );
         }
-        
+
         return $xml;
     }
 
@@ -318,7 +325,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         return $params;
     }
-    
+
     /**
      * Convert API params (already ISO-8859-1) to url format (curl string)
      * @param array $params
@@ -331,7 +338,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         foreach ($params as $k => $v) {
             $fieldsString .= $k.'='.urlencode($v).'&';
         }
-        
         return rtrim($fieldsString, '&');
     }
 }
+
+
+    
