@@ -17,7 +17,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     protected $_isGateway = true;
     protected $_canAuthorize = true;
     protected $_canCapture = true;
-    protected $_canRefund = false;
+    protected $_canRefund = true;
+    protected $_canRefundInvoicePartial = false;
     protected $_canVoid = true;
     protected $_canUseInternal = false;
     protected $_canUseCheckout = true;
@@ -113,6 +114,13 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         parent::validate();
         $info = $this->getInfoInstance();
 
+        $shippingMethod = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingMethod();
+
+        // verifica se não há método de envio selecionado antes de exibir o erro de falha no cartão de crédito - Weber
+        if (empty($shippingMethod)) {
+            return false;
+        }
+
         $senderHash = $info->getAdditionalInformation('sender_hash');
         $creditCardToken = $info->getAdditionalInformation('credit_card_token');
 
@@ -127,6 +135,54 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             Mage::throwException(
                 'Falha ao processar pagamento junto ao PagSeguro. Por favor, entre em contato com nossa equipe.'
             );
+        }
+        return $this;
+    }
+
+    /**
+     * Check refund availability
+     *
+     * @return bool
+     */
+    public function canRefund()
+    {
+        return $this->_canRefund;
+    }
+
+    // public function processBeforeRefund($invoice, $payment){} //before refund
+    // public function processCreditmemo($creditmemo, $payment){} //after refund
+
+    /**
+     * Order payment
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     *
+     * @return RicardoMartins_PagSeguro_Model_Payment_Cc
+     */
+    public function refund(Varien_Object $payment, $amount){
+        $order      = $payment->getOrder();
+
+        //will grab data to be send via POST to API inside $params
+        $rmHelper   = Mage::helper('ricardomartins_pagseguro');
+
+        // recupera a informação adicional do PagSeguro
+        $info           = $this->getInfoInstance();
+        $transaction_id = $info->getAdditionalInformation('transaction_id');
+
+        $params = array(
+            'email'             => $rmHelper->getMerchantEmail(),
+            'token'             => $rmHelper->getToken(),
+            'transactionCode'   => $transaction_id,
+            //'refundValue'       => $amount,
+        );
+
+        // call API - refund
+        $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
+
+        if($returnXml === null) {
+            $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
+            Mage::throwException($errorMsg);
         }
         return $this;
     }
@@ -175,6 +231,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 }
             }
             $payment->setAdditionalInformation($additional);
+
         }
         return $this;
     }
