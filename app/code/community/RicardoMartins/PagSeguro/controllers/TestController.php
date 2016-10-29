@@ -19,19 +19,23 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
     public function getConfigAction()
     {
         $info = array();
+        $helper = Mage::helper('ricardomartins_pagseguro');
+
         $info['RicardoMartins_PagSeguro']['version'] = (string)Mage::getConfig()
                                                         ->getModuleConfig('RicardoMartins_PagSeguro')->version;
-        $info['RicardoMartins_PagSeguro']['debug'] = Mage::getStoreConfigFlag('payment/pagseguro/debug');
-        $info['RicardoMartins_PagSeguro']['sandbox'] = Mage::getStoreConfigFlag('payment/pagseguro/sandbox');
+        $info['RicardoMartins_PagSeguro']['debug'] = Mage::getStoreConfigFlag('payment/rm_pagseguro/debug');
+        $info['RicardoMartins_PagSeguro']['sandbox'] = Mage::getStoreConfigFlag('payment/rm_pagseguro/sandbox');
 
         if (Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguroPro')) {
             $info['RicardoMartins_PagSeguroPro']['version'] = (string)Mage::getConfig()
                                                         ->getModuleConfig('RicardoMartins_PagSeguroPro')->version;
-            $info['RicardoMartins_PagSeguroPro']['key_type'] =
-                (string)Mage::getStoreConfig('payment/pagseguropro/key_type');
+
+            $keyType = $helper->getLicenseType();
+            $info['RicardoMartins_PagSeguroPro']['key_type'] = ($keyType)==''?'assinatura':$keyType;
+
         }
 
-        $helper = Mage::helper('ricardomartins_pagseguro');
+
         $info['session_id'] = $helper->getSessionId();
 
         $modules = array_keys((array)Mage::getConfig()->getNode('modules')->children());

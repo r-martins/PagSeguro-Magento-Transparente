@@ -23,7 +23,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/rm_pagseguro/sandbox_ws_url';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/rm_pagseguro/sandbox_js_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/rm_pagseguropro/key';
+    const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -243,7 +243,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function checkTokenIntegrity()
     {
         $section = Mage::getSingleton('adminhtml/config')->getSection('payment');
-        $frontendType = (string)$section->groups->pagseguro->fields->token->frontend_type;
+        $frontendType = (string)$section->groups->rm_pagseguro->fields->token->frontend_type;
 
         if ('obscure' != $frontendType) {
             $this->writeLog(
