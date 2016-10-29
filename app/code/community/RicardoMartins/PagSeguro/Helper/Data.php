@@ -11,19 +11,19 @@
  */
 class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    const XML_PATH_PAYMENT_PAGSEGURO_EMAIL              = 'payment/pagseguro/merchant_email';
-    const XML_PATH_PAYMENT_PAGSEGURO_TOKEN              = 'payment/pagseguro/token';
-    const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/pagseguro/debug';
-    const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/pagseguro/sandbox';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/pagseguro/sandbox_merchant_email';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN      = 'payment/pagseguro/sandbox_token';
-    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL             = 'payment/pagseguro/ws_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP         = 'payment/pagseguro/ws_url_app';
-    const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'payment/pagseguro/js_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/pagseguro/sandbox_ws_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/pagseguro/sandbox_ws_url_app';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/pagseguro/sandbox_js_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
+    const XML_PATH_PAYMENT_PAGSEGURO_EMAIL              = 'payment/rm_pagseguro/merchant_email';
+    const XML_PATH_PAYMENT_PAGSEGURO_TOKEN              = 'payment/rm_pagseguro/token';
+    const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/rm_pagseguro/debug';
+    const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/rm_pagseguro/sandbox';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/rm_pagseguro/sandbox_merchant_email';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN      = 'payment/rm_pagseguro/sandbox_token';
+    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL             = 'payment/rm_pagseguro/ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP         = 'payment/rm_pagseguro/ws_url_app';
+    const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'payment/rm_pagseguro/js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/rm_pagseguro/sandbox_ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/rm_pagseguro/sandbox_js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/rm_pagseguropro/key';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -187,7 +187,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCpfVisible()
     {
-        $customerCpfAttribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
+        $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
         return empty($customerCpfAttribute);
     }
 

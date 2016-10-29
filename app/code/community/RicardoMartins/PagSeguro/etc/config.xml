@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>2.5.6</version>
+            <version>3.0.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -21,6 +21,14 @@
                 <class>RicardoMartins_PagSeguro_Helper</class>
             </ricardomartins_pagseguro>
         </helpers>
+        <resources>
+            <ricardomartins_pagseguro_setup>
+                <setup>
+                    <module>RicardoMartins_PagSeguro</module>
+                    <class>Mage_Core_Model_Resource_Setup</class>
+                </setup>
+            </ricardomartins_pagseguro_setup>
+        </resources>
     </global>
     <frontend>
         <routers>
@@ -63,7 +71,7 @@
     </adminhtml>
     <default>
         <payment>
-            <pagseguro_cc>
+            <rm_pagseguro_cc>
                 <active>0</active>
                 <title>Cartão de Crédito - via PagSeguro UOL</title>
                 <order_status>pending</order_status>
@@ -73,8 +81,8 @@
                 <send_neworder_email>0</send_neworder_email>
                 <!--<specificcountry>BR</specificcountry>-->
                 <group_restriction>0</group_restriction>
-            </pagseguro_cc>
-            <pagseguro>
+            </rm_pagseguro_cc>
+            <rm_pagseguro>
                 <customer_cpf_attribute>taxvat</customer_cpf_attribute>
                 <address_street_attribute>street_1</address_street_attribute>
                 <address_number_attribute>street_2</address_number_attribute>
@@ -87,7 +95,7 @@
                 <sandbox_ws_url_app>https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>
                 <!--<sandbox_ws_url_app>http://ws.local.com.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>-->
                 <sandbox_js_url>https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</sandbox_js_url>
-            </pagseguro>
+            </rm_pagseguro>
         </payment>
     </default>
     <phpunit>

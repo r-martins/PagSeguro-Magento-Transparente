@@ -138,10 +138,10 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         /** @var Mage_Sales_Model_Order_Address $address */
         $address = ($type=='shipping' && !$order->getIsVirtual()) ?
             $order->getShippingAddress() : $order->getBillingAddress();
-        $addressStreetAttribute = Mage::getStoreConfig('payment/pagseguro/address_street_attribute');
-        $addressNumberAttribute = Mage::getStoreConfig('payment/pagseguro/address_number_attribute');
-        $addressComplementAttribute = Mage::getStoreConfig('payment/pagseguro/address_complement_attribute');
-        $addressNeighborhoodAttribute = Mage::getStoreConfig('payment/pagseguro/address_neighborhood_attribute');
+        $addressStreetAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_street_attribute');
+        $addressNumberAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_number_attribute');
+        $addressComplementAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_complement_attribute');
+        $addressNeighborhoodAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_neighborhood_attribute');
 
         //gathering address data
         $addressStreet = $this->_getAddressAttributeValue($address, $addressStreetAttribute);
@@ -415,7 +415,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     private function _getCustomerCpfValue(Mage_Sales_Model_Order $order, $payment)
     {
-        $customerCpfAttribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
+        $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
 
         if (empty($customerCpfAttribute)) { //Asked with payment data
             if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {

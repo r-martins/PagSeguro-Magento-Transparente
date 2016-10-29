@@ -86,7 +86,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     $msg = sprintf('Pagamento capturado. Identificador da Transação: %s', (string)$resultXML->code);
                     $invoice->addComment($msg);
                     $invoice->sendEmail(
-                        Mage::getStoreConfigFlag('payment/pagseguro/send_invoice_email'),
+                        Mage::getStoreConfigFlag('payment/rm_pagseguro/send_invoice_email'),
                         'Pagamento recebido com sucesso.'
                     );
                     Mage::getModel('core/resource_transaction')

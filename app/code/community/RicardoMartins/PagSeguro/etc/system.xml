@@ -29,7 +29,7 @@
     <sections>
         <payment>
             <groups>
-                <pagseguro module="ricardomartins_pagseguro">
+                <rm_pagseguro module="ricardomartins_pagseguro">
                     <comment><![CDATA[Precisa de ajuda? - <a href="http://r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Site oficial do módulo</a> | <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Central de Ajuda</a></href><br/> Lembre-se de <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html#contratar" target="_blank"><strong>autorizar sua conta</strong></a> com a aplicação do módulo para liberar o checkout transparente junto ao PagSeguro. Ao fazer isso você também receberá o módulo PRO gratuitamente no e-mail informado, com suporte a boleto e TEF.<br/>Se preferir não utilizar a aplicação, <a href="//pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">solicite ao PagSeguro</a> a liberação da sua conta manualmente. E se desejar receber o módulo PRO com suporte a boleto e tef sem autorizar a aplicação, <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">faça uma assinatura</a>.]]></comment>
                     <label>PagSeguro - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
@@ -202,8 +202,8 @@
                             <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o campo 'Bairro' de entrega, selecione aqui.]]></comment>
                         </address_neighborhood_attribute>
                     </fields>
-                </pagseguro>
-                <pagseguro_cc module="ricardomartins_pagseguro">
+                </rm_pagseguro>
+                <rm_pagseguro_cc module="ricardomartins_pagseguro">
                     <label>PagSeguro - Cartão de Crédito - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>111</sort_order>
@@ -282,7 +282,7 @@
                             </depends>
                         </customer_groups>
                     </fields>
-                </pagseguro_cc>
+                </rm_pagseguro_cc>
             </groups>
         </payment>
     </sections>
