@@ -30,7 +30,7 @@
         <payment>
             <groups>
                 <rm_pagseguro module="ricardomartins_pagseguro">
-                    <comment><![CDATA[Precisa de ajuda? - <a href="http://r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Site oficial do módulo</a> | <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Central de Ajuda</a></href><br/> Lembre-se de <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html#contratar" target="_blank"><strong>autorizar sua conta</strong></a> com a aplicação do módulo para liberar o checkout transparente junto ao PagSeguro. Ao fazer isso você também receberá o módulo PRO gratuitamente no e-mail informado, com suporte a boleto e TEF.<br/>Se preferir não utilizar a aplicação, <a href="//pagseguro.uol.com.br/receba-pagamentos.jhtml#checkout-transparent" target="_blank">solicite ao PagSeguro</a> a liberação da sua conta manualmente. E se desejar receber o módulo PRO com suporte a boleto e tef sem autorizar a aplicação, <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">faça uma assinatura</a>.]]></comment>
+                    <comment><![CDATA[Precisa de ajuda? - <a href="//r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Site oficial do módulo</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Central de Ajuda</a>.<br/> Quer pagar menos taxas? <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank"><strong>Autorize sua conta</strong></a> no modelo de aplicação e receba o módulo PRO gratuitamente no e-mail informado, com suporte a boleto e TEF.<br/>Se você tem taxas menores ainda, e desejar receber o módulo PRO com suporte a boleto e tef sem autorizar a aplicação, <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">faça uma assinatura</a>.]]></comment>
                     <label>PagSeguro - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>110</sort_order>
@@ -47,6 +47,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <comment>E-mail da loja (conta vendedor)</comment>
+                            <tooltip>E-mail da sua conta PagSeguro. Você deve ter uma Conta Vendedor ou Conta Empresarial.</tooltip>
                         </merchant_email>
                         <token translate="label">
                             <label>Token</label>
@@ -57,6 +58,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <comment>O token é obtido no seu painel do PagSeguro. Ao salvar esta página, ele será criptografado, aparentando ter um tamanho menor.</comment>
+                            <tooltip>No caso de suspeita de token inválido ou de ter instalado outro módulo PagSeguro anteriormente, redigite o token e salve as configurações.</tooltip>
                         </token>
                         <sandbox translate="label">
                             <label>Ambiente de testes?</label>
@@ -240,6 +242,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </order_status>
+                        <flag>
+                            <label>Tamanho da bandeira do cartão</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_ccbrand</source_model>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip><![CDATA[Exemplos: <br/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/visa.png" title="42x20"/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/visa.png" title="68x30"/>]]></tooltip>
+                        </flag>
                         <owner_dob_attribute>
                             <label>Data de Nascimento</label>
                             <frontend_type>select</frontend_type>

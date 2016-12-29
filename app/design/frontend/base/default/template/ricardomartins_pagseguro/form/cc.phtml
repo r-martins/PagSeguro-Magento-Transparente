@@ -1,6 +1,11 @@
 <?php
 /** @var RicardoMartins_PagSeguro_Block_Form_Cc $this */
 $_code=$this->getMethodCode();
+$_grandTotal = Mage::helper('checkout/cart')->getQuote()->getGrandTotal();
+$_grandTotal = (!$_grandTotal)?'null':$_grandTotal;
+$_installments = Mage::getSingleton('checkout/session')->getQuote()->getPayment()->getAdditionalInformation('installment_quantity');
+$_installments = (!$_installments)?'null':$_installments;
+
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
 <?php /*
@@ -38,8 +43,6 @@ $_code=$this->getMethodCode();
             <?php #nao remover os campos abaixo ?>
             <span id="card-brand" style="text-transform: capitalize; display: block;"></span>
             <span id="card-msg" style="color: red;clear:left; display: block;"></span>
-            <input type="hidden" name="payment[ps_card_type]"/>
-            <input type="hidden" name="payment[credit_card_token]"/>
         </div>
     </li>
     <li id="<?php echo $_code ?>_cc_type_exp_div">
@@ -90,8 +93,18 @@ $_code=$this->getMethodCode();
 </ul>
 <script type="text/javascript">
 //<![CDATA[
-    if ('undefined' !== typeof RMPagSeguro) {
-        RMPagSeguro.getInstallments();
+//    if ('undefined' !== typeof RMPagSeguro) {
+//        RMPagSeguro.getInstallments();
+//    }
+if(typeof RMPagSeguroObj != "undefined"){
+    if(RMPagSeguroObj.config.debug){
+        console.info('Adicionando observer para campos de cartão...');
     }
+    RMPagSeguroObj.addCardFieldsObserver(RMPagSeguroObj);
+    if(typeof RMPagSeguroObj.brand != "undefined"){
+        RMPagSeguroObj.updateBrand();
+        RMPagSeguroObj.getInstallments(<?php echo $_grandTotal . ',' . $_installments;?>);
+    }
+}
 //]]
 </script>

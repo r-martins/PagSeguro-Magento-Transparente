@@ -11,7 +11,7 @@
  */
 class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro_Model_Abstract
 {
-    protected $_code = 'pagseguro_cc';
+    protected $_code = 'rm_pagseguro_cc';
     protected $_formBlockType = 'ricardomartins_pagseguro/form_cc';
     protected $_infoBlockType = 'ricardomartins_pagseguro/form_info_cc';
     protected $_isGateway = true;
@@ -64,10 +64,14 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data->getSenderHash())
-            ->setAdditionalInformation('credit_card_token', $data->getCreditCardToken())
+
+        /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
+        $pHelper = Mage::helper('ricardomartins_pagseguro/params');
+
+        $info->setAdditionalInformation('sender_hash', $pHelper->getPaymentHash('sender_hash'))
+            ->setAdditionalInformation('credit_card_token', $pHelper->getPaymentHash('credit_card_token'))
             ->setAdditionalInformation('credit_card_owner', $data->getPsCcOwner())
-            ->setCcType($data->getPsCardType())
+            ->setCcType($pHelper->getPaymentHash('cc_type'))
             ->setCcLast4(substr($data->getPsCcNumber(), -4));
 
         //cpf
@@ -112,7 +116,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     public function validate()
     {
         parent::validate();
-        $info = $this->getInfoInstance();
+        $missingInfo = $this->getInfoInstance();
+
+        /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
+        $pHelper = Mage::helper('ricardomartins_pagseguro/params');
 
         $shippingMethod = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingMethod();
 
@@ -121,16 +128,17 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             return false;
         }
 
-        $senderHash = $info->getAdditionalInformation('sender_hash');
-        $creditCardToken = $info->getAdditionalInformation('credit_card_token');
+        $senderHash = $pHelper->getPaymentHash('sender_hash');
+        $creditCardToken = $pHelper->getPaymentHash('credit_card_token');
 
-        if (empty($creditCardToken) || empty($senderHash)) {
+        if (!$creditCardToken || !$senderHash) {
+            $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
+            $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             Mage::helper('ricardomartins_pagseguro')
                 ->writeLog(
-                    'Falha ao obter o token do cartao ou sender_hash.
-                    Veja se os dados "sender_hash" e "credit_card_token" foram enviados no formulário.
-                    Um problema de JavaScript pode ter ocorrido.
-                    Se esta for apenas uma atualização de blocos via ajax nao se preocupe.'
+                    "Falha ao obter o token do cartao ou sender_hash.
+                    Ative o modo debug e observe o console de erros do seu navegador.
+                    $missingInfo"
                 );
             Mage::throwException(
                 'Falha ao processar pagamento junto ao PagSeguro. Por favor, entre em contato com nossa equipe.'
@@ -160,7 +168,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      *
      * @return RicardoMartins_PagSeguro_Model_Payment_Cc
      */
-    public function refund(Varien_Object $payment, $amount){
+    public function refund(Varien_Object $payment, $amount)
+    {
         $order      = $payment->getOrder();
 
         //will grab data to be send via POST to API inside $params
@@ -168,19 +177,19 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         // recupera a informação adicional do PagSeguro
         $info           = $this->getInfoInstance();
-        $transaction_id = $info->getAdditionalInformation('transaction_id');
+        $transactionId = $info->getAdditionalInformation('transaction_id');
 
         $params = array(
             'email'             => $rmHelper->getMerchantEmail(),
             'token'             => $rmHelper->getToken(),
-            'transactionCode'   => $transaction_id,
+            'transactionCode'   => $transactionId,
             //'refundValue'       => $amount,
         );
 
         // call API - refund
         $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
 
-        if($returnXml === null) {
+        if ($returnXml === null) {
             $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
             Mage::throwException($errorMsg);
         }

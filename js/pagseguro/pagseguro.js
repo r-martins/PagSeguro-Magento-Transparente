@@ -2,13 +2,15 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 2.5.5
+ * @version 3.0.0
  */
+/*
 (function() {
 document.observe("dom:loaded", function() {
     var errors = false;
     RMPagSeguro = function RMPagSeguro(){
         this.init = function() {
+            console.log('initiated');
             this.grandTotal = 0;
         }
     };
@@ -21,6 +23,23 @@ document.observe("dom:loaded", function() {
                 $$('input[name="payment[sender_hash]"]').first().enable();
             }
         }
+
+        this.createFormElements();
+    }
+
+    RMPagSeguro.createFormElements = function(){
+        var methods= $$('#p_method_rm_pagseguro_cc', '#p_method_pagseguropro_boleto', '#p_method_pagseguropro_tef');
+        if(!methods.length){
+            return;
+        }
+        var checkoutForm = methods.first().closest('form');
+        if(!checkoutForm.length){
+            return;
+        }
+
+        this.checkoutFormElm = checkoutForm;
+
+
     }
 
     RMPagSeguro.addBrandObserver = function(){
@@ -34,9 +53,9 @@ document.observe("dom:loaded", function() {
                     success: function(psresponse){
                         RMPagSeguro.brand= psresponse.brand;
                         $('card-brand').innerHTML = psresponse.brand.name;
-                        /*Se preferir, comente a linha abaixo para exibir somente o nome do cartao. Voce tambem pode trocar 42x20 por 68x30 para obter um tamanho maior.*/
+                        /!*Se preferir, comente a linha abaixo para exibir somente o nome do cartao. Voce tambem pode trocar 42x20 por 68x30 para obter um tamanho maior.*!/
                         $('card-brand').innerHTML = '<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>';
-                        $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*/g,'');
+                        $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*!/g,'');
                         $$('input[name="payment[ps_card_type]"]').first().value = psresponse.brand.name;
                         RMPagSeguro.getInstallments();
                     },
@@ -141,7 +160,7 @@ document.observe("dom:loaded", function() {
             amount: this.grandTotal,
             brand: brandName,
             success: function(response) {
-                var parcelsDrop = document.getElementById('pagseguro_cc_cc_installments');
+                var parcelsDrop = document.getElementById('rm_pagseguro_cc_cc_installments');
                 for( installment in response.installments) break;
 //                       console.log(response.installments);
                 var b = response.installments[RMPagSeguro.brand.name];
@@ -226,4 +245,295 @@ document.observe("dom:loaded", function() {
     window.RMPagSeguro = RMPagSeguro;
     RMPagSeguro.updateSessionId();
 });
-}());
+}());*/
+
+RMPagSeguro = Class.create({
+    initialize: function (config) {
+        if (typeof config.checkoutFormElm == "undefined") {
+            var methods= $$('#p_method_rm_pagseguro_cc', '#p_method_pagseguropro_boleto', '#p_method_pagseguropro_tef');
+            if(!methods.length){
+                console.log('PagSeguro: Não há métodos de pagamento habilitados em exibição. Execução abortada.');
+                return;
+            }
+            var checkoutForm = methods.first().closest('form');
+            if(!checkoutForm.length){
+                console.log('Não foi possível determinar o form do checkout. Defina-o em config.checkoutFormElm.');
+                return;
+            }
+
+            config.checkoutFormElm = checkoutForm;
+        }
+
+        if(config.PagSeguroSessionId == false){
+            console.error('Não foi possível obter o SessionId do PagSeguro. Verifique seu token, chave e configurações.');
+        }
+        console.log('RMPagSeguro prototype class has been initialized.');
+
+        this.config = config;
+
+        PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
+
+
+        var senderHashSuccess = this.updateSenderHash();
+        if(!senderHashSuccess){
+            console.log('Uma nova tentativa de obter o sender_hash será realizada.');
+            document.observe("click", function(e){
+                var senderHashSuccess = RMPagSeguroObj.updateSenderHash();
+                if(!senderHashSuccess){
+                    console.log('PagSeguro: segunda tentativa de obter o hash do comprador (sender_hash) falhou. Tente manualmente com RMPagSeguroObj.updateSenderHash().');
+                }
+            });
+        }
+
+    },
+
+    updateSenderHash: function() {
+        var senderHash = PagSeguroDirectPayment.getSenderHash();
+        if(typeof senderHash != "undefined" && senderHash != '')
+        {
+            if(typeof $$('input[name="payment[sender_hash]"]').first() != "undefined"){
+                $$('input[name="payment[sender_hash]"]').first().value = senderHash;
+                $$('input[name="payment[sender_hash]"]').first().enable();
+            }
+            this.senderHash = senderHash;
+            this.updatePaymentHashes();
+            return true;
+        }
+        console.log('PagSeguro: Falha ao obter o senderHash.');
+        return false;
+    },
+
+    getInstallments: function(grandTotal, selectedInstallment){
+        var brandName = "";
+        if(typeof RMPagSeguroObj.brand == "undefined"){
+            return;
+        }
+        if(!grandTotal){
+            grandTotal = this.getGrandTotal();
+            return;
+        }
+        if(!selectedInstallment){
+            selectedInstallment = 1;
+        }
+
+        brandName = RMPagSeguroObj.brand.name;
+        PagSeguroDirectPayment.getInstallments({
+            amount: grandTotal,
+            brand: brandName,
+            success: function(response) {
+                var parcelsDrop = $('rm_pagseguro_cc_cc_installments');
+                for(installment in response.installments) break;
+//                       console.log(response.installments);
+                var b = response.installments[RMPagSeguroObj.brand.name];
+                parcelsDrop.length = 0;
+                for(var x=0; x < b.length; x++){
+                    var option = document.createElement('option');
+                    option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
+                    option.text += (b[x].interestFree)?" sem juros":" com juros";
+                    option.selected = (b[x].quantity == selectedInstallment);
+                    option.value = b[x].quantity + "|" + b[x].installmentAmount;
+                    parcelsDrop.add(option);
+                }
+//                       console.log(b[0].quantity);
+//                       console.log(b[0].installmentAmount);
+
+            },
+            error: function(response) {
+                console.error('Erro ao obter parcelas:');
+                console.error(response);
+            },
+            complete: function(response) {
+//                       console.log(response);
+//                 RMPagSeguro.reCheckSenderHash();
+            }
+        });
+    },
+
+    addCardFieldsObserver: function(obj){
+        var ccNumElm = $$('input[name="payment[ps_cc_number]"]').first();
+        var ccExpMoElm = $$('select[name="payment[ps_cc_exp_month]"]').first();
+        var ccExpYrElm = $$('select[name="payment[ps_cc_exp_year]"]').first();
+        var ccCvvElm = $$('input[name="payment[ps_cc_cid]"]').first();
+
+        Element.observe(ccNumElm,'keyup',function(e){obj.updateCreditCardToken();});
+        Element.observe(ccExpMoElm,'change',function(e){obj.updateCreditCardToken();});
+        Element.observe(ccExpYrElm,'change',function(e){obj.updateCreditCardToken();});
+        Element.observe(ccCvvElm,'change',function(e){obj.updateCreditCardToken();});
+    },
+    updateCreditCardToken: function(){
+        var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/^\s+|\s+$/g,'');
+        // var ccNumElm = $$('input[name="payment[ps_cc_number]"]').first();
+        var ccExpMo = $$('select[name="payment[ps_cc_exp_month]"]').first().value;
+        var ccExpYr = $$('select[name="payment[ps_cc_exp_year]"]').first().value;
+        var ccCvv = $$('input[name="payment[ps_cc_cid]"]').first().value;
+
+        this.updateBrand();
+        var brandName = '';
+        if(typeof RMPagSeguroObj.brand != "undefined"){
+            brandName = RMPagSeguroObj.brand.name;
+        }
+
+        if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
+        {
+            PagSeguroDirectPayment.createCardToken({
+                cardNumber: ccNum,
+                brand: brandName,
+                cvv: ccCvv,
+                expirationMonth: ccExpMo,
+                expirationYear: ccExpYr,
+                success: function(psresponse){
+                    RMPagSeguroObj.creditCardToken = psresponse.card.token;
+                    RMPagSeguroObj.updatePaymentHashes();
+                    $('card-msg').innerHTML = '';
+                },
+                error: function(psresponse){
+                    if(undefined!=psresponse.errors["30400"]) {
+                        $('card-msg').innerHTML = 'Dados do cartão inválidos.';
+                    }else if(undefined!=psresponse.errors["10001"]){
+                        $('card-msg').innerHTML = 'Tamanho do cartão inválido.';
+                    }else if(undefined!=psresponse.errors["10006"]){
+                        $('card-msg').innerHTML = 'Tamanho do CVV inválido.';
+                    }else if(undefined!=psresponse.errors["30405"]){
+                        $('card-msg').innerHTML = 'Data de validade incorreta.';
+                    }else if(undefined!=psresponse.errors["30403"]){
+                        RMPagSeguroObj.updateSessionId(); //Se sessao expirar, atualizamos a session
+                    }else{
+                        $('card-msg').innerHTML = 'Verifique os dados do cartão digitado.';
+                    }
+                    console.error('Falha ao obter o token do cartao.');
+                    console.log(psresponse.errors);
+                    errors = true;
+                },
+                complete: function(psresponse){
+                    if(RMPagSeguroObj.config.debug){
+                        console.info('Card token updated successfully.');
+                    }
+                }
+            });
+        }
+        if(typeof RMPagSeguroObj.brand != "undefined") {
+            this.getInstallments();
+        }
+    },
+    updateBrand: function(){
+        var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/^\s+|\s+$/g,'');
+        var currentBin = ccNum.substring(0, 6);
+        var flag = RMPagSeguroObj.config.flag;
+
+        if(ccNum.length >= 6){
+            if (typeof RMPagSeguroObj.cardBin != "undefined" && currentBin == RMPagSeguroObj.cardBin) {
+                if(typeof RMPagSeguroObj.brand != "undefined"){
+                    $('card-brand').innerHTML = '<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + RMPagSeguroObj.brand.name + '.png" alt="' + RMPagSeguroObj.brand.name + '" title="' + RMPagSeguroObj.brand.name + '"/>';
+                }
+                return;
+            }
+            RMPagSeguroObj.cardBin = ccNum.substring(0, 6); 
+            PagSeguroDirectPayment.getBrand({
+                cardBin: currentBin,
+                success: function(psresponse){
+                    RMPagSeguroObj.brand = psresponse.brand;
+                    $('card-brand').innerHTML = psresponse.brand.name;
+                    if(RMPagSeguroObj.config.flag != ''){
+
+                        $('card-brand').innerHTML = '<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>';
+                    }
+                    $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*!/g,'');
+                },
+                error: function(psresponse){
+                    console.error('Falha ao obter bandeira do cartão.');
+                    if(RMPagSeguroObj.config.debug){
+                        console.debug('Verifique a chamada para /getBin em df.uol.com.br no seu inspetor de Network a fim de obter mais detalhes.');
+                    }
+                }
+            })
+        }
+    },
+    updatePaymentHashes: function(){
+        var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/updatePaymentHashes';
+        var _paymentHashes = {
+            "payment[sender_hash]": this.senderHash,
+            "payment[credit_card_token]": this.creditCardToken,
+            "payment[cc_type]": (this.brand)?this.brand.name:''
+        };
+        new Ajax.Request(_url, {
+            method: 'post',
+            parameters: _paymentHashes,
+            onSuccess: function(response){
+                if(RMPagSeguroObj.config.debug){
+                    console.debug('Hashes atualizados com sucesso.');
+                    console.debug(_paymentHashes);
+                }
+            },
+            onFailure: function(response){
+                if(RMPagSeguroObj.config.debug){
+                    console.error('Falha ao atualizar os hashes da sessão.');
+                    console.error(response);
+                }
+                return false;
+            }
+        });
+    },
+    getGrandTotal: function(){
+        var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/getGrandTotal';
+        new Ajax.Request(_url, {
+            onSuccess: function(response){
+                RMPagSeguroObj.grandTotal =  response.responseJSON.total;
+                RMPagSeguroObj.getInstallments(RMPagSeguroObj.grandTotal);
+            },
+            onFailure: function(response){
+                return false;
+            }
+        });
+    },
+    removeUnavailableBanks: function() {
+        if (RMPagSeguroObj.config.active_methods.tef) {
+            if($('pseguro_tef_bank').nodeName != "SELECT"){
+                //se houve customizações no elemento dropdown de bancos, não selecionaremos aqui
+                return;
+            }
+            PagSeguroDirectPayment.getPaymentMethods({
+                amount: RMPagSeguroObj.grandTotal,
+                success: function (response) {
+                    if (response.error == true && RMPagSeguroObj.config.debug) {
+                        console.log('Não foi possível obter os meios de pagamento que estão funcionando no momento.');
+                        return;
+                    }
+                    if (RMPagSeguroObj.config.debug) {
+                        console.log(response.paymentMethods);
+                    }
+
+                    try {
+                        $('pseguro_tef_bank').options.length = 0;
+                        for (y in response.paymentMethods.ONLINE_DEBIT.options) {
+                            if (response.paymentMethods.ONLINE_DEBIT.options[y].status != 'UNAVAILABLE') {
+                                var optName = response.paymentMethods.ONLINE_DEBIT.options[y].displayName.toString();
+                                var optValue = response.paymentMethods.ONLINE_DEBIT.options[y].name.toString();
+
+                                var optElm = new Element('option', {value: optValue}).update(optName);
+                                $('pseguro_tef_bank').insert(optElm);
+                            }
+                        }
+
+                        if(RMPagSeguroObj.config.debug){
+                            console.info('Bancos TEF atualizados com sucesso.');
+                        }
+                    } catch (err) {
+                        console.log(err.message);
+                    }
+                }
+            })
+        }
+    },
+    updateSessionId: function() {
+        var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/getSessionId';
+        new Ajax.Request(_url, {
+            onSuccess: function (response) {
+                var session_id = response.responseJSON.session_id;
+                if(!session_id){
+                    console.log('Não foi possível obter a session id do PagSeguro. Verifique suas configurações.');
+                }
+                PagSeguroDirectPayment.setSessionId(session_id);
+            }
+        });
+    }
+});

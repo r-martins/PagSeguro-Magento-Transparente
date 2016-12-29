@@ -55,7 +55,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $return = array(
             'senderName'    => $senderName,
             'senderEmail'   => trim($order->getCustomerEmail()),
-            'senderHash'    => $payment['additional_information']['sender_hash'],
+            'senderHash'    => $this->getPaymentHash('sender_hash'),
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
@@ -476,5 +476,25 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $totalAmount += $item->getRowTotal();
         }
         return (abs($extraAmount) == $totalAmount);
+    }
+
+    /**
+     * Get payment hashes (sender_hash & credit_card_token) from session
+     * @param string $param sender_hash or credit_card_token
+     *
+     * @return bool|string
+     */
+    public function getPaymentHash($param=null)
+    {
+        $registry = Mage::getSingleton('checkout/session')->getData('payment');
+        if (is_null($param)) {
+            return $registry;
+        }
+
+        if (isset($registry[$param])) {
+            return $registry[$param];
+        }
+
+        return false;
     }
 }

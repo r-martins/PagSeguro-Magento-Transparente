@@ -105,7 +105,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     );
 
                     // salva o transaction id na invoice
-                    $invoice->setTransactionId((string)$resultXML->code)->save();
+                    if (isset($resultXML->code)) {
+                        $invoice->setTransactionId((string)$resultXML->code)->save();
+                    }
 
                     Mage::getModel('core/resource_transaction')
                         ->addObject($invoice)
@@ -246,6 +248,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      * Call PagSeguro API to place an order (/transactions)
      * @param $params
      * @param $payment
+     * @param $type
      *
      * @return SimpleXMLElement
      */
@@ -310,6 +313,18 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
 
         return $xml;
+    }
+
+    /**
+     * Check if order total is zero making method unavailable
+     * @param Mage_Sales_Model_Quote $quote
+     *
+     * @return mixed
+     */
+    public function isAvailable($quote = null)
+    {
+        return parent::isAvailable($quote) && !empty($quote)
+            && Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) > 0;
     }
 
     /**

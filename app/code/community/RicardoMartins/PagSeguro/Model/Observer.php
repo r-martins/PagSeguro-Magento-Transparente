@@ -20,7 +20,7 @@ class RicardoMartins_PagSeguro_Model_Observer
             $directpayment = Mage::app()->getLayout()
                                 ->createBlock('ricardomartins_pagseguro/form_directpayment')
                                 ->toHtml();
-            $observer->getTransport()->setHtml($output . $directpayment);
+            $observer->getTransport()->setHtml($directpayment . $output);
         }
         return $this;
     }
