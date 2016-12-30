@@ -1,0 +1,105 @@
+<?php
+/** @var RicardoMartins_PagSeguro_Block_Form_Cc $this */
+$_code=$this->getMethodCode();
+$_singleton = (Mage::app()->getStore()->isAdmin())?'adminhtml/session_quote':'checkout/session';
+$_grandTotal = Mage::getSingleton($_singleton)->getQuote()->getGrandTotal();
+$_grandTotal = (!$_grandTotal)?'null':$_grandTotal;
+$_installments = Mage::getSingleton('checkout/session')->getQuote()->getPayment()->getAdditionalInformation('installment_quantity');
+$_installments = (!$_installments)?'null':$_installments;
+
+?>
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
+<?php /*
+    <li>
+        <div class="input-box">
+            <label for="<?php echo $_code ?>_cc_owner" class="required"><em>*</em><?php echo $this->__('Name on Card') ?></label>
+            <input type="text" title="<?php echo $this->__('Name on Card') ?>" class="input-text required-entry" id="<?php echo $_code ?>_cc_owner" name="payment[cc_owner]" value="<?php echo $this->escapeHtml($this->getInfoData('cc_owner')) ?>" />
+        </div>
+    </li>
+*/ ?>
+    <li>
+        <label for="<?php echo $_code ?>_cc_owner" class="required"><em>*</em><?php echo $this->__('Credit Card Owner\'s Name') ?></label>
+        <div class="input-box">
+            <input type="text" id="<?php echo $_code ?>_cc_owner" name="payment[ps_cc_owner]" title="<?php echo $this->__('Credit Card Owner\'s Name') ?>" class="input-text required-entry" value=""/>
+        </div>
+    </li>
+    <?php if($this->isDobVisible()):?>
+        <li id="<?php echo $_code ?>_cc_dob_div">
+            <?php $_dob = $this->getLayout()->createBlock('ricardomartins_pagseguro/form_cc_dob') ?>
+            <?php echo $_dob->toHtml() ?>
+        </li>
+    <?php endif ?>
+    <?php if(Mage::helper('ricardomartins_pagseguro')->isCpfVisible()):?>
+        <li id="<?php echo $_code ?>_cpf_div">
+            <label for="<?php echo $_code ?>_cpf" class="required"><em>*</em><?php echo $this->__('Credit Card Owner\'s CPF') ?></label>
+            <div class="input-box">
+                <input type="text" id="<?php echo $_code ?>_cpf" name="payment[<?php echo $_code?>_cpf]" title="<?php echo $this->__('Credit Card Owner\'s CPF') ?>" class="input-text required-entry validate-digits" value="" maxlength="11"/>
+            </div>
+        </li>
+    <?php endif ?>
+    <li>
+        <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
+        <div class="input-box">
+            <input type="text" id="<?php echo $_code ?>_cc_number" name="payment[ps_cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-cc-number validate-cc-type required-entry" value="" maxlength="16"/>
+            <?php #nao remover os campos abaixo ?>
+            <span id="card-brand" style="text-transform: capitalize; display: block;"></span>
+            <span id="card-msg" style="color: red;clear:left; display: block;"></span>
+        </div>
+    </li>
+    <li id="<?php echo $_code ?>_cc_type_exp_div">
+        <label for="<?php echo $_code ?>_expiration" class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <select id="<?php echo $_code ?>_expiration" name="payment[ps_cc_exp_month]" class="month validate-cc-exp required-entry">
+                <?php $_ccExpMonth = $this->getInfoData('ps_cc_exp_month') ?>
+                <?php foreach ($this->getCcMonths() as $k=>$v): ?>
+                    <option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpMonth): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                <?php endforeach ?>
+                </select>
+            </div>
+            <div class="v-fix">
+                <?php $_ccExpYear = $this->getInfoData('ps_cc_exp_year') ?>
+                <select id="<?php echo $_code ?>_expiration_yr" name="payment[ps_cc_exp_year]" class="year required-entry">
+                <?php foreach ($this->getCcYears() as $k=>$v): ?>
+                    <option value="<?php echo $k?$k:'' ?>"<?php if($k==$_ccExpYear): ?> selected="selected"<?php endif ?>><?php echo $v ?></option>
+                <?php endforeach ?>
+                </select>
+            </div>
+        </div>
+    </li>
+    <li id="<?php echo $_code ?>_cc_type_cvv_div">
+        <label for="<?php echo $_code ?>_cc_cid" class="required"><em>*</em><?php echo $this->__('Card Verification Number') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <input type="text" title="<?php echo $this->__('Card Verification Number') ?>" class="input-text cvv required-entry validate-cc-cvn" id="<?php echo $_code ?>_cc_cid" name="payment[ps_cc_cid]" value="" maxlength="4"/>
+            </div>
+            <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
+        </div>
+    </li>
+    <li id="<?php echo $_code ?>_cc_installments_div">
+        <label for="<?php echo $_code ?>_cc_installments"><?php echo $this->__('Installments') ?></label>
+        <div class="input-box">
+            <div class="v-fix">
+                <select name="payment[ps_cc_installments]" id="<?php echo $_code ?>_cc_installments" class="required">
+                    <option value="">Informe os dados do cartão para calcular</option>
+                </select>
+            </div>
+        </div>
+    </li>
+    <?php echo $this->getChildHtml() ?>
+</ul>
+<script type="text/javascript">
+//<![CDATA[
+if(typeof RMPagSeguroObj != "undefined"){
+    if(RMPagSeguroObj.config.debug){
+        console.info('Adicionando observer para campos de cartão...');
+    }
+    if(typeof RMPagSeguroObj.brand != "undefined"){
+        RMPagSeguroObj.updateBrand();
+        RMPagSeguroObj.getInstallments(<?php echo $_grandTotal . ',' . $_installments;?>);
+    }
+}else{
+    console.error('RMPagSeguroObj não foi definido.');
+}
+//]]
+</script>

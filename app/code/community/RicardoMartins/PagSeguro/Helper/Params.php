@@ -45,7 +45,6 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
 
-
         $senderName = $this->removeDuplicatedSpaces(
             sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
         );
@@ -486,7 +485,14 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function getPaymentHash($param=null)
     {
-        $registry = Mage::getSingleton('checkout/session')->getData('payment');
+        $isAdmin = Mage::app()->getStore()->isAdmin();
+        $session = ($isAdmin)?'core/cookie':'checkout/session';
+        $registry = Mage::getSingleton($session);
+
+        $registry = ($isAdmin)?$registry->get('PsPayment'):$registry->getData('PsPayment');
+
+        $registry = unserialize($registry);
+
         if (is_null($param)) {
             return $registry;
         }

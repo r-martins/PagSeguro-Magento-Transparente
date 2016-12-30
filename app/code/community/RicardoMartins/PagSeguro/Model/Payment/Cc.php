@@ -141,7 +141,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                     $missingInfo"
                 );
             Mage::throwException(
-                'Falha ao processar pagamento junto ao PagSeguro. Por favor, entre em contato com nossa equipe.'
+                'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
             );
         }
         return $this;

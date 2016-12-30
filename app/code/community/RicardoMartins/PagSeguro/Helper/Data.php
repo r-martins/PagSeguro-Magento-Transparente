@@ -304,7 +304,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             ),
             'flag' => Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
             'debug' => $this->isDebugActive(),
-            'PagSeguroSessionId' => $this->getSessionId()
+            'PagSeguroSessionId' => $this->getSessionId(),
+            'is_admin' => Mage::app()->getStore()->isAdmin()
         );
         return json_encode($config);
     }

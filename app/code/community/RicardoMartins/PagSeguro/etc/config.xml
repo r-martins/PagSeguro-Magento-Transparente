@@ -102,7 +102,7 @@
     <phpunit>
         <suite>
             <modules>
-                <RicardoMartins_PagSeguro />
+                <RicardoMartins_PagSeguro/>
             </modules>
         </suite>
     </phpunit>

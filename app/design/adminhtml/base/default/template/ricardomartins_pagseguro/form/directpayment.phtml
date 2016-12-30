@@ -1,20 +1,22 @@
 <?php
 $_helper = Mage::helper('ricardomartins_pagseguro');
 ?>
-<!--@TODO: Remover sender_hash que sera adicionado depois, igual frontend-->
-<input type="hidden" name="payment[sender_hash]" id="admin_sender_hash"/>
 <script type="text/javascript">
     //<![CDATA[
-    PagSeguroDirectPayment.setSessionId('<?php echo $_helper->getSessionId();?>');
-    var iid = setInterval(function()
-    {
-        if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
-            console.log('PagSeguro ready');
-
-            clearInterval(iid);
-            RMPagSeguro.updateSenderHash();
+    var preparePagSeguro = function(){
+        if(typeof RMPagSeguroObj != "undefined"){
+            <?php if ($_helper->isDebugActive()): ?>
+            console.info('PagSeguro was already started.');
+            <?php endif; ?>
+            return;
         }
-    }, 4000);
-    document.getElementById('edit_form').appendChild(document.getElementById('admin_sender_hash'));
+        <?php if ($_helper->isDebugActive()): ?>
+        console.info('PagSeguro is initiating. Wait for ready message.');
+        <?php endif; ?>
+        RMPagSeguroObj = new RMPagSeguro(<?php echo $_helper->getConfigJs()?>);
+        console.info('PagSeguro ready');
+    }
+    preparePagSeguro();
+
     //]]>
 </script>
