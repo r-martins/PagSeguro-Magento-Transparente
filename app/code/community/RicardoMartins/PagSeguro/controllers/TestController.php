@@ -63,7 +63,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
     {
         $key = Mage::getStoreConfig('payment/pagseguropro/key');
         if (empty($key)) {
-            return 'Key is empty';
+            return 'KEY IS EMPTY';
         }
             $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $key;
 

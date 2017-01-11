@@ -79,6 +79,9 @@ RMPagSeguro = Class.create({
                     var option = document.createElement('option');
                     option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');
                     option.text += (b[x].interestFree)?" sem juros":" com juros";
+                    if(RMPagSeguroObj.config.show_total){
+                        option.text += " (total R$" + (b[x].installmentAmount*b[x].quantity).toFixed(2).toString().replace('.', ',') + ")";
+                    }
                     option.selected = (b[x].quantity == selectedInstallment);
                     option.value = b[x].quantity + "|" + b[x].installmentAmount;
                     parcelsDrop.add(option);

@@ -90,6 +90,14 @@ $_installments = (!$_installments)?'null':$_installments;
         <?php /* O selo do PagSeguro deve ser exibido obrigatoriamente. Você pode escolher outra imagem disponivel na pasta 'selo' */ ?>
         <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>
     </li>
+	<?php if ($this->helper('ricardomartins_pagseguro')->isInfoBrlActive()): ?>
+	<li>
+		<p class="info-brl">
+			<img src="<?php echo $this->getSkinUrl('pagseguro/selo/brflag.png'); ?>" alt="Bandeira do Brasil" style="float: left">
+			Esta compra está sendo feita no <strong>Brasil</strong>.
+		</p>
+	</li>
+	<?php endif;?>
 </ul>
 <script type="text/javascript">
 //<![CDATA[

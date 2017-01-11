@@ -147,54 +147,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         return $this;
     }
 
-    /**
-     * Check refund availability
-     *
-     * @return bool
-     */
-    public function canRefund()
-    {
-        return $this->_canRefund;
-    }
 
     // public function processBeforeRefund($invoice, $payment){} //before refund
     // public function processCreditmemo($creditmemo, $payment){} //after refund
-
-    /**
-     * Order payment
-     *
-     * @param Varien_Object $payment
-     * @param float $amount
-     *
-     * @return RicardoMartins_PagSeguro_Model_Payment_Cc
-     */
-    public function refund(Varien_Object $payment, $amount)
-    {
-        $order      = $payment->getOrder();
-
-        //will grab data to be send via POST to API inside $params
-        $rmHelper   = Mage::helper('ricardomartins_pagseguro');
-
-        // recupera a informação adicional do PagSeguro
-        $info           = $this->getInfoInstance();
-        $transactionId = $info->getAdditionalInformation('transaction_id');
-
-        $params = array(
-            'email'             => $rmHelper->getMerchantEmail(),
-            'token'             => $rmHelper->getToken(),
-            'transactionCode'   => $transactionId,
-            //'refundValue'       => $amount,
-        );
-
-        // call API - refund
-        $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
-
-        if ($returnXml === null) {
-            $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
-            Mage::throwException($errorMsg);
-        }
-        return $this;
-    }
 
     /**
      * Order payment

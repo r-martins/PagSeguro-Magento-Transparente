@@ -327,6 +327,44 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             && Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) > 0;
     }
 
+
+    /**
+     * Order payment
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     *
+     * @return RicardoMartins_PagSeguro_Model_Payment_Abstract
+     */
+    public function refund(Varien_Object $payment, $amount)
+    {
+        //will grab data to be send via POST to API inside $params
+        $rmHelper   = Mage::helper('ricardomartins_pagseguro');
+
+        // recupera a informação adicional do PagSeguro
+        $info           = $this->getInfoInstance();
+        $transactionId = $info->getAdditionalInformation('transaction_id');
+
+        $params = array(
+            'transactionCode'   => $transactionId,
+            'refundValue'       => number_format($amount, 2, '.', ''),
+        );
+
+        if ($rmHelper->getLicenseType() != 'app') {
+            $params['token'] = $rmHelper->getToken();
+            $params['email'] = $rmHelper->getMerchantEmail();
+        }
+
+        // call API - refund
+        $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
+
+        if ($returnXml === null) {
+            $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
+            Mage::throwException($errorMsg);
+        }
+        return $this;
+    }
+
     /**
      * Convert array values to utf-8
      * @param array $params
