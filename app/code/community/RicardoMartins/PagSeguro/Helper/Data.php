@@ -11,18 +11,24 @@
  */
 class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    const XML_PATH_PAYMENT_PAGSEGURO_EMAIL              = 'payment/pagseguro/merchant_email';
-    const XML_PATH_PAYMENT_PAGSEGURO_TOKEN              = 'payment/pagseguro/token';
-    const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/pagseguro/debug';
-    const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/pagseguro/sandbox';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/pagseguro/sandbox_merchant_email';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN      = 'payment/pagseguro/sandbox_token';
-    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL             = 'payment/pagseguro/ws_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP         = 'payment/pagseguro/ws_url_app';
-    const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'payment/pagseguro/js_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/pagseguro/sandbox_ws_url';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/pagseguro/sandbox_ws_url_app';
-    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/pagseguro/sandbox_js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_EMAIL              = 'payment/rm_pagseguro/merchant_email';
+    const XML_PATH_PAYMENT_PAGSEGURO_TOKEN              = 'payment/rm_pagseguro/token';
+    const XML_PATH_PAYMENT_PAGSEGURO_DEBUG              = 'payment/rm_pagseguro/debug';
+    const XML_PATH_PAUMENT_PAGSEGURO_SANDBOX            = 'payment/rm_pagseguro/sandbox';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL      = 'payment/rm_pagseguro/sandbox_merchant_email';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN      = 'payment/rm_pagseguro/sandbox_token';
+    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL             = 'payment/rm_pagseguro/ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_WS_URL_APP         = 'payment/rm_pagseguro/ws_url_app';
+    const XML_PATH_PAYMENT_PAGSEGURO_JS_URL             = 'payment/rm_pagseguro/js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/rm_pagseguro/sandbox_ws_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/rm_pagseguro/sandbox_js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE          = 'payment/rm_pagseguro_cc/active';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG            = 'payment/rm_pagseguro_cc/flag';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL        = 'payment/rm_pagseguro_cc/info_brl';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL      = 'payment/rm_pagseguro_cc/show_total';
+    const XML_PATH_PAYMENT_PAGSEGUROPRO_TEF_ACTIVE      = 'payment/pagseguropro_tef/active';
+    const XML_PATH_PAYMENT_PAGSEGUROPRO_BOLETO_ACTIVE   = 'payment/pagseguropro_boleto/active';
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
 
     /**
@@ -187,7 +193,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCpfVisible()
     {
-        $customerCpfAttribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
+        $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
         return empty($customerCpfAttribute);
     }
 
@@ -243,7 +249,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function checkTokenIntegrity()
     {
         $section = Mage::getSingleton('adminhtml/config')->getSection('payment');
-        $frontendType = (string)$section->groups->pagseguro->fields->token->frontend_type;
+        $frontendType = (string)$section->groups->rm_pagseguro->fields->token->frontend_type;
 
         if ('obscure' != $frontendType) {
             $this->writeLog(
@@ -284,5 +290,31 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             )
         );
         return $scriptBlock;
+    }
+
+    /**
+     * Return serialized (json) string with module configuration
+     * return string
+     */
+    public function getConfigJs()
+    {
+        $config = array(
+            'active_methods' => array(
+                'cc' => (int)Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE),
+                'boleto' => (int)Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGUROPRO_BOLETO_ACTIVE),
+                'tef' => (int)Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGUROPRO_TEF_ACTIVE)
+            ),
+            'flag' => Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG),
+            'debug' => $this->isDebugActive(),
+            'PagSeguroSessionId' => $this->getSessionId(),
+            'is_admin' => Mage::app()->getStore()->isAdmin(),
+            'show_total' => Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
+        );
+        return json_encode($config);
+    }
+
+    public function isInfoBrlActive()
+    {
+        return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL);
     }
 }

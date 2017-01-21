@@ -45,7 +45,6 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
 
-
         $senderName = $this->removeDuplicatedSpaces(
             sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
         );
@@ -55,7 +54,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $return = array(
             'senderName'    => $senderName,
             'senderEmail'   => trim($order->getCustomerEmail()),
-            'senderHash'    => $payment['additional_information']['sender_hash'],
+            'senderHash'    => $this->getPaymentHash('sender_hash'),
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
@@ -138,10 +137,10 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         /** @var Mage_Sales_Model_Order_Address $address */
         $address = ($type=='shipping' && !$order->getIsVirtual()) ?
             $order->getShippingAddress() : $order->getBillingAddress();
-        $addressStreetAttribute = Mage::getStoreConfig('payment/pagseguro/address_street_attribute');
-        $addressNumberAttribute = Mage::getStoreConfig('payment/pagseguro/address_number_attribute');
-        $addressComplementAttribute = Mage::getStoreConfig('payment/pagseguro/address_complement_attribute');
-        $addressNeighborhoodAttribute = Mage::getStoreConfig('payment/pagseguro/address_neighborhood_attribute');
+        $addressStreetAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_street_attribute');
+        $addressNumberAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_number_attribute');
+        $addressComplementAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_complement_attribute');
+        $addressNeighborhoodAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_neighborhood_attribute');
 
         //gathering address data
         $addressStreet = $this->_getAddressAttributeValue($address, $addressStreetAttribute);
@@ -415,7 +414,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     private function _getCustomerCpfValue(Mage_Sales_Model_Order $order, $payment)
     {
-        $customerCpfAttribute = Mage::getStoreConfig('payment/pagseguro/customer_cpf_attribute');
+        $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
 
         if (empty($customerCpfAttribute)) { //Asked with payment data
             if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
@@ -476,5 +475,32 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $totalAmount += $item->getRowTotal();
         }
         return (abs($extraAmount) == $totalAmount);
+    }
+
+    /**
+     * Get payment hashes (sender_hash & credit_card_token) from session
+     * @param string $param sender_hash or credit_card_token
+     *
+     * @return bool|string
+     */
+    public function getPaymentHash($param=null)
+    {
+        $isAdmin = Mage::app()->getStore()->isAdmin();
+        $session = ($isAdmin)?'core/cookie':'checkout/session';
+        $registry = Mage::getSingleton($session);
+
+        $registry = ($isAdmin)?$registry->get('PsPayment'):$registry->getData('PsPayment');
+
+        $registry = unserialize($registry);
+
+        if (is_null($param)) {
+            return $registry;
+        }
+
+        if (isset($registry[$param])) {
+            return $registry[$param];
+        }
+
+        return false;
     }
 }

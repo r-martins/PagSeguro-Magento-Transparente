@@ -1,7 +1,8 @@
 <?php
 /** @var RicardoMartins_PagSeguro_Block_Form_Cc $this */
 $_code=$this->getMethodCode();
-$_grandTotal = Mage::helper('checkout/cart')->getQuote()->getGrandTotal();
+$_singleton = (Mage::app()->getStore()->isAdmin())?'adminhtml/session_quote':'checkout/session';
+$_grandTotal = Mage::getSingleton($_singleton)->getQuote()->getGrandTotal();
 $_grandTotal = (!$_grandTotal)?'null':$_grandTotal;
 $_installments = Mage::getSingleton('checkout/session')->getQuote()->getPayment()->getAdditionalInformation('installment_quantity');
 $_installments = (!$_installments)?'null':$_installments;
@@ -86,33 +87,19 @@ $_installments = (!$_installments)?'null':$_installments;
         </div>
     </li>
     <?php echo $this->getChildHtml() ?>
-    <li>
-        <?php /* O selo do PagSeguro deve ser exibido obrigatoriamente. Você pode escolher outra imagem disponivel na pasta 'selo' */ ?>
-        <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>
-    </li>
-	<?php if ($this->helper('ricardomartins_pagseguro')->isInfoBrlActive()): ?>
-	<li>
-		<p class="info-brl">
-			<img src="<?php echo $this->getSkinUrl('pagseguro/selo/brflag.png'); ?>" alt="Bandeira do Brasil" style="float: left">
-			Esta compra está sendo feita no <strong>Brasil</strong>.
-		</p>
-	</li>
-	<?php endif;?>
 </ul>
 <script type="text/javascript">
 //<![CDATA[
-//    if ('undefined' !== typeof RMPagSeguro) {
-//        RMPagSeguro.getInstallments();
-//    }
 if(typeof RMPagSeguroObj != "undefined"){
     if(RMPagSeguroObj.config.debug){
         console.info('Adicionando observer para campos de cartão...');
     }
-    RMPagSeguroObj.addCardFieldsObserver(RMPagSeguroObj);
     if(typeof RMPagSeguroObj.brand != "undefined"){
         RMPagSeguroObj.updateBrand();
         RMPagSeguroObj.getInstallments(<?php echo $_grandTotal . ',' . $_installments;?>);
     }
+}else{
+    console.error('RMPagSeguroObj não foi definido.');
 }
 //]]
 </script>

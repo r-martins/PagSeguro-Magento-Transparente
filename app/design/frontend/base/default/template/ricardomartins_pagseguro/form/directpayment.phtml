@@ -1,22 +1,21 @@
 <?php
 $_helper = Mage::helper('ricardomartins_pagseguro');
 ?>
-<input type="hidden" name="payment[sender_hash]"/>
 <script type="text/javascript">
     //<![CDATA[
     var preparePagSeguro = function(){
-        var iid = setInterval(function()
-        {
-            if(typeof PagSeguroDirectPayment != "undefined" && PagSeguroDirectPayment.ready){
-                console.log('PagSeguro ready');
+        if(typeof RMPagSeguroObj != "undefined"){
+            <?php if ($_helper->isDebugActive()): ?>
+			console.info('PagSeguro was already started.');
+            <?php endif; ?>
+            return;
+		}
+        <?php if ($_helper->isDebugActive()): ?>
+        console.info('PagSeguro is initiating. Wait for ready message.');
+        <?php endif; ?>
+			RMPagSeguroObj = new RMPagSeguro(<?php echo $_helper->getConfigJs()?>);
+			console.info('PagSeguro ready');
 
-                clearInterval(iid);
-                RMPagSeguro.updateSenderHash();
-                RMPagSeguro.addBrandObserver();
-                RMPagSeguro.addCardFieldsObserver();
-                RMPagSeguro.removeUnavailableBanks();
-            }
-        }, 4000);
     }
     preparePagSeguro();
 

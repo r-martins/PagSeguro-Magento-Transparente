@@ -11,13 +11,14 @@
  */
 class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro_Model_Abstract
 {
-    protected $_code = 'pagseguro_cc';
+    protected $_code = 'rm_pagseguro_cc';
     protected $_formBlockType = 'ricardomartins_pagseguro/form_cc';
     protected $_infoBlockType = 'ricardomartins_pagseguro/form_info_cc';
     protected $_isGateway = true;
     protected $_canAuthorize = true;
     protected $_canCapture = true;
-    protected $_canRefund = false;
+    protected $_canRefund = true;
+    protected $_canRefundInvoicePartial = false;
     protected $_canVoid = true;
     protected $_canUseInternal = false;
     protected $_canUseCheckout = true;
@@ -63,10 +64,14 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
 
         $info = $this->getInfoInstance();
-        $info->setAdditionalInformation('sender_hash', $data->getSenderHash())
-            ->setAdditionalInformation('credit_card_token', $data->getCreditCardToken())
+
+        /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
+        $pHelper = Mage::helper('ricardomartins_pagseguro/params');
+
+        $info->setAdditionalInformation('sender_hash', $pHelper->getPaymentHash('sender_hash'))
+            ->setAdditionalInformation('credit_card_token', $pHelper->getPaymentHash('credit_card_token'))
             ->setAdditionalInformation('credit_card_owner', $data->getPsCcOwner())
-            ->setCcType($data->getPsCardType())
+            ->setCcType($pHelper->getPaymentHash('cc_type'))
             ->setCcLast4(substr($data->getPsCcNumber(), -4));
 
         //cpf
@@ -111,25 +116,40 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     public function validate()
     {
         parent::validate();
-        $info = $this->getInfoInstance();
+        $missingInfo = $this->getInfoInstance();
 
-        $senderHash = $info->getAdditionalInformation('sender_hash');
-        $creditCardToken = $info->getAdditionalInformation('credit_card_token');
+        /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
+        $pHelper = Mage::helper('ricardomartins_pagseguro/params');
 
-        if (empty($creditCardToken) || empty($senderHash)) {
+        $shippingMethod = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingMethod();
+
+        // verifica se não há método de envio selecionado antes de exibir o erro de falha no cartão de crédito - Weber
+        if (empty($shippingMethod)) {
+            return false;
+        }
+
+        $senderHash = $pHelper->getPaymentHash('sender_hash');
+        $creditCardToken = $pHelper->getPaymentHash('credit_card_token');
+
+        if (!$creditCardToken || !$senderHash) {
+            $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
+            $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             Mage::helper('ricardomartins_pagseguro')
                 ->writeLog(
-                    'Falha ao obter o token do cartao ou sender_hash.
-                    Veja se os dados "sender_hash" e "credit_card_token" foram enviados no formulário.
-                    Um problema de JavaScript pode ter ocorrido.
-                    Se esta for apenas uma atualização de blocos via ajax nao se preocupe.'
+                    "Falha ao obter o token do cartao ou sender_hash.
+                    Ative o modo debug e observe o console de erros do seu navegador.
+                    $missingInfo"
                 );
             Mage::throwException(
-                'Falha ao processar pagamento junto ao PagSeguro. Por favor, entre em contato com nossa equipe.'
+                'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
             );
         }
         return $this;
     }
+
+
+    // public function processBeforeRefund($invoice, $payment){} //before refund
+    // public function processCreditmemo($creditmemo, $payment){} //after refund
 
     /**
      * Order payment
@@ -175,6 +195,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 }
             }
             $payment->setAdditionalInformation($additional);
+
         }
         return $this;
     }

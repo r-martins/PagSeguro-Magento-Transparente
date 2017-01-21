@@ -35,4 +35,19 @@ class RicardoMartins_PagSeguro_AjaxController extends Mage_Core_Controller_Front
         $this->getResponse()->setHeader('Content-type', 'application/json', true);
         $this->getResponse()->setBody(json_encode(array('session_id' => $sessionId)));
     }
+
+    public function updatePaymentHashesAction()
+    {
+        $paymentPost = $this->getRequest()->getPost('payment');
+        $isAdmin = isset($paymentPost['is_admin']) && $paymentPost['is_admin']=="true";
+        $session = 'checkout/session';
+        if ($isAdmin) {
+            $session = 'core/cookie';
+            Mage::getSingleton($session)->set('PsPayment', serialize($paymentPost));
+        } else {
+            Mage::getSingleton($session)->setData('PsPayment', serialize($paymentPost));
+        }
+
+        $this->getResponse()->setHttpResponseCode(200);
+    }
 }

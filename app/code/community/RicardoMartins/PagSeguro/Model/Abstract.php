@@ -11,6 +11,7 @@
  */
 class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_Abstract
 {
+
     /**
      * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      * @see https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-notificacoes.html#v2-item-servico-de-notificacoes
@@ -18,6 +19,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      */
     public function proccessNotificatonResult(SimpleXMLElement $resultXML)
     {
+        // prevent this event from firing twice
+        if(Mage::registry('sales_order_invoice_save_after_event_triggered'))
+        {
+            return $this; // this method has already been executed once in this request
+        }
+        Mage::register('sales_order_invoice_save_after_event_triggered', true);
+
         if (isset($resultXML->error)) {
             $errMsg = Mage::helper('ricardomartins_pagseguro')->__((string)$resultXML->error->message);
             Mage::throwException(
@@ -32,22 +40,24 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             /** @var Mage_Sales_Model_Order $order */
             $order = Mage::getModel('sales/order')->loadByIncrementId((string)$resultXML->reference);
             $payment = $order->getPayment();
+
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
+
             $message = $processedState->getMessage();
 
             if ((int)$resultXML->status == 6) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
                 if ($order->canUnhold()) {
                     $order->unhold();
                 }
+
                 if ($order->canCancel()) {
                     $order->cancel();
                     $order->save();
                 } else {
                     $payment->registerRefundNotification(floatval($resultXML->grossAmount));
                     $order->addStatusHistoryComment(
-                        'Devolvido: o valor foi devolvido ao comprador, mas o
-                        pedido encontra-se em um estado que não pode ser cancelado.'
+                        'Devolvido: o valor foi devolvido ao comprador.'
                     )->save();
                 }
             }
@@ -67,28 +77,38 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             }
 
             if ($processedState->getStateChanged()) {
-                $order->setState(
-                    $processedState->getState(),
-                    true,
-                    $message,
-                    $processedState->getIsCustomerNotified()
-                )->save();
+                // somente para o status 6 que edita o status do pedido - Weber
+                if ((int)$resultXML->status != 6) {
+                    $order->setState(
+                        $processedState->getState(),
+                        true,
+                        $message,
+                        $processedState->getIsCustomerNotified()
+                    )->save();
+                }
+
             } else {
                 $order->addStatusHistoryComment($message);
             }
 
             if ((int)$resultXML->status == 3) { //Quando o pedido foi dado como Pago
-                //cria fatura e envia email (se configurado)
-//                $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
+                // cria fatura e envia email (se configurado)
+                // $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
                 if(!$order->hasInvoices()){
                     $invoice = $order->prepareInvoice();
                     $invoice->register()->pay();
                     $msg = sprintf('Pagamento capturado. Identificador da Transação: %s', (string)$resultXML->code);
                     $invoice->addComment($msg);
                     $invoice->sendEmail(
-                        Mage::getStoreConfigFlag('payment/pagseguro/send_invoice_email'),
+                        Mage::getStoreConfigFlag('payment/rm_pagseguro/send_invoice_email'),
                         'Pagamento recebido com sucesso.'
                     );
+
+                    // salva o transaction id na invoice
+                    if (isset($resultXML->code)) {
+                        $invoice->setTransactionId((string)$resultXML->code)->save();
+                    }
+
                     Mage::getModel('core/resource_transaction')
                         ->addObject($invoice)
                         ->addObject($invoice->getOrder())
@@ -132,7 +152,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         $client->request();
         $resposta = $client->getLastResponse()->getBody();
-        
+
         $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $resposta));
 
         libxml_use_internal_errors(true);
@@ -155,6 +175,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         $return = new Varien_Object();
         $return->setStateChanged(true);
         $return->setIsTransactionPending(true); //payment is pending?
+
         switch($statusCode)
         {
             case '1':
@@ -204,7 +225,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 );
                 break;
             case '6':
-                $return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
+                //$return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
+                $return->setData('state', Mage_Sales_Model_Order::STATE_CLOSED);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
                 $return->setMessage('Devolvida: o valor da transação foi devolvido para o comprador.');
@@ -226,10 +248,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      * Call PagSeguro API to place an order (/transactions)
      * @param $params
      * @param $payment
+     * @param $type
      *
      * @return SimpleXMLElement
      */
-    public function callApi($params, $payment)
+    public function callApi($params, $payment, $type='transactions')
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
         $useApp = $helper->getLicenseType() == 'app';
@@ -238,11 +261,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         $params = $this->_convertEncoding($params);
         $paramsString = $this->_convertToCURLString($params);
-        
-        $helper->writeLog('Parametros sendo enviados para API (/transactions): '. var_export($params, true));
-        
+
+        $helper->writeLog('Parametros sendo enviados para API (/'.$type.'): '. var_export($params, true));
+
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $helper->getWsUrl('transactions', $useApp));
+        curl_setopt($ch, CURLOPT_URL, $helper->getWsUrl($type, $useApp));
         curl_setopt($ch, CURLOPT_POST, count($params));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $paramsString);
@@ -263,10 +286,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         curl_close($ch);
 
-        $helper->writeLog('Retorno PagSeguro (/transactions): ' . var_export($response, true));
+        $helper->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(trim($response));
+
         if (false === $xml) {
             switch($response){
                 case 'Unauthorized':
@@ -287,8 +311,58 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 'Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.'
             );
         }
-        
+
         return $xml;
+    }
+
+    /**
+     * Check if order total is zero making method unavailable
+     * @param Mage_Sales_Model_Quote $quote
+     *
+     * @return mixed
+     */
+    public function isAvailable($quote = null)
+    {
+        return parent::isAvailable($quote) && !empty($quote)
+            && Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) > 0;
+    }
+
+
+    /**
+     * Order payment
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     *
+     * @return RicardoMartins_PagSeguro_Model_Payment_Abstract
+     */
+    public function refund(Varien_Object $payment, $amount)
+    {
+        //will grab data to be send via POST to API inside $params
+        $rmHelper   = Mage::helper('ricardomartins_pagseguro');
+
+        // recupera a informação adicional do PagSeguro
+        $info           = $this->getInfoInstance();
+        $transactionId = $info->getAdditionalInformation('transaction_id');
+
+        $params = array(
+            'transactionCode'   => $transactionId,
+            'refundValue'       => number_format($amount, 2, '.', ''),
+        );
+
+        if ($rmHelper->getLicenseType() != 'app') {
+            $params['token'] = $rmHelper->getToken();
+            $params['email'] = $rmHelper->getMerchantEmail();
+        }
+
+        // call API - refund
+        $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
+
+        if ($returnXml === null) {
+            $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
+            Mage::throwException($errorMsg);
+        }
+        return $this;
     }
 
     /**
@@ -304,7 +378,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         return $params;
     }
-    
+
     /**
      * Convert API params (already ISO-8859-1) to url format (curl string)
      * @param array $params
@@ -317,7 +391,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         foreach ($params as $k => $v) {
             $fieldsString .= $k.'='.urlencode($v).'&';
         }
-        
         return rtrim($fieldsString, '&');
     }
 }
+
+
+    
