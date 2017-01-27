@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.0.3</version>
+            <version>3.0.4</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -73,6 +73,7 @@
         <payment>
             <pagseguro_cc>
                 <model>ricardomartins_pagseguro/payment_ccview</model>
+                <title>Cartão de Crédito - via PagSeguro UOL (antigo)</title>
             </pagseguro_cc>
             <rm_pagseguro_cc>
                 <active>0</active>

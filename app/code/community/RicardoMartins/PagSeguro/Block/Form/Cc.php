@@ -44,7 +44,7 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
      */
     public function isDobVisible()
     {
-        $ownerDobAttribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
+        $ownerDobAttribute = Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute');
         return empty($ownerDobAttribute);
     }
 
