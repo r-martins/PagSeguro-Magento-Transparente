@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -72,7 +72,7 @@
     <default>
         <payment>
             <pagseguro_cc>
-                <model>ricardomartins_pagseguro/payment_cc</model>
+                <model>ricardomartins_pagseguro/payment_ccview</model>
             </pagseguro_cc>
             <rm_pagseguro_cc>
                 <active>0</active>
