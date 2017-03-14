@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.0.0
+ * @version 3.1.0
  */
 
 RMPagSeguro = Class.create({
@@ -37,6 +37,11 @@ RMPagSeguro = Class.create({
                 document.stopObserving('click');
             });
         }
+        Validation.add('validate-pagseguro', 'Falha ao atualizar dados do pagaento. Entre novamente com seus dados.',
+            function(v, el){
+                RMPagSeguroObj.updatePaymentHashes();
+                return true;
+        })
     },
 
     updateSenderHash: function() {
@@ -109,9 +114,9 @@ RMPagSeguro = Class.create({
             var ccCvvElm = $$('input[name="payment[ps_cc_cid]"]').first();
 
             Element.observe(ccNumElm,'keyup',function(e){obj.updateCreditCardToken();});
-            Element.observe(ccExpMoElm,'change',function(e){obj.updateCreditCardToken();});
-            Element.observe(ccExpYrElm,'change',function(e){obj.updateCreditCardToken();});
-            Element.observe(ccCvvElm,'change',function(e){obj.updateCreditCardToken();});
+            Element.observe(ccExpMoElm,'keyup',function(e){obj.updateCreditCardToken();});
+            Element.observe(ccExpYrElm,'keyup',function(e){obj.updateCreditCardToken();});
+            Element.observe(ccCvvElm,'keyup',function(e){obj.updateCreditCardToken();});
         }catch(e){
             console.error('Não foi possível adicionar observevação aos cartões. ' + e.message);
         }
@@ -120,14 +125,16 @@ RMPagSeguro = Class.create({
     updateCreditCardToken: function(){
         var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/^\s+|\s+$/g,'');
         // var ccNumElm = $$('input[name="payment[ps_cc_number]"]').first();
-        var ccExpMo = $$('select[name="payment[ps_cc_exp_month]"]').first().value;
-        var ccExpYr = $$('select[name="payment[ps_cc_exp_year]"]').first().value;
-        var ccCvv = $$('input[name="payment[ps_cc_cid]"]').first().value;
+        var ccExpMo = $$('select[name="payment[ps_cc_exp_month]"]').first().value.replace(/^\s+|\s+$/g,'');
+        var ccExpYr = $$('select[name="payment[ps_cc_exp_year]"]').first().value.replace(/^\s+|\s+$/g,'');
+        var ccCvv = $$('input[name="payment[ps_cc_cid]"]').first().value.replace(/^\s+|\s+$/g,'');
 
-        this.updateBrand();
         var brandName = '';
-        if(typeof RMPagSeguroObj.brand != "undefined"){
-            brandName = RMPagSeguroObj.brand.name;
+        if(typeof RMPagSeguroObj.lastCcNum != "undefined" || ccNum != RMPagSeguroObj.lastCcNum){
+            this.updateBrand();
+            if(typeof RMPagSeguroObj.brand != "undefined"){
+                brandName = RMPagSeguroObj.brand.name;
+            }
         }
 
         if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)

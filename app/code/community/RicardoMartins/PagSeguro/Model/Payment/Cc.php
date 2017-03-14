@@ -138,6 +138,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 ->writeLog(
                     "Falha ao obter o token do cartao ou sender_hash.
                     Ative o modo debug e observe o console de erros do seu navegador.
+                    Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
                     $missingInfo"
                 );
             Mage::throwException(

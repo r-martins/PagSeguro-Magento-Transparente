@@ -19,6 +19,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      */
     public function proccessNotificatonResult(SimpleXMLElement $resultXML)
     {
+        $helper = Mage::helper('ricardomartins_pagseguro');
         // prevent this event from firing twice
         if(Mage::registry('sales_order_invoice_save_after_event_triggered'))
         {
@@ -38,7 +39,14 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         if (isset($resultXML->reference)) {
             /** @var Mage_Sales_Model_Order $order */
-            $order = Mage::getModel('sales/order')->loadByIncrementId((string)$resultXML->reference);
+            $orderNo = (string)$resultXML->reference;
+            $order = Mage::getModel('sales/order')->loadByIncrementId($orderNo);
+            if (!$order->getId()) {
+                $helper->writeLog(
+                    sprintf('Pedido %s não encontrado no sistema. Impossível processar retorno.', $orderNo)
+                );
+                return $this;
+            }
             $payment = $order->getPayment();
 
             $this->_code = $payment->getMethod();
@@ -142,25 +150,36 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     {
         $helper =  Mage::helper('ricardomartins_pagseguro');
         $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode, false);
-        $client = new Zend_Http_Client($url);
-        $client->setParameterGet(
-            array(
-                'token'=>$helper->getToken(),
-                'email'=> $helper->getMerchantEmail(),
-            )
-        );
 
-        $client->request();
-        $resposta = $client->getLastResponse()->getBody();
+        $params = array('token' => $helper->getToken(), 'email' => $helper->getMerchantEmail(),);
+        $url .= '?' . http_build_query($params);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
-        $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $resposta));
-
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string(trim($resposta));
-        if (false === $xml) {
-            $helper->writeLog('Retorno de notificacao XML PagSeguro em formato não esperado. Retorno: ' . $resposta);
+        try {
+            $return = curl_exec($ch);
+        } catch (Exception $e) {
+            $helper->writeLog(
+                sprintf(
+                    'Falha ao capturar retorno para notificationCode %s: %s(%d)', $notificationCode, curl_error($ch),
+                    curl_errno($ch)
+                )
+            );
         }
 
+        $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $return));
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string(trim($return));
+        if (false === $xml) {
+            $helper->writeLog('Retorno de notificacao XML PagSeguro em formato não esperado. Retorno: ' . $return);
+        }
+
+        curl_close($ch);
         return $xml;
     }
 
@@ -260,6 +279,18 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $params['public_key'] = Mage::getStoreConfig('payment/pagseguropro/key');
         }
         $params = $this->_convertEncoding($params);
+        $paramsObj = new Varien_Object(array('params'=>$params));
+
+        //you can create a module to modify some parameter using the following observer
+        Mage::dispatchEvent(
+            'ricardomartins_pagseguro_params_callapi_before_send',
+            array(
+                'params' => $params,
+                'payment' => $payment,
+                'type' => $type
+            )
+        );
+        $params = $paramsObj->getParams();
         $paramsString = $this->_convertToCURLString($params);
 
         $helper->writeLog('Parametros sendo enviados para API (/'.$type.'): '. var_export($params, true));
