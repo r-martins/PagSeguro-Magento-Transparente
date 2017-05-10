@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.1.0
+ * @version 3.2.0
  */
 
 RMPagSeguro = Class.create({
@@ -66,9 +66,9 @@ RMPagSeguro = Class.create({
             return;
         }
         this.grandTotal = grandTotal;
-        if(!selectedInstallment){
-            selectedInstallment = 1;
-        }
+        // if(!selectedInstallment){
+        //     selectedInstallment = 1;
+        // }
 
         brandName = RMPagSeguroObj.brand.name;
         PagSeguroDirectPayment.getInstallments({
@@ -80,6 +80,14 @@ RMPagSeguro = Class.create({
 //                       console.log(response.installments);
                 var b = response.installments[RMPagSeguroObj.brand.name];
                 parcelsDrop.length = 0;
+
+                if(RMPagSeguroObj.config.force_installments_selection){
+                    var option = document.createElement('option');
+                    option.text = "Selecione a quantidade de parcelas";
+                    option.value = "";
+                    parcelsDrop.add(option);
+                }
+
                 for(var x=0; x < b.length; x++){
                     var option = document.createElement('option');
                     option.text = b[x].quantity + "x de R$" + b[x].installmentAmount.toFixed(2).toString().replace('.',',');

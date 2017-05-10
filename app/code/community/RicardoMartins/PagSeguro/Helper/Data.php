@@ -30,6 +30,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGUROPRO_TEF_ACTIVE      = 'payment/pagseguropro_tef/active';
     const XML_PATH_PAYMENT_PAGSEGUROPRO_BOLETO_ACTIVE   = 'payment/pagseguropro_boleto/active';
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -309,6 +310,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             'PagSeguroSessionId' => $this->getSessionId(),
             'is_admin' => Mage::app()->getStore()->isAdmin(),
             'show_total' => Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
+            'force_installments_selection' =>
+                Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS)
         );
         return json_encode($config);
     }

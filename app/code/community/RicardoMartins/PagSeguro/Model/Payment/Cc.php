@@ -80,7 +80,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
 
         //DOB
-        $ownerDobAttribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
+        $ownerDobAttribute = Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute');
         if (empty($ownerDobAttribute)) {
             $info->setAdditionalInformation(
                 'credit_card_owner_birthdate',

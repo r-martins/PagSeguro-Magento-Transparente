@@ -77,10 +77,10 @@ $_installments = (!$_installments)?'null':$_installments;
         </div>
     </li>
     <li id="<?php echo $_code ?>_cc_installments_div">
-        <label for="<?php echo $_code ?>_cc_installments"><?php echo $this->__('Installments') ?></label>
+        <label for="<?php echo $_code ?>_cc_installments" class="required"><em>*</em><?php echo $this->__('Installments') ?></label>
         <div class="input-box">
             <div class="v-fix">
-                <select name="payment[ps_cc_installments]" id="<?php echo $_code ?>_cc_installments" class="required">
+                <select name="payment[ps_cc_installments]" id="<?php echo $_code ?>_cc_installments" class="required-entry">
                     <option value="">Informe os dados do cartão para calcular</option>
                 </select>
             </div>

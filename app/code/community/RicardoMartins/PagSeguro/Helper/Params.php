@@ -391,7 +391,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     private function _getCustomerCcDobValue(Mage_Customer_Model_Customer $customer, $payment)
     {
-        $ccDobAttribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
+        $ccDobAttribute = Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute');
 
         if (empty($ccDobAttribute)) { //when asked with payment data
             if (isset($payment['additional_information']['credit_card_owner_birthdate'])) {
@@ -399,7 +399,8 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             }
         }
 
-        $dob = $customer->getResource()->getAttribute($ccDobAttribute)->getFrontend()->getValue($customer);
+//        $dob = $customer->getResource()->getAttribute($ccDobAttribute)->getFrontend()->getValue($customer);
+        $dob = $payment->getOrder()->getData('customer_' . $ccDobAttribute);
 
 
         return date('d/m/Y', strtotime($dob));

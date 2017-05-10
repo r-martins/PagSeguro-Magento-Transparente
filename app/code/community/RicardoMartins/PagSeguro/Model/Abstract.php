@@ -200,7 +200,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             case '1':
                 $return->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
                 $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
-                if ($this->getCode()=='pagseguro_cc') {
+                if ($this->getCode()=='rm_pagseguro_cc') {
                     $return->setStateChanged(false);
                 }
                 $return->setMessage(
