@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<layout version="0.1.0">
+    <pagseguro_checkout_handle>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/ricardomartins_pagseguro.css</name>
+            </action>
+            <action method="addItem">
+                <type>skin_js</type>
+                <script>js/ricardomartins_pagseguro.js</script>
+            </action>
+        </reference>
+        <reference name="after_body_start">
+            <block type="page/html" name="ricardomartins_pagseguro_loader">
+                <action method="setTemplate">
+                    <template>ricardomartins_pagseguro/form/loader.phtml</template>
+                </action>
+            </block>
+        </reference>
+    </pagseguro_checkout_handle>
+    <checkout_onepage_success>
+        <update handle="pagseguro_checkout_handle" />
+    </checkout_onepage_success>
+    <onestepcheckout_index_index>
+        <update handle="pagseguro_checkout_handle" />
+    </onestepcheckout_index_index>
+    <opc_index_index>
+        <update handle="pagseguro_checkout_handle" />
+    </opc_index_index>
+    <aw_onestepcheckout_index_index>
+        <update handle="pagseguro_checkout_handle" />
+    </aw_onestepcheckout_index_index>
+</layout>
+

@@ -40,6 +40,13 @@
                 </args>
             </ricardomartins_pagseguro>
         </routers>
+        <layout>
+            <updates>
+                <ricardomartins_pagseguro>
+                    <file>ricardomartins_pagseguro.xml</file>
+                </ricardomartins_pagseguro>
+            </updates>
+        </layout>
         <translate>
             <modules>
                 <ricardomartins_pagseguro>

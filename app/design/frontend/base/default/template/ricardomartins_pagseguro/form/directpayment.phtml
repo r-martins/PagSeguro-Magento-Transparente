@@ -17,7 +17,15 @@ $_helper = Mage::helper('ricardomartins_pagseguro');
 			console.info('PagSeguro ready');
 
     }
+
+    $("pagseguro-overlay").setStyle({ height: pagseguroDocumentHeight() + "px" });
+    $("pagseguro-overlay").show ();
+    $("pagseguro-mask").show ();
+
     preparePagSeguro();
+
+    $("pagseguro-mask").hide ();
+    $("pagseguro-overlay").hide ();
 
     //]]>
 </script>
