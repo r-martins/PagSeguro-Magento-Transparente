@@ -20,12 +20,21 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     public function getItemsParams(Mage_Sales_Model_Order $order)
     {
         $return = array();
-        if ($items = $order->getAllVisibleItems()) {
-            for ($x=1, $y=0, $c=count($items); $x <= $c; $x++, $y++) {
+        $items = $order->getAllVisibleItems();
+        if ($items) {
+            $itemsCount = count($items);
+            for ($x=1, $y=0; $x <= $itemsCount; $x++, $y++) {
+                $itemPrice = $items[$y]->getPrice();
+                $qtyOrdered = $items[$y]->getQtyOrdered();
                 $return['itemId'.$x] = $items[$y]->getId();
                 $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
-                $return['itemAmount'.$x] = number_format($items[$y]->getPrice(), 2, '.', '');
-                $return['itemQuantity'.$x] = $items[$y]->getQtyOrdered();
+                $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
+                $return['itemQuantity'.$x] = $qtyOrdered;
+
+                //We can't send 0.00 as value to PagSeguro. Will be discounted on extraAmount.
+                if ($itemPrice == 0) {
+                    $return['itemAmount'.$x] = 0.01;
+                }
             }
         }
         return $return;
@@ -161,7 +170,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $type.'AddressCity'       => substr($addressCity, 0, 60),
             $type.'AddressState'      => $addressState,
             $type.'AddressCountry'    => 'BRA',
-         );
+        );
 
         //shipping specific
         if ($type == 'shipping') {
@@ -277,7 +286,15 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $extra = $discount + $taxAmount;
 
         if ($this->_shouldSplit($order)) {
-            $extra = $extra+0.01;
+            $extra += 0.01;
+        }
+
+        //Discounting gift products
+        $orderItems = $order->getAllVisibleItems();
+        foreach ($orderItems as $item) {
+            if ($item->getPrice() == 0) {
+                $extra -= 0.01 * $item->getQtyOrdered();
+            }
         }
         return number_format($extra, 2, '.', '');
     }
@@ -391,7 +408,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     private function _getCustomerCcDobValue(Mage_Customer_Model_Customer $customer, $payment)
     {
-        $ccDobAttribute = Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute');
+        $ccDobAttribute = Mage::getStoreConfig('payment/pagseguro_cc/owner_dob_attribute');
 
         if (empty($ccDobAttribute)) { //when asked with payment data
             if (isset($payment['additional_information']['credit_card_owner_birthdate'])) {
@@ -399,8 +416,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             }
         }
 
-//        $dob = $customer->getResource()->getAttribute($ccDobAttribute)->getFrontend()->getValue($customer);
-        $dob = $payment->getOrder()->getData('customer_' . $ccDobAttribute);
+        $dob = $customer->getResource()->getAttribute($ccDobAttribute)->getFrontend()->getValue($customer);
 
 
         return date('d/m/Y', strtotime($dob));
@@ -448,7 +464,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 'order' => $order,
                 'payment' => $payment,
                 'cpf_obj' => $cpfObj,
-                )
+            )
         );
 
         return $cpfObj->getCpf();
