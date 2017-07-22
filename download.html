@@ -431,7 +431,6 @@ zE(function() {
     document.getElementById("formAppNew").action = "http://ws.local.com.br/pspro/v6/app/new";
 }
 var validateAndSubmit = function(){
-	alert('Estamos atualizando nossos servidores. Tente de novo daqui 1 hora.'); return false;
     var email = document.getElementById("email").value;
     var url = document.getElementById("url").value;
     if(!validateEmail(email)){alert('Email inválido.'); return false;}
