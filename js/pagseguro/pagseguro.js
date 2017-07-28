@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.2.2-beta
+ * @version 3.2.2
  */
 
 RMPagSeguro = Class.create({
