@@ -400,7 +400,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Returns customer's date of birthday, based on your module configuration
+     * Returns customer's date of birthday, based on your module configuration or return a default date
      * @param Mage_Customer_Model_Customer $customer
      * @param                              $payment
      *
@@ -416,7 +416,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             }
         }
 
-        $dob = $customer->getResource()->getAttribute($ccDobAttribute)->getFrontend()->getValue($customer);
+        $attribute = $customer->getResource()->getAttribute($ccDobAttribute);
+        if (!$attribute) {
+            return '01/01/1970';
+        }
+
+        $dob = $attribute->getFrontend()->getValue($customer);
 
 
         return date('d/m/Y', strtotime($dob));
