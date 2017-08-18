@@ -416,11 +416,17 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             }
         }
 
+        //try to get from payment info
+        $dob = $payment->getOrder()->getData('customer_' . $ccDobAttribute);
+        if (!empty($dob)) {
+            return date('d/m/Y', strtotime($dob));
+        }
+
+        //try to get from customer
         $attribute = $customer->getResource()->getAttribute($ccDobAttribute);
         if (!$attribute) {
             return '01/01/1970';
         }
-
         $dob = $attribute->getFrontend()->getValue($customer);
 
 
