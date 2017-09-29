@@ -31,6 +31,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGUROPRO_BOLETO_ACTIVE   = 'payment/pagseguropro_boleto/active';
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT  = 'payment/rm_pagseguro_cc/installment_limit';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -311,7 +312,9 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             'is_admin' => Mage::app()->getStore()->isAdmin(),
             'show_total' => Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
             'force_installments_selection' =>
-                Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS)
+                Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS),
+            'installment_limit' =>
+                (int)Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT)
         );
         return json_encode($config);
     }
