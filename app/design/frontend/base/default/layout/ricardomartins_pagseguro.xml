@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<layout>
+    <ricardomartins_pagseguro_notification_index>
+        <reference name="content">
+            <block name="ricardomartins.pagseguro.notification" type="core/template" template="ricardomartins_pagseguro/notification.phtml" after="-"/>
+        </reference>
+    </ricardomartins_pagseguro_notification_index>
+</layout>

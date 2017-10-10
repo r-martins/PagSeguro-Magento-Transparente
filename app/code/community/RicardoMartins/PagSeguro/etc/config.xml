@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.3.0</version>
+            <version>3.4.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -59,6 +59,13 @@
                 </observers>
             </core_block_abstract_to_html_after>
         </events>
+        <layout>
+            <updates>
+                <ricardomartins_pagseguro>
+                    <file>ricardomartins_pagseguro.xml</file>
+                </ricardomartins_pagseguro>
+            </updates>
+        </layout>
     </frontend>
     <adminhtml>
         <layout>
@@ -68,6 +75,26 @@
                 </ricardomartins_pagseguro>
             </updates>
         </layout>
+        <events>
+            <admin_session_user_login_success>
+                <observers>
+                    <ricardomartins_pagseguro_healthcheck>
+                        <type>singleton</type>
+                        <class>ricardomartins_pagseguro/healthcheck</class>
+                        <method>basicCheck</method>
+                    </ricardomartins_pagseguro_healthcheck>
+                </observers>
+            </admin_session_user_login_success>
+            <admin_system_config_changed_section_payment>
+                <observers>
+                    <ricardomartins_pagseguro_healthcheck>
+                        <type>singleton</type>
+                        <class>ricardomartins_pagseguro/healthcheck</class>
+                        <method>check</method>
+                    </ricardomartins_pagseguro_healthcheck>
+                </observers>
+            </admin_system_config_changed_section_payment>
+    </events>
     </adminhtml>
     <default>
         <payment>
