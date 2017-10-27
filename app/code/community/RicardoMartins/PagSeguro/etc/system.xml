@@ -323,6 +323,16 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Quando habilitado, forçará o cliente a selecionar o valor de parcelas ao invés de deixar pagamento a vista pre-selecionado.]]></comment>
                         </force_installments_selection>
+                        <installment_limit>
+                            <label>Limitar parcelas</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>90</sort_order>
+                            <source_model>ricardomartins_pagseguro/source_ccinstallments</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Limita o número de parcelas. A configuração de juros é sempre feita no seu painel PagSeguro.]]></comment>
+                        </installment_limit>
                     </fields>
                 </rm_pagseguro_cc>
             </groups>

@@ -6,3 +6,4 @@ app/etc/modules/RicardoMartins_PagSeguro.xml app/etc/modules/RicardoMartins_PagS
 app/locale/pt_BR/RicardoMartins_PagSeguro.csv app/locale/pt_BR/RicardoMartins_PagSeguro.csv
 js/pagseguro/pagseguro.js js/pagseguro/pagseguro.js
 skin/frontend/base/default/pagseguro/selo/* skin/frontend/base/default/pagseguro/selo/
+app/design/frontend/base/default/layout/ricardomartins_pagseguro.xml app/design/frontend/base/default/layout/ricardomartins_pagseguro.xml
