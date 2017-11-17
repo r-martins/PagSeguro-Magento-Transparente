@@ -213,16 +213,6 @@
                           <show_in_store>0</show_in_store>
                           <comment><![CDATA[Informe as Request URLs (separadas por ; ) que deseja desativar validação imediata para corrigir erro de desconto. Ex.: onestepcheckout/ajax/savePaymentMethod; ]]></comment>
                         </exception_request_validate>
-
-                        <place_order_validate>
-                          <label>Path URL do Checkout Utilizado</label>
-                          <frontend_type>text</frontend_type>
-                          <sort_order>90</sort_order>
-                          <show_in_default>1</show_in_default>
-                          <show_in_website>1</show_in_website>
-                          <show_in_store>0</show_in_store>
-                          <comment><![CDATA[Informe a Request URL do módulo utilizado. Exemplo (Módulo OSC): onestepcheckout/ajax/placeOrder ]]></comment>
-                        </place_order_validate>
                     </fields>
                 </rm_pagseguro>
                 <rm_pagseguro_cc module="ricardomartins_pagseguro">
