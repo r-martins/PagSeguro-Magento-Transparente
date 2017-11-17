@@ -115,23 +115,39 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     public function validate()
     {
-        parent::validate();
-        $missingInfo = $this->getInfoInstance();
+      parent::validate();
+      $missingInfo = $this->getInfoInstance();
 
-        /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
-        $pHelper = Mage::helper('ricardomartins_pagseguro/params');
+      /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
+      $pHelper = Mage::helper('ricardomartins_pagseguro/params');
 
-        $shippingMethod = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingMethod();
+      $shippingMethod = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingMethod();
 
-        // verifica se não há método de envio selecionado antes de exibir o erro de falha no cartão de crédito - Weber
-        if (empty($shippingMethod)) {
-            return false;
-        }
+      // verifica se não há método de envio selecionado antes de exibir o erro de falha no cartão de crédito - Weber
+      if (empty($shippingMethod)) {
+          return false;
+      }
 
-        $senderHash = $pHelper->getPaymentHash('sender_hash');
-        $creditCardToken = $pHelper->getPaymentHash('credit_card_token');
+      $senderHash = $pHelper->getPaymentHash('sender_hash');
+      $creditCardToken = $pHelper->getPaymentHash('credit_card_token');
 
-        if (!$creditCardToken || !$senderHash) {
+      //mapeia a request URL atual
+      $controller = Mage::app()->getRequest()->getControllerName();
+      $action = Mage::app()->getRequest()->getActionName();
+      $route = Mage::app()->getRequest()->getRouteName();
+      $pathRequest = $route.'/'.$controller.'/'.$action;
+
+      //seta o path definido no admin para setar a request URL do checkout
+      $placeOrder = Mage::getStoreConfig('payment/rm_pagseguro/place_order_validate');
+
+      //seta os paths para bloqueio de validação instantânea definidos no admin no array
+      $configPaths = Mage::getStoreConfig('payment/rm_pagseguro/exception_request_validate');
+      $configPaths = explode(";", $configPaths);
+
+
+      //Valida token e hash se a request atual se encontra na lista de exceções do admin ou se a requisição vem de placeOrder
+      if ( (!$creditCardToken || !$senderHash) && !in_array($pathRequest, $configPaths) || ($pathRequest == $placeOrder)) {
+
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             Mage::helper('ricardomartins_pagseguro')
