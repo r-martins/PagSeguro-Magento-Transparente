@@ -11,6 +11,9 @@
  */
 class RicardoMartins_PagSeguro_Model_Source_Customer_Cpf
 {
+    /**
+     * @return array
+     */
     public function toOptionArray()
     {
         $fields = Mage::helper('ricardomartins_pagseguro/internal')->getFields('customer');

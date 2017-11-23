@@ -16,6 +16,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      * @see https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-notificacoes.html#v2-item-servico-de-notificacoes
      * @param SimpleXMLElement $resultXML
+     * @return $this
      */
     public function proccessNotificatonResult(SimpleXMLElement $resultXML)
     {

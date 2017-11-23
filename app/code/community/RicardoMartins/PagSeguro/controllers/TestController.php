@@ -100,6 +100,9 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
         );
     }
 
+    /**
+     * @return string
+     */
     private function _getTokenConsistency()
     {
         $token = Mage::helper('ricardomartins_pagseguro')->getToken();

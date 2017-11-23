@@ -17,6 +17,9 @@ class RicardoMartins_PagSeguro_Block_Form_Directpayment extends Mage_Core_Block_
         $this->setTemplate('ricardomartins_pagseguro/form/directpayment.phtml');
     }
 
+    /**
+     * @return string
+     */
     protected function _toHtml()
     {
 //        avoids block being inserted twice
