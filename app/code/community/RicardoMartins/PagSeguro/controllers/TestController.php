@@ -34,7 +34,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
 
             $keyType = $helper->getLicenseType();
             $info['RicardoMartins_PagSeguroPro']['key_type'] = ($keyType)==''?'assinatura':$keyType;
-            $info['RicardoMartins_PagSeguroPro']['key_validation'] = $this->_validateKey($keyType);
+            $info['RicardoMartins_PagSeguroPro']['key_validation'] = $this->_validateKey();
 
         }
 
@@ -100,6 +100,9 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
         );
     }
 
+    /**
+     * @return string
+     */
     private function _getTokenConsistency()
     {
         $token = Mage::helper('ricardomartins_pagseguro')->getToken();

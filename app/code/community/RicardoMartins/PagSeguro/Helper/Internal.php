@@ -28,6 +28,8 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
 
     /**
      * Returns associative array with required parameters to API, used on CC method calls
+     * @param Mage_Sales_Model_Order $order
+     * @param Mage_Sales_Model_Order_Payment $payment
      * @return array
      */
     public function getCreditCardApiCallParams(Mage_Sales_Model_Order $order, $payment)

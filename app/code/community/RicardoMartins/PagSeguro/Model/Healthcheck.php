@@ -3,6 +3,9 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
 {
     protected $_errors = array();
 
+    /**
+     * @param Varien_Event_Observer $observer
+     */
     public function check(Varien_Event_Observer $observer)
     {
 
@@ -10,6 +13,9 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
         $this->basicCheck($observer);
     }
 
+    /**
+     * @param Varien_Event_Observer $observer
+     */
     public function basicCheck(Varien_Event_Observer $observer)
     {
         $this->_checkToken();

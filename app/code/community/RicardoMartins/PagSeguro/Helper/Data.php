@@ -318,6 +318,9 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         return json_encode($config);
     }
 
+    /**
+     * @return string
+     */
     public function isInfoBrlActive()
     {
         return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL);

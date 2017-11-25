@@ -7,6 +7,10 @@
  */
 class RicardoMartins_PagSeguro_Model_Payment_Ccview extends RicardoMartins_PagSeguro_Model_Payment_Cc
 {
+    /**
+     * @param Mage_Sales_Model_Quote $quote
+     * @return bool
+     */
     public function isAvailable($quote = null)
     {
         return false;

@@ -201,7 +201,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         }
         else if(strlen($state) > 2 && is_string($state))
         {
-            $state = $this->normalizeChars($state);
+            $state = self::normalizeChars($state);
             $state = trim($state);
             $state = $this->stripAccents($state);
             $state = mb_convert_case($state, MB_CASE_UPPER);
@@ -306,7 +306,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function removeDuplicatedSpaces($string)
     {
-        $string = $this->normalizeChars($string);
+        $string = self::normalizeChars($string);
 
         return preg_replace('/\s+/', ' ', trim($string));
     }
