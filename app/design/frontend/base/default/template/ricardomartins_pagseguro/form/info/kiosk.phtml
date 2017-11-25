@@ -1,0 +1,9 @@
+<?php
+$_orderId = $this->getInfo()->getOrder()->getId();
+$_kHelper = Mage::helper('ricardomartins_pagseguro/kiosk');
+?>
+    <strong><?php echo $this->escapeHtml($this->getMethod()->getTitle()) ?> (PagSeguro)</strong>
+<?php if($info = $_kHelper->getInfo($_orderId)): ?>
+    <br/>
+    Referência no PagSeguro: <a href="<?php echo $_kHelper->getPagseguroLink($info)?>" target="_blank" title="Pesquisar no Pagseguro"><?php echo $info->getTemporaryReference();?></a>
+<?php endif; ?>

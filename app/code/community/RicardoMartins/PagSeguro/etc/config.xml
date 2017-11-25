@@ -2,14 +2,23 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.4.0</version>
+            <version>3.5.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
         <models>
             <ricardomartins_pagseguro>
                 <class>RicardoMartins_PagSeguro_Model</class>
+                <resourceModel>ricardomartins_pagseguro_resource</resourceModel>
             </ricardomartins_pagseguro>
+            <ricardomartins_pagseguro_resource>
+                <class>RicardoMartins_PagSeguro_Model_Resource</class>
+                <entities>
+                    <kiosk>
+                        <table>ricardomartins_pagseguro_kiosk</table>
+                    </kiosk>
+                </entities>
+            </ricardomartins_pagseguro_resource>
         </models>
         <blocks>
             <ricardomartins_pagseguro>
@@ -58,6 +67,14 @@
                     </pagseguro>
                 </observers>
             </core_block_abstract_to_html_after>
+            <ricardomartins_pagseguro_kioskorder_notification_received>
+                <observers>
+                    <kiosk_notification>
+                        <class>ricardomartins_pagseguro/kiosk</class>
+                        <method>createOrderFromNotification</method>
+                    </kiosk_notification>
+                </observers>
+            </ricardomartins_pagseguro_kioskorder_notification_received>
         </events>
         <layout>
             <updates>
@@ -131,6 +148,14 @@
                 <!--<sandbox_ws_url_app>http://ws.local.com.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>-->
                 <sandbox_js_url>https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</sandbox_js_url>
             </rm_pagseguro>
+            <rm_pagseguro_kiosk>
+                <active>0</active>
+                <title>Pagamento avulso - via PagSeguro UOL</title>
+                <order_status>pending</order_status>
+                <model>ricardomartins_pagseguro/payment_kiosk</model>
+                <allowspecific>0</allowspecific>
+                <send_neworder_email>1</send_neworder_email>
+            </rm_pagseguro_kiosk>
         </payment>
     </default>
     <phpunit>

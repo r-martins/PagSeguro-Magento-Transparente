@@ -531,4 +531,82 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         return false;
     }
+
+    /**
+     * Gets firstname and lastname of the full given name
+     * @param $fullName
+     *
+     * @return array with 2 elements (firstname and lastname)
+     */
+    public function splitName($fullName)
+    {
+        $fullName = $this->removeDuplicatedSpaces($fullName);
+        $exploded = explode(' ', $fullName);
+        return array(
+          0 => $exploded[0],
+          1 => end($exploded)
+        );
+
+    }
+
+    /**
+     * Get the default name of given Brazilian UF
+     * @param $uf
+     *
+     * @return string or false
+     */
+    public function convertUFRegion($uf)
+    {
+        $uf = strtoupper($uf);
+        $directory = Mage::getModel('directory/country')->loadByCode('BR');
+        if ($directory && $directory->getRegionCollection()) {
+            return $directory->getRegionCollection()->addFieldToFilter('code', $uf)->getFirstItem()->getDefaultName();
+        }
+
+        $brUFRegions = array(
+            'AC'=>'Acre',
+            'AL'=>'Alagoas',
+            'AP'=>'Amapá',
+            'AM'=>'Amazonas',
+            'BA'=>'Bahia',
+            'CE'=>'Ceará',
+            'DF'=>'Distrito Federal',
+            'ES'=>'Espírito Santo',
+            'GO'=>'Goiás',
+            'MA'=>'Maranhão',
+            'MT'=>'Mato Grosso',
+            'MS'=>'Mato Grosso do Sul',
+            'MG'=>'Minas Gerais',
+            'PA'=>'Pará',
+            'PB'=>'Paraíba',
+            'PR'=>'Paraná',
+            'PE'=>'Pernambuco',
+            'PI'=>'Piauí',
+            'RJ'=>'Rio de Janeiro',
+            'RN'=>'Rio Grande do Norte',
+            'RS'=>'Rio Grande do Sul',
+            'RO'=>'Rondônia',
+            'RR'=>'Roraima',
+            'SC'=>'Santa Catarina',
+            'SP'=>'São Paulo',
+            'SE'=>'Sergipe',
+            'TO'=>'Tocantins'
+        );
+        return (isset($brUFRegions[$uf]))?$brUFRegions[$uf]:false;
+    }
+
+    /**
+     * @param $uf
+     *
+     * @return int|false
+     */
+    public function getRegionIdFromUF($uf)
+    {
+        $uf = strtoupper($uf);
+        $directory = Mage::getModel('directory/country')->loadByCode('BR');
+        if ($directory && $directory->getRegionCollection()) {
+            return $directory->getRegionCollection()->addFieldToFilter('code', $uf)->getFirstItem()->getRegionId();
+        }
+        return false;
+    }
 }

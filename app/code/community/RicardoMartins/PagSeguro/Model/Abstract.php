@@ -40,6 +40,16 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         if (isset($resultXML->reference)) {
             /** @var Mage_Sales_Model_Order $order */
             $orderNo = (string)$resultXML->reference;
+            if (strstr($orderNo, 'kiosk_') !== false) {
+                $kioskNotification = new Varien_Object();
+                $kioskNotification->setOrderNo($orderNo);
+                $kioskNotification->setNotificationXml($resultXML);
+                Mage::dispatchEvent(
+                    'ricardomartins_pagseguro_kioskorder_notification_received',
+                    array('kiosk_notification' => $kioskNotification)
+                );
+                $orderNo = $kioskNotification->getOrderNo();
+            }
             $order = Mage::getModel('sales/order')->loadByIncrementId($orderNo);
             if (!$order->getId()) {
                 $helper->writeLog(

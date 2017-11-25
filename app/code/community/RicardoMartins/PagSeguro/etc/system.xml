@@ -335,6 +335,47 @@
                         </installment_limit>
                     </fields>
                 </rm_pagseguro_cc>
+
+                <rm_pagseguro_kiosk module="ricardomartins_pagseguro">
+                    <label>PagSeguro - Kiosk mode - Ricardo Martins (beta)</label>
+                    <comment><![CDATA[Permite realizar um pedido inteiro através de um link único. Saiba mais <a href="//pagsegurotransparente.zendesk.com/hc/pt-br/sections/115000671771" target="_blank">aqui</a>. <br/><strong>Este é um recurso novo, ainda em fase de testes (beta) e pode sofrer alterações significativas nas próximas versões. Teste bem antes de usar.</strong>]]></comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>113</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </title>
+                        <order_status translate="label">
+                            <label>New Order Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_order_status</source_model>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </order_status>
+                    </fields>
+                </rm_pagseguro_kiosk>
             </groups>
         </payment>
     </sections>

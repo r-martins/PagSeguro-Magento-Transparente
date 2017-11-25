@@ -313,8 +313,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             'show_total' => Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
             'force_installments_selection' =>
                 Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS),
-            'installment_limit' =>
-                (int)Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT)
+            'installment_limit' => (int)Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT)
         );
         return json_encode($config);
     }
