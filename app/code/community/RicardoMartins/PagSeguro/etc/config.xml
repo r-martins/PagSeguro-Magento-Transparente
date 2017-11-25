@@ -147,6 +147,7 @@
                 <sandbox_ws_url_app>https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>
                 <!--<sandbox_ws_url_app>http://ws.local.com.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>-->
                 <sandbox_js_url>https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</sandbox_js_url>
+                <exception_request_validate>onestepcheckout/ajax/savePaymentMethod</exception_request_validate>
             </rm_pagseguro>
             <rm_pagseguro_kiosk>
                 <active>0</active>

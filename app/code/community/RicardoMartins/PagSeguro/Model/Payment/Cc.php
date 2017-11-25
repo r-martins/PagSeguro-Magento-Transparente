@@ -116,7 +116,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     public function validate()
     {
         parent::validate();
-        $missingInfo = $this->getInfoInstance();
 
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
         $pHelper = Mage::helper('ricardomartins_pagseguro/params');
@@ -131,14 +130,29 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $senderHash = $pHelper->getPaymentHash('sender_hash');
         $creditCardToken = $pHelper->getPaymentHash('credit_card_token');
 
-        if (!$creditCardToken || !$senderHash) {
+        //mapeia a request URL atual
+        $controller = Mage::app()->getRequest()->getControllerName();
+        $action = Mage::app()->getRequest()->getActionName();
+        $route = Mage::app()->getRequest()->getRouteName();
+        $pathRequest = $route.'/'.$controller.'/'.$action;
+
+        //seta os paths para bloqueio de validação instantânea definidos no admin no array
+        $configPaths = Mage::getStoreConfig('payment/rm_pagseguro/exception_request_validate');
+//        $configPaths = explode(PHP_EOL, $configPaths);
+        $configPaths = preg_split('/\r\n|[\r\n]/', $configPaths);
+
+        //Valida token e hash se a request atual se encontra na lista de
+        //exceções do admin ou se a requisição vem de placeOrder
+        if ( (!$creditCardToken || !$senderHash) && !in_array($pathRequest, $configPaths)) {
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
+            $missingInfo .= '/ URL desta requisição: ' . $pathRequest;
             Mage::helper('ricardomartins_pagseguro')
                 ->writeLog(
                     "Falha ao obter o token do cartao ou sender_hash.
                     Ative o modo debug e observe o console de erros do seu navegador.
-                    Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido.
+                    Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido, ou configure
+                    a url de exceção.
                     $missingInfo"
                 );
             Mage::throwException(
