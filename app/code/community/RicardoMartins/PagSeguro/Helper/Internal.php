@@ -49,7 +49,7 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'creditCardToken'   => $pHelper->getPaymentHash('credit_card_token'),
             'reference'         => $order->getIncrementId(),
             'extraAmount'       => $pHelper->getExtraAmount($order),
-            'notificationURL'   => Mage::getUrl('ricardomartins_pagseguro/notification'),
+            'notificationURL'   => Mage::getUrl('ricardomartins_pagseguro/notification', array('_secure' => true)),
         );
         $params = array_merge($params, $pHelper->getItemsParams($order));
         $params = array_merge($params, $pHelper->getSenderParams($order, $payment));
