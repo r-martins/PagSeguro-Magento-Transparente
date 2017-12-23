@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.3.0
+ * @version 3.5.2
  */
 
 RMPagSeguro = Class.create({
@@ -21,38 +21,14 @@ RMPagSeguro = Class.create({
         console.log('RMPagSeguro prototype class has been initialized.');
 
         this.config = config;
-        this.config.maxSenderHashAttempts = 30;
+        this.maxSenderHashAttempts = 30;
+        this.hashSuccess = false;
 
         PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
 
 
-        var senderHashSuccess = this.updateSenderHash();
-        if(!senderHashSuccess){
-            console.log('Uma nova tentativa de obter o sender_hash será realizada em 3 segundos.');
-            var intervalSenderHash;
-            var senderHashAttempts = 0;
-            intervalSenderHash = setInterval(function(){
-                senderHashAttempts++;
-                if(PagSeguroDirectPayment.ready){
-                    RMPagSeguroObj.updateSenderHash();
-                    clearInterval(intervalSenderHash);
-                    return true;
-                }
-                if (senderHashAttempts == RMPagSeguroObj.config.maxSenderHashAttempts) {
-                    clearInterval(intervalSenderHash);
-                    console.error('Não foi possível obter o sender_hash após várias tentativas.');
-                }
-            }, 3000 );
+        this.updateSenderHash();
 
-            // document.observe("click", function(e){
-            //     var senderHashSuccess = RMPagSeguroObj.updateSenderHash();
-            //     if(!senderHashSuccess){
-            //         console.log('PagSeguro: segunda tentativa de obter o hash do comprador (sender_hash) falhou. Tente manualmente com RMPagSeguroObj.updateSenderHash().');
-            //         return;
-            //     }
-            //     document.stopObserving('click');
-            // });
-        }
         Validation.add('validate-pagseguro', 'Falha ao atualizar dados do pagaento. Entre novamente com seus dados.',
             function(v, el){
                 RMPagSeguroObj.updatePaymentHashes();
@@ -60,15 +36,38 @@ RMPagSeguro = Class.create({
         })
     },
 
+    retryUpdateSender: function() {
+        if (this.hashSuccess){
+            return true;
+        }
+        console.log('Uma nova tentativa de obter o sender_hash será realizada em 3 segundos.');
+
+        var senderHashAttempts = 0;
+        this.intervalSenderHash = setInterval(function(){
+            senderHashAttempts++;
+            console.log("Tentativa " + senderHashAttempts);
+            if(PagSeguroDirectPayment.ready){
+                RMPagSeguroObj.updateSenderHash();
+                clearInterval(RMPagSeguroObj.intervalSenderHash);
+                return true;
+            }
+            if (senderHashAttempts == RMPagSeguroObj.maxSenderHashAttempts) {
+                clearInterval(RMPagSeguroObj.intervalSenderHash);
+                console.error('Não foi possível obter o sender_hash após várias tentativas.');
+            }
+        }, 3000 );
+    },
     updateSenderHash: function() {
         var senderHash = PagSeguroDirectPayment.getSenderHash();
         if(typeof senderHash != "undefined" && senderHash != '')
         {
             this.senderHash = senderHash;
             this.updatePaymentHashes();
+            RMPagSeguroObj.hashSuccess = true;
             return true;
         }
         console.log('PagSeguro: Falha ao obter o senderHash.');
+        this.retryUpdateSender();
         return false;
     },
 

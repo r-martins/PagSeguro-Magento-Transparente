@@ -13,6 +13,12 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         $this->_init('ricardomartins_pagseguro/kiosk');
     }
 
+    /**
+     * Create new order from notification sent from PagSeguro
+     * @param $observer
+     *
+     * @throws Exception
+     */
     public function createOrderFromNotification($observer)
     {
         $notificationXML = $observer->getKioskNotification()->getNotificationXml();
@@ -22,8 +28,8 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
 
         //if order exists
         if ($orderId = $this->getOrderId()) {
-            $incrementId = Mage::getModel('sales/order')->load($orderId);
-            $observer->getKioskNotification()->setOrderNo($incrementId);
+            $order = Mage::getModel('sales/order')->load($orderId);
+            $observer->getKioskNotification()->setOrderNo($order->getIncrementId());
             return;
         }
 
@@ -66,6 +72,13 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         $this->save();
     }
 
+    /**
+     * Create new customer or load an existing one, based on notificationXML result and typed email address
+     * @param $notificationXML
+     *
+     * @return Mage_Customer_Model_Customer
+     * @throws Exception
+     */
     protected function loadOrCreateCustomer($notificationXML)
     {
 
@@ -77,6 +90,7 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
             $pHelper = Mage::helper('ricardomartins_pagseguro/params');
             $name = $pHelper->splitName($notificationXML->sender->name);
 
+            /** @var Mage_Customer_Model_Customer $customer */
             $customer = Mage::getModel('customer/customer')
                ->setWebsite($this->_websiteId);
             $customer->setData(array(
@@ -102,6 +116,9 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
                 ->setSaveInAddressBook('1');
             $address->save();
 
+            $customer->sendPasswordReminderEmail();
+            $customer->setConfirmation(null);
+            $customer->save();
         }
         $this->setCustomerId($customer->getId());
         return $customer;
