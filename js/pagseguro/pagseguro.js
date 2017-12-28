@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.5.2
+ * @version 3.5.3
  */
 
 RMPagSeguro = Class.create({
@@ -33,7 +33,7 @@ RMPagSeguro = Class.create({
             function(v, el){
                 RMPagSeguroObj.updatePaymentHashes();
                 return true;
-        })
+        });
     },
 
     retryUpdateSender: function() {
@@ -45,7 +45,7 @@ RMPagSeguro = Class.create({
         var senderHashAttempts = 0;
         this.intervalSenderHash = setInterval(function(){
             senderHashAttempts++;
-            console.log("Tentativa " + senderHashAttempts);
+            // console.log("Tentativa " + senderHashAttempts);
             if(PagSeguroDirectPayment.ready){
                 RMPagSeguroObj.updateSenderHash();
                 clearInterval(RMPagSeguroObj.intervalSenderHash);
@@ -63,7 +63,7 @@ RMPagSeguro = Class.create({
         {
             this.senderHash = senderHash;
             this.updatePaymentHashes();
-            RMPagSeguroObj.hashSuccess = true;
+            this.hashSuccess = true;
             return true;
         }
         console.log('PagSeguro: Falha ao obter o senderHash.');
