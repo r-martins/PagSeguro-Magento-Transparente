@@ -11,6 +11,10 @@
  */
 class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 {
+    // If discount amount is greater than items
+    protected $_extraDiscountGreaterThanItems = false;
+
+    protected $_extraDiscount = 0;
 
     /**
      * Return items information, to be send to API
@@ -181,6 +185,21 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 if ($this->_shouldSplit($order)) {
                     $shippingCost -= 0.01;
                 }
+
+                //If total discount is greater than items, we try to discount from shipping
+                if ($this->_extraDiscountGreaterThanItems && abs($this->_extraDiscount) >= $shippingCost) {
+                    $shippingDiscount = (abs($this->_extraDiscount) <= $shippingCost)?
+                        abs($this->_extraDiscount):
+                        min(abs($this->_extraDiscount),$shippingCost);
+
+                    //if extra discount greater, we change extraAmount to get only the difference
+                    if (abs($this->_extraDiscount) >= $shippingCost) {
+                        $return['extraAmount'] = $this->_extraDiscount + $shippingCost;
+                    }
+
+                    $shippingCost -= $shippingDiscount;
+                }
+
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
             }
         }
@@ -291,11 +310,21 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         //Discounting gift products
         $orderItems = $order->getAllVisibleItems();
+        $itemsTotal = 0;
         foreach ($orderItems as $item) {
-            if ($item->getPrice() == 0) {
+            $itemPrice = $item->getPrice();
+            if ($itemPrice == 0) {
                 $extra -= 0.01 * $item->getQtyOrdered();
             }
+            $itemsTotal += $itemPrice;
         }
+
+        if ($extra < 0 && abs($extra) >= $itemsTotal) {
+            $this->_extraDiscountGreaterThanItems = true;
+        }
+
+        $this->_extraDiscount = $extra;
+
         return number_format($extra, 2, '.', '');
     }
 
