@@ -69,7 +69,7 @@
 
     function loadApp() {
         var url = document.getElementsByTagName('html')[0].getAttribute('manifest'),
-            appUrl = window.location.protocol + "//themler.com/",
+            appUrl = window.location.protocol + "//themler.io/",
             newDomain = decodeURIComponent(getQueryVariable("domain")),
             startJsUrl = "loader/start.js";
 

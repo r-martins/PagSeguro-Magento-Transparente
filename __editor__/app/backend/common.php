@@ -349,7 +349,7 @@ function getAvailableThemeName($path, $themeName)
 
 function checkThemeInstallation() {
     if (!file_exists(THEMES)) {
-        die('[PHP_NOT_ERROR]{"message": "Incorrect theme installation. Please follow the steps described at <a href=\"http://answers.themler.com/articles/25259\" target=\"_blank\">http://answers.themler.com/articles/25259</a>"}[PHP_NOT_ERROR]');
+        die('[PHP_NOT_ERROR]{"message": "Incorrect theme installation. Please follow the steps described at <a href=\"http://answers.themler.io/articles/25259\" target=\"_blank\">http://answers.themler.io/articles/25259</a>"}[PHP_NOT_ERROR]');
     }
 }
 

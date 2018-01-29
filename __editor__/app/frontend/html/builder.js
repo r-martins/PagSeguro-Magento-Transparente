@@ -287,9 +287,6 @@ BD.Builder = (function () {
 
     Builder.prototype.processMedia = function processMedia(content, mediaRoot, type) {
         type = type || 'html';
-        if (type === 'html') {
-            content = content.replace('//fonts.googleapis.com', 'http://fonts.googleapis.com');
-        }
         return content.replace(mediaRE, function (str, tag, brace, match, src) {
             tag = tag || '';
             brace = brace || '';
