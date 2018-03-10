@@ -19,6 +19,7 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
     public function basicCheck(Varien_Event_Observer $observer)
     {
         $this->_checkToken();
+        $this->_checkCurl();
         $this->_checkSandbox();
         $this->_checkVersions();
         $this->_processCheckResults();
@@ -76,6 +77,13 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
 
         if (!$helper->getSessionId()) {
             $this->_errors[] = 'Não foi possível obter o sessionId. Verifique e-mail e chave digitados.';
+        }
+    }
+
+    protected function _checkCurl()
+    {
+        if (!function_exists('curl_exec')) {
+            $this->_errors[] = 'Não foi possível usar o método curl_exec. Verifique se a biblioteca PHP libcurl está habilitada e instalada.';
         }
     }
 }
