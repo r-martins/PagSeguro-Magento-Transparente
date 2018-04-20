@@ -23,6 +23,7 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
     public function createOrderAction()
     {
         $kHelper = Mage::helper('ricardomartins_pagseguro/kiosk');
+        $pHelper = Mage::helper('ricardomartins_pagseguro');
         if (!$kHelper->isActive()) {
             return $this->redirectException($kHelper->__('Kiosk is not active.'));
         }
@@ -76,13 +77,15 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
             'itemAmount1' => number_format($product->getFinalPrice(), 2, '.', ''),
             'shippingAddressRequired' => false,
             'redirectURL' => $successUrl,
-            'notificationURL' => Mage::getUrl('ricardomartins_pagseguro/notification')
+            'notificationURL' => Mage::getUrl('ricardomartins_pagseguro/notification'),
+            'email' => $pHelper->getMerchantEmail(),
+            'token' => $pHelper->getToken()
         );
 
         try{
             $checkout = Mage::getModel('ricardomartins_pagseguro/abstract')->callApi($params, null, 'checkout');
         }catch (Exception $e) {
-            $this->redirectException($e->getMessage());
+            return $this->redirectException($e->getMessage());
         }
 
         if(!isset($checkout->code)){
