@@ -16,6 +16,13 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
     protected $_extraDiscount = 0;
 
+    protected $_telephoneAttribute = null;
+
+    public function __construct()
+    {
+        $this->_telephoneAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_telephone_attribute');
+    }
+
     /**
      * Return items information, to be send to API
      * @param Mage_Sales_Model_Order $order
@@ -56,7 +63,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $digits = new Zend_Filter_Digits();
         $cpf = $this->_getCustomerCpfValue($order, $payment);
 
-        $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
+        $phone = $this->_extractPhone($order->getBillingAddress()->getData($this->_telephoneAttribute));
 
         $senderName = $this->removeDuplicatedSpaces(
             sprintf('%s %s', $order->getCustomerFirstname(), $order->getCustomerLastname())
@@ -94,7 +101,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         //data
         $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($order->getCustomer(), $payment);
-        $phone = $this->_extractPhone($order->getBillingAddress()->getTelephone());
+        $phone = $this->_extractPhone($order->getBillingAddress()->getData($this->_telephoneAttribute));
 
 
         $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
