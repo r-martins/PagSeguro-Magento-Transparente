@@ -71,9 +71,11 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         $senderName = substr($senderName, 0, 50);
 
+        $emailPrefix = $this->_dispatchHashEmail($order) ? 'hash' : 'customer';
+
         $return = array(
             'senderName'    => $senderName,
-            'senderEmail'   => trim($order->getCustomerEmail()),
+            'senderEmail'   => trim($order->getData($emailPrefix . '_email')),
             'senderHash'    => $this->getPaymentHash('sender_hash'),
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
@@ -539,6 +541,23 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $totalAmount += $item->getRowTotal();
         }
         return (abs($extraAmount) == $totalAmount);
+    }
+
+    private function _dispatchHashEmail (&$order)
+    {
+        if (Mage::getStoreConfigFlag('payment/rm_pagseguro/hash_email_active'))
+        {
+            $algo   = Mage::getStoreConfig('payment/rm_pagseguro/hash_email_algo');
+            $domain = Mage::getStoreConfig('payment/rm_pagseguro/hash_email_domain');
+
+            $order->setHashEmail(hash($algo, $order->getCustomerEmail()) . '@' . $domain);
+
+            Mage::dispatchEvent ('ricardomartins_pagseguro_hash_email_before', array(
+                'customer_email' => $order->getCustomerEmail(), 'hash_email' => $order->getHashEmail()
+            ));
+
+            return true;
+        }
     }
 
     /**
