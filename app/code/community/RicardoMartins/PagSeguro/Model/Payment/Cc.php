@@ -117,6 +117,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     {
         parent::validate();
 
+        /** @var RicardoMartins_PagSeguro_Helper_Data $helper */
+        $helper = Mage::helper('ricardomartins_pagseguro');
+
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
         $pHelper = Mage::helper('ricardomartins_pagseguro/params');
 
@@ -147,17 +150,22 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             $missingInfo .= '/ URL desta requisição: ' . $pathRequest;
-            Mage::helper('ricardomartins_pagseguro')
-                ->writeLog(
+            $helper->writeLog(
                     "Falha ao obter o token do cartao ou sender_hash.
                     Ative o modo debug e observe o console de erros do seu navegador.
                     Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido, ou configure
                     a url de exceção.
                     $missingInfo"
                 );
-            Mage::throwException(
-                'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
-            );
+            if (!$helper->isRetryActive()){
+                Mage::throwException(
+                    'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
+                );
+            }else{
+                $helper->writeLog(
+                    'Apesar da transação ter falhado, o pedido poderá continuar pois a retentativa está ativa.'
+                );
+            }
         }
         return $this;
     }
@@ -176,6 +184,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     public function order(Varien_Object $payment, $amount)
     {
+        /** @var Mage_Sales_Model_Order $order */
         $order = $payment->getOrder();
 
         //will grab data to be send via POST to API inside $params
@@ -184,19 +193,28 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         //call API
         $returnXml = $this->callApi($params, $payment);
-        $this->proccessNotificatonResult($returnXml);
 
-        if (isset($returnXml->errors)) {
-            $errMsg = array();
-            foreach ($returnXml->errors as $error) {
-                $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
+        try {
+            $this->proccessNotificatonResult($returnXml);
+            if (isset($returnXml->errors)) {
+                $errMsg = array();
+                foreach ($returnXml->errors as $error) {
+                    $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
+                }
+                Mage::throwException(
+                    'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
+                );
             }
-            Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-        }
-        if (isset($returnXml->error)) {
-            $error = $returnXml->error;
-            $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-            Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+            if (isset($returnXml->error)) {
+                $error = $returnXml->error;
+                $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
+                Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+            }
+        } catch (Mage_Core_Exception $e) {
+            if (!$rmHelper->isRetryActive() || !$rmHelper->canRetryOrder($order)) {
+                $order->addStatusHistoryComment('A retentativa de pedido está ativa. O pedido foi concluído mesmo com o seguite erro: ' . $e->getMessage());
+                Mage::throwException($e->getMessage());
+            }
         }
 
         $payment->setSkipOrderProcessing(true);

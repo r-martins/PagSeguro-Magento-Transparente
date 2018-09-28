@@ -325,4 +325,43 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL);
     }
+
+    /**
+     * Check if order retry is available (PRO module >= 3.3) and enabled
+     * @return boolean
+     */
+    public function isRetryActive()
+    {
+        $moduleConfig = Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguroPro');
+
+        if (version_compare($moduleConfig->version, '3.3', '<')) {
+            return false;
+        }
+
+        $rHelper = Mage::helper('ricardomartins_pagseguropro/retry');
+        if ($rHelper && $rHelper->isRetryEnabled()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if an order could have retry payment process
+     * @param Mage_Sales_Model_Order $order
+     * @return boolean
+     */
+    public function canRetryOrder($order)
+    {
+        if (!$this->isRetryActive()) {
+            return false;
+        }
+
+        $paymentMethod = $order->getPayment()->getMethod();
+        if ($paymentMethod != 'rm_pagseguro_cc') {
+            return false;
+        }
+
+        return true;
+    }
 }

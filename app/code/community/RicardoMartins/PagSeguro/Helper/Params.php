@@ -33,7 +33,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 $return['itemId'.$x] = $items[$y]->getId();
                 $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
                 $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
-                $return['itemQuantity'.$x] = $qtyOrdered;
+                $return['itemQuantity'.$x] = (int)$qtyOrdered;
 
                 //We can't send 0.00 as value to PagSeguro. Will be discounted on extraAmount.
                 if ($itemPrice == 0) {
@@ -478,22 +478,28 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 return $payment['additional_information'][$payment->getMethod() . '_cpf'];
             }
         }
-        $entity = explode('|', $customerCpfAttribute);
+        $cpfAttributeCnf = explode('|', $customerCpfAttribute);
+        $entity = reset($cpfAttributeCnf);
+        $attrName = end($cpfAttributeCnf);
         $cpf = '';
-        if (count($entity) == 1 || $entity[0] == 'customer') {
-            if (count($entity) == 2) {
-                $customerCpfAttribute = $entity[1];
+        if ($entity && $attrName) {
+            if (!$order->getCustomerIsGuest()) {
+                $address = ($entity == 'customer') ? $order->getShippingAddress() : $order->getBillingAddress();
+                $cpf = $address->getData($attrName);
+
+                //if fail,try to get cpf from customer entity
+                if (!$cpf) {
+                    $customer = $order->getCustomer();
+                    $cpf = $customer->getData($attrName);
+                }
             }
-            $customer = $order->getCustomer();
 
-            $cpf = $customer->getData($customerCpfAttribute);
-        } else if (count($entity) == 2 && $entity[0] == 'billing' ) { //billing
-            $cpf = $order->getShippingAddress()->getData($entity[1]);
+            //for guest orders...
+            if (!$cpf && $order->getCustomerIsGuest()) {
+                $cpf = $order->getData($entity . '_' . $attrName);
+            }
         }
 
-        if ($order->getCustomerIsGuest() && empty($cpf)) {
-            $cpf = $order->getData('customer_' . $customerCpfAttribute);
-        }
 
         $cpfObj = new Varien_Object(array('cpf'=>$cpf));
 
