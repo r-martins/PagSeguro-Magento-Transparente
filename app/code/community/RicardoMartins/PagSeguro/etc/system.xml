@@ -163,6 +163,16 @@
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o CPF do cliente, selecione aqui. Caso contrário escolha "Solicitar junto com os outros dados do pagamento".]]></comment>
                         </customer_cpf_attribute>
+                        <address_telephone_attribute>
+                            <label>Telefone do cliente</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_address_attributes</source_model>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o Telefone do cliente, selecione aqui.]]></comment>
+                        </address_telephone_attribute>
                         <address_street_attribute>
                             <label>Atributo Rua de entrega</label>
                             <frontend_type>select</frontend_type>
@@ -203,6 +213,47 @@
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o campo 'Bairro' de entrega, selecione aqui.]]></comment>
                         </address_neighborhood_attribute>
+                        <notification_url_nosid>
+                            <label>Não utilizar SID na URL de notificação</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>71</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Previne que o parâmetro de sessão SID seja utilizado na URL de notificação.]]></comment>
+                        </notification_url_nosid>
+                        <hash_email_active>
+                            <label>Utilizar hash@dominio ao invés do e-mail do comprador</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>72</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Converte o e-mail do comprador para hash@dominio.]]></comment>
+                        </hash_email_active>
+                        <hash_email_algo>
+                            <label>Algoritimo do hash</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_algorithms</source_model>
+                            <sort_order>73</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Algoritimo utilizado na criação do hash.]]></comment>
+                            <depends><hash_email_active>1</hash_email_active></depends>
+                        </hash_email_algo>
+                        <hash_email_domain>
+                            <label>Domínio após o hash</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>74</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Domínio que será anexado após o hash.]]></comment>
+                            <depends><hash_email_active>1</hash_email_active></depends>
+                        </hash_email_domain>
                         <exception_request_validate>
                           <label>Bloquear Validação Instantânea</label>
                           <frontend_type>textarea</frontend_type>

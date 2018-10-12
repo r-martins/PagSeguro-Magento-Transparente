@@ -34,6 +34,8 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
      */
     public function getCreditCardApiCallParams(Mage_Sales_Model_Order $order, $payment)
     {
+        $noSID = Mage::getStoreConfigFlag('payment/rm_pagseguro/notification_url_nosid');
+
         /** @var RicardoMartins_PagSeguro_Helper_Data $helper */
         $helper = Mage::helper('ricardomartins_pagseguro');
 
@@ -49,7 +51,7 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'creditCardToken'   => $pHelper->getPaymentHash('credit_card_token'),
             'reference'         => $order->getIncrementId(),
             'extraAmount'       => $pHelper->getExtraAmount($order),
-            'notificationURL'   => Mage::getUrl('ricardomartins_pagseguro/notification', array('_secure' => true)),
+            'notificationURL'   => Mage::getUrl('ricardomartins_pagseguro/notification', array('_secure' => true, '_nosid' => $noSID)),
         );
         $params = array_merge($params, $pHelper->getItemsParams($order));
         $params = array_merge($params, $pHelper->getSenderParams($order, $payment));
