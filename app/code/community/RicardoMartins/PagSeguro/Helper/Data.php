@@ -32,6 +32,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT  = 'payment/rm_pagseguro_cc/installment_limit';
+    const XML_PATH_PAYMENT_PAGSEGURO_NOTIFICATION_URL_NOSID= 'payment/rm_pagseguro/notification_url_nosid';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -363,5 +364,14 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return true;
+    }
+
+    /**
+     * Checks if "Dont send SID in the Return URL" option is enabled
+     * @return bool
+     */
+    public function isNoSidUrlEnabled()
+    {
+        return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_NOTIFICATION_URL_NOSID);
     }
 }

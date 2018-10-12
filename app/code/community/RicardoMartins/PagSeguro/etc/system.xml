@@ -214,7 +214,7 @@
                             <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o campo 'Bairro' de entrega, selecione aqui.]]></comment>
                         </address_neighborhood_attribute>
                         <notification_url_nosid>
-                            <label>Não utilizar SID na URL de notificação</label>
+                            <label>Esconder SID na URL de notificação</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>71</sort_order>
@@ -226,11 +226,12 @@
                         <hash_email_active>
                             <label>Utilizar hash@dominio ao invés do e-mail do comprador</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <source_model>ricardomartins_pagseguro/source_hash</source_model>
                             <sort_order>72</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
+                            <tooltip>O uso deste recurso pode aumentar a quantidade de pedidos negados e também impede o PagSeguro de enviar e-mails sobre o pedido para o cliente.</tooltip>
                             <comment><![CDATA[Converte o e-mail do comprador para hash@dominio.]]></comment>
                         </hash_email_active>
                         <hash_email_algo>
