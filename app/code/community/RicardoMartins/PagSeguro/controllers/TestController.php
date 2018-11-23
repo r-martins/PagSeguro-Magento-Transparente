@@ -42,6 +42,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
 
         $info['token_consistency'] = $this->_getTokenConsistency();
         $info['session_id'] = $helper->getSessionId();
+        $info['retry_active'] = $helper->isRetryActive();
 
         $modules = array_keys((array)Mage::getConfig()->getNode('modules')->children());
         $coreHelper = Mage::helper('core');

@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.5.3
+ * @version 3.7.2
  */
 
 RMPagSeguro = Class.create({
@@ -140,10 +140,10 @@ RMPagSeguro = Class.create({
             var ccExpYrElm = $$('select[name="payment[ps_cc_exp_year]"]').first();
             var ccCvvElm = $$('input[name="payment[ps_cc_cid]"]').first();
 
-            Element.observe(ccNumElm,'keyup',function(e){obj.updateCreditCardToken();});
-            Element.observe(ccExpMoElm,'keyup',function(e){obj.updateCreditCardToken();});
-            Element.observe(ccExpYrElm,'keyup',function(e){obj.updateCreditCardToken();});
-            Element.observe(ccCvvElm,'keyup',function(e){obj.updateCreditCardToken();});
+            Element.observe(ccNumElm,'change',function(e){obj.updateCreditCardToken();});
+            Element.observe(ccExpMoElm,'change',function(e){obj.updateCreditCardToken();});
+            Element.observe(ccExpYrElm,'change',function(e){obj.updateCreditCardToken();});
+            Element.observe(ccCvvElm,'change',function(e){obj.updateCreditCardToken();});
         }catch(e){
             console.error('Não foi possível adicionar observevação aos cartões. ' + e.message);
         }
