@@ -17,7 +17,11 @@ class RicardoMartins_PagSeguro_AjaxController extends Mage_Core_Controller_Front
      */
     public function getGrandTotalAction()
     {
-        $total = Mage::helper('checkout/cart')->getQuote()->getGrandTotal();
+        /** @var Mage_Sales_Model_Quote $quote */
+        $quote = Mage::helper('checkout/cart')->getQuote();
+        $quote->getPayment()->setMethod('rm_pagseguro_cc');
+        $quote->collectTotals();
+        $total = $quote->getGrandTotal();
 
         $this->getResponse()->setHeader('Content-type', 'application/json', true);
         $this->getResponse()->setBody(json_encode(array('total'=>$total)));
