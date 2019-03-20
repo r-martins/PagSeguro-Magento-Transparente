@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.7.2
+ * @version 3.7.4
  */
 
 RMPagSeguro = Class.create({
@@ -22,12 +22,15 @@ RMPagSeguro = Class.create({
 
         this.config = config;
         this.maxSenderHashAttempts = 30;
+
+        /*@deprecated hashSuccess since 3.7.4*/
         this.hashSuccess = false;
 
         PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
 
 
-        this.updateSenderHash();
+        // this.updateSenderHash();
+        PagSeguroDirectPayment.onSenderHashReady(this.updateSenderHash);
 
         Validation.add('validate-pagseguro', 'Falha ao atualizar dados do pagaento. Entre novamente com seus dados.',
             function(v, el){
@@ -36,6 +39,7 @@ RMPagSeguro = Class.create({
         });
     },
 
+    /** @deprecated since 3.7.4 - agora usamos o onSenderHashReady ao invés de getSenderHash que dispensa checar disponibilidade*/
     retryUpdateSender: function() {
         if (this.hashSuccess){
             return true;
@@ -57,18 +61,20 @@ RMPagSeguro = Class.create({
             }
         }, 3000 );
     },
-    updateSenderHash: function() {
-        var senderHash = PagSeguroDirectPayment.getSenderHash();
-        if(typeof senderHash != "undefined" && senderHash != '')
-        {
-            this.senderHash = senderHash;
-            this.updatePaymentHashes();
-            this.hashSuccess = true;
-            return true;
+    updateSenderHash: function(response) {
+        if(typeof(response) === "undefined"){
+            PagSeguroDirectPayment.onSenderHashReady(this.updateSenderHash);
         }
-        console.log('PagSeguro: Falha ao obter o senderHash.');
-        this.retryUpdateSender();
-        return false;
+        if(response.status == 'error'){
+            console.log('PagSeguro: Falha ao obter o senderHash. ' + response.message);
+            return false;
+        }
+        RMPagSeguroObj.senderHash = response.senderHash;
+        RMPagSeguroObj.updatePaymentHashes();
+
+        /*@deprecated hashSuccess since 3.7.4*/
+        RMPagSeguroObj.hashSuccess = true;
+        return true;
     },
 
     getInstallments: function(grandTotal, selectedInstallment){
