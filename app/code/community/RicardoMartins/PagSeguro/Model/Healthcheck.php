@@ -38,7 +38,7 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
     {
         $token = Mage::helper('ricardomartins_pagseguro')->getToken();
 
-        if(strlen($token)!=32)
+        if(strlen($token) != 32 && strlen($token) != 100)
             $this->_errors[] = 'O token PagSeguro digitado não é válido.';
     }
 

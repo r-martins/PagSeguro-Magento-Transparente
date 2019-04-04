@@ -107,7 +107,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
     private function _getTokenConsistency()
     {
         $token = Mage::helper('ricardomartins_pagseguro')->getToken();
-        return (strlen($token)!=32)?'Wrong size':'Good';
+        return (strlen($token)!=32 && strlen($token)!=100)?'Wrong size':'Good';
     }
 
     public function testSenderHashAction()

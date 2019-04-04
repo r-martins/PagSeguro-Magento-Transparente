@@ -9,7 +9,7 @@ $installer = $this;
 $token = Mage::getStoreConfig('payment/pagseguro/token');
 $decryptedToken = Mage::helper('core')->decrypt($token);
 
-if ($token != false && strlen($decryptedToken) == 32 ) {
+if ($token != false && (strlen($decryptedToken) == 32 || strlen($decryptedToken) == 100) ) {
     $sql = "UPDATE {$this->getTable('core/config_data')} 
             SET path = REPLACE(path, 'payment/pagseguro/', 'payment/rm_pagseguro/')
             WHERE path LIKE 'payment/pagseguro/%'";
