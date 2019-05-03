@@ -5,4 +5,9 @@
             <block name="ricardomartins.pagseguro.notification" type="core/template" template="ricardomartins_pagseguro/notification.phtml" after="-"/>
         </reference>
     </ricardomartins_pagseguro_notification_index>
+    <catalog_product_view>
+        <reference name="product.info.extrahint">
+            <block type="ricardomartins_pagseguro/product_installments" name="ricardomartins.pagseguro.parcelas" template="ricardomartins_pagseguro/product/installments.phtml"/>
+        </reference>
+    </catalog_product_view>
 </layout>

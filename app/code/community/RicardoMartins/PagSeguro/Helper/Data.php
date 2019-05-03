@@ -296,6 +296,22 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Retrieves the JS Include for PagSeguro JS only
+     * @author Ricardo Martins
+     * @return Mage_Core_Block_Text
+     */
+    public function getExternalPagSeguroScriptBlock()
+    {
+        $scriptBlock = Mage::app()->getLayout()->createBlock('core/text', 'pagseguro_direct');
+        $scriptBlock->setText(
+            sprintf(
+                '<script type="text/javascript" src="%s" defer>', Mage::helper('ricardomartins_pagseguro')->getJsUrl()
+            )
+        );
+        return $scriptBlock;
+    }
+
+    /**
      * Return serialized (json) string with module configuration
      * return string
      */

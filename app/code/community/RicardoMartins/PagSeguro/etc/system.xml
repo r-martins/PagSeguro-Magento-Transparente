@@ -415,6 +415,17 @@
                                 <allowspecific>1</allowspecific>
                             </depends>
                         </specificcountry>
+                        <installments_product>
+                            <label>Exibir parcelas na página de produto?</label>
+                            <sort_order>120</sort_order>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <frontend_type>select</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip>Pode deixar sua página de produtos mais lenta.</tooltip>
+                            <comment><![CDATA[É exibido o parcelamento máximo com base no cartão VISA, de acordo com suas configurações no PagSeguro. Saiba mais <a href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360027562792" target="_blank">aqui</a>.]]></comment>
+                        </installments_product>
                     </fields>
                 </rm_pagseguro_cc>
 

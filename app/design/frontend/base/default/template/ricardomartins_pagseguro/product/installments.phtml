@@ -1,0 +1,40 @@
+<?php
+$_helper = Mage::helper('ricardomartins_pagseguro');
+$_ajaxSessionIdUrl = Mage::getUrl('pseguro/ajax/getSessionId', array('_secure' => true));
+$_price = $this->getPrice();
+?>
+
+<div id="rmpagseguro_parcelas_box">
+    <p id="rmpagseguro_parcelas_loading">Carregando parcelas...</p>
+    <p id="pseguro_parcelas" style="display: none;">Parcele em até <span id="installments"></span>x de R$<span id="installment_value"></span> (Total R$<span id="installment_total"></span>) com PagSeguro UOL.</p>
+</div>
+
+<script type="text/javascript">
+// <![CDATA[
+    document.observe("dom:loaded", function(){
+        new Ajax.Request('<?php echo $_ajaxSessionIdUrl?>', {
+            method: 'get',
+            onSuccess: function(transport){
+                PagSeguroDirectPayment.setSessionId(transport.responseJSON.session_id);
+                PagSeguroDirectPayment.onSenderHashReady(updateInstallments);
+            }
+        });
+
+    })
+    var updateInstallments = function() {
+        PagSeguroDirectPayment.getInstallments({
+            amount: <?php echo $_price?>,
+            brand: 'visa',
+            success: function (response) {
+                var responseVisa = response.installments.visa;
+                var installment = responseVisa[responseVisa.length - 1];
+                $('installments').innerHTML = installment.quantity.toString();
+                $('installment_value').innerHTML = installment.installmentAmount.toFixed(2).toString().replace('.', ',');
+                $('installment_total').innerHTML = installment.totalAmount.toFixed(2).toString().replace('.', ',');
+                $('pseguro_parcelas').setStyle({display: ''});
+                $('rmpagseguro_parcelas_loading').setStyle({display: 'none'});
+            }
+        })
+    };
+// ]]>
+</script>
