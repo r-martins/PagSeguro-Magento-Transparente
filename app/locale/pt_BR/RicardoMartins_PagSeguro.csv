@@ -158,3 +158,4 @@
 "installment quantity out of range: %s. The value must be greater than zero.","Quantidade de parcelas fora do limite: %s. O valor deve ser maior que zero."
 "sender is blocked.","Comprador está bloqueado."
 "credit card token invalid.","Token de cartão de crédito inválido."
+"credit card holder name invalid value: %s","Nome do titular do cartão inválido: %s"

@@ -197,17 +197,23 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         try {
             $this->proccessNotificatonResult($returnXml);
             if (isset($returnXml->errors)) {
-                $errMsg = array();
                 foreach ($returnXml->errors as $error) {
-                    $errMsg[] = $rmHelper->__((string)$error->message) . '(' . $error->code . ')';
+                    $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
                 }
-                Mage::throwException(
-                    'Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg)
-                );
+                Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
-            if (isset($returnXml->error)) {
+
+            if (isset($xmlRetorno->error)) {
                 $error = $returnXml->error;
                 $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
+
+                if(count($returnXml->error) > 1){
+                    unset($errMsg);
+                    foreach ($returnXml->error as $error) {
+                        $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
+                    }
+                }
+
                 Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
             }
         } catch (Mage_Core_Exception $e) {

@@ -36,16 +36,27 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         Mage::register('sales_order_invoice_save_after_event_triggered', true);
 
-        if (isset($resultXML->error)) {
-            $errMsg = Mage::helper('ricardomartins_pagseguro')->__((string)$resultXML->error->message);
-            Mage::throwException(
-                $this->_getHelper()->__(
-                    'Problemas ao processar seu pagamento. %s(%s)',
-                    $errMsg,
-                    (string)$resultXML->error->code
-                )
-            );
+        if (isset($resultXML->errors)) {
+            foreach ($resultXML->errors as $error) {
+                $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
+            }
+            Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
         }
+
+        if (isset($resultXML->error)) {
+            $error = $resultXML->error;
+            $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
+
+            if(count($resultXML->error) > 1){
+                unset($errMsg);
+                foreach ($resultXML->error as $error) {
+                    $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
+                }
+            }
+
+            Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
+        }
+
         if (isset($resultXML->reference)) {
             /** @var Mage_Sales_Model_Order $order */
             $orderNo = (string)$resultXML->reference;
@@ -467,6 +478,16 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $fieldsString .= $k.'='.urlencode($v).'&';
         }
         return rtrim($fieldsString, '&');
+    }
+
+    /**
+     * Retrieve model helper
+     *
+     * @return RicardoMartins_PagSeguro_Helper_Data
+     */
+    protected function _getHelper()
+    {
+        return Mage::helper('ricardomartins_pagseguro');
     }
 }
 
