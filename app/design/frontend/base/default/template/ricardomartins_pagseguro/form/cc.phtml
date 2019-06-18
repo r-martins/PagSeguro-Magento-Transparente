@@ -6,6 +6,11 @@ $_grandTotal = (!$_grandTotal)?'null':$_grandTotal;
 $_installments = Mage::getSingleton('checkout/session')->getQuote()->getPayment()->getAdditionalInformation('installment_quantity');
 $_installments = (!$_installments)?'null':$_installments;
 
+$_grandTotalToFormat = false;
+if ($_grandTotal && $_grandTotal != 'null') {
+    $_grandTotalToFormat = $_grandTotal; //to be formatted accordingly
+}
+
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
 <?php /*
@@ -80,7 +85,8 @@ $_installments = (!$_installments)?'null':$_installments;
         <div class="input-box">
             <div class="v-fix">
                 <select name="payment[ps_cc_installments]" id="<?php echo $_code ?>_cc_installments" class="required-entry">
-                    <option value="">Informe os dados do cartão para calcular</option>
+                    <option value="1|<?php echo $_grandTotal?>">1x de R$<?php echo number_format($_grandTotal, 2, ',', '.');?> sem juros</option>
+                    <option value="">Informe os dados do cartão para calcular as demais parcelas</option>
                 </select>
             </div>
         </div>

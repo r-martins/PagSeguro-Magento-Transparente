@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.7.4
+ * @version 3.7.8
  */
 
 RMPagSeguro = Class.create({
@@ -92,14 +92,16 @@ RMPagSeguro = Class.create({
         // }
 
         brandName = RMPagSeguroObj.brand.name;
+        var parcelsDrop = $('rm_pagseguro_cc_cc_installments');
         PagSeguroDirectPayment.getInstallments({
             amount: grandTotal,
             brand: brandName,
             success: function(response) {
-                var parcelsDrop = $('rm_pagseguro_cc_cc_installments');
                 for(installment in response.installments) break;
 //                       console.log(response.installments);
-                var b = response.installments[RMPagSeguroObj.brand.name];
+//                 var responseBrand = Object.keys(response.installments)[0];
+//                 var b = response.installments[responseBrand];
+                var b = Object.values(response.installments)[0];
                 parcelsDrop.length = 0;
 
                 if(RMPagSeguroObj.config.force_installments_selection){
@@ -129,7 +131,20 @@ RMPagSeguro = Class.create({
 
             },
             error: function(response) {
-                console.error('Erro ao obter parcelas:');
+                parcelsDrop.length = 0;
+
+                var option = document.createElement('option');
+                option.text = "1x de R$" + RMPagSeguroObj.grandTotal.toFixed(2).toString().replace('.',',') + " sem juros";
+                option.selected = true;
+                option.value = "1|" + RMPagSeguroObj.grandTotal.toFixed(2);
+                parcelsDrop.add(option);
+
+                var option = document.createElement('option');
+                option.text = "Falha ao obter demais parcelas junto ao pagseguro";
+                option.value = "";
+                parcelsDrop.add(option);
+
+                console.error('Somente uma parcela será exibida. Erro ao obter parcelas junto ao PagSeguro:');
                 console.error(response);
             },
             complete: function(response) {
