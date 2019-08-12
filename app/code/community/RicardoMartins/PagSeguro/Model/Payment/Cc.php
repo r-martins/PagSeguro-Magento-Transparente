@@ -22,7 +22,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     protected $_canVoid = true;
     protected $_canUseInternal = false;
     protected $_canUseCheckout = true;
-    protected $_canUseForMultishipping = true;
+    protected $_canUseForMultishipping = false;
     protected $_canSaveCc = false;
 
     /**

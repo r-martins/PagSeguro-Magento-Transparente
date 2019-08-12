@@ -356,7 +356,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         curl_setopt($ch, CURLOPT_TIMEOUT, 45);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
+        curl_setopt($ch, CURLOPT_USERAGENT, $helper->getUserAgent());
         $response = '';
 
         try{

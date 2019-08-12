@@ -61,7 +61,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
                 CURLOPT_TIMEOUT         => 45,
                 CURLOPT_SSL_VERIFYPEER  => false,
                 CURLOPT_SSL_VERIFYHOST  => false,
-            )
+                CURLOPT_USERAGENT => $this->getUserAgent()
+    )
         );
 
         $response = null;
@@ -389,5 +390,25 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function isNoSidUrlEnabled()
     {
         return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_NOTIFICATION_URL_NOSID);
+    }
+
+    /**
+     * Sends information about module's and Magento version
+     * @return false|string
+     */
+    public function getUserAgent()
+    {
+        $psVersion = (string)Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguro')->version;
+        $psProVersion = 'notInstalled';
+        $mageVersion = Mage::getVersion();
+
+        if (Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguroPro')) {
+            $psProVersion = (string)Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguroPro')->version;
+        }
+
+        $userAgent = array('modules' => array('RicardoMartins_PagSeguro'    => $psVersion,
+                                              'RicardoMartins_PagSeguroPro' => $psProVersion),
+                           'magento' => $mageVersion);
+        return json_encode($userAgent);
     }
 }
