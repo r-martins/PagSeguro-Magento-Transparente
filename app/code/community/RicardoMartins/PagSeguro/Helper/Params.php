@@ -121,7 +121,6 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function getCreditCardInstallmentsParams(Mage_Sales_Model_Order $order, $payment)
     {
-        $return = array();
         if ($payment->getAdditionalInformation('installment_quantity')
             && $payment->getAdditionalInformation('installment_value')) {
             $return = array(
@@ -579,7 +578,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         $registry = ($isAdmin)?$registry->get('PsPayment'):$registry->getData('PsPayment');
 
-        $registry = unserialize($registry);
+        $registry = Zend_Serializer::unserialize($registry);
 
         if (is_null($param)) {
             return $registry;

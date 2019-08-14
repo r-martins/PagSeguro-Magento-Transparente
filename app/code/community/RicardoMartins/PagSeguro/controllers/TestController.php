@@ -135,7 +135,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
 
         $registry = ($isAdmin)?$registry->get('PsPayment'):$registry->getData('PsPayment');
 
-        $registry = unserialize($registry);
+        $registry = Zend_Serializer::unserialize($registry);
 
         Mage::log('Registry:' . var_export($registry, true), null, 'martins.log', true);
 

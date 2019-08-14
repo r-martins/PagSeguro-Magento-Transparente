@@ -47,9 +47,9 @@ class RicardoMartins_PagSeguro_AjaxController extends Mage_Core_Controller_Front
         $session = 'checkout/session';
         if ($isAdmin) {
             $session = 'core/cookie';
-            Mage::getSingleton($session)->set('PsPayment', serialize($paymentPost));
+            Mage::getSingleton($session)->set('PsPayment', Zend_Serializer::serialize($paymentPost));
         } else {
-            Mage::getSingleton($session)->setData('PsPayment', serialize($paymentPost));
+            Mage::getSingleton($session)->setData('PsPayment', Zend_Serializer::serialize($paymentPost));
         }
 
         $this->getResponse()->setHttpResponseCode(200);
