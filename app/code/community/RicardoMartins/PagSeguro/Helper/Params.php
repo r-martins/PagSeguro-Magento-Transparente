@@ -43,6 +43,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 }
             }
         }
+
         return $return;
     }
 
@@ -135,6 +136,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 'installmentValue'      => number_format($order->getGrandTotal(), 2, '.', ''),
             );
         }
+
         return $return;
     }
 
@@ -193,7 +195,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 if ($this->_extraDiscountGreaterThanItems && abs($this->_extraDiscount) >= $shippingCost) {
                     $shippingDiscount = (abs($this->_extraDiscount) <= $shippingCost)?
                         abs($this->_extraDiscount):
-                        min(abs($this->_extraDiscount),$shippingCost);
+                        min(abs($this->_extraDiscount), $shippingCost);
 
                     //if extra discount greater, we change extraAmount to get only the difference
                     if (abs($this->_extraDiscount) >= $shippingCost) {
@@ -206,6 +208,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
             }
         }
+
         return $return;
     }
 
@@ -217,12 +220,9 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function getStateCode($state)
     {
-        if(strlen($state) == 2 && is_string($state))
-        {
-            return mb_convert_case($state,MB_CASE_UPPER);
-        }
-        else if(strlen($state) > 2 && is_string($state))
-        {
+        if (strlen($state) == 2 && is_string($state)) {
+            return mb_convert_case($state, MB_CASE_UPPER);
+        } else if (strlen($state) > 2 && is_string($state)) {
             $state = self::normalizeChars($state);
             $state = trim($state);
             $state = $this->stripAccents($state);
@@ -260,6 +260,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 return $code;
             }
         }
+
         return $state;
     }
 
@@ -319,6 +320,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             if ($itemPrice == 0) {
                 $extra -= 0.01 * $item->getQtyOrdered();
             }
+
             $itemsTotal += $itemPrice;
         }
 
@@ -351,12 +353,13 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     public function getYears()
     {
         $years = array();
-        $first = date("Y");
+        $first = Mage::getSingleton('core/date')->date('Y');
 
         for ($index=0; $index <= 20; $index++) {
             $year = $first + $index;
             $years[$year] = $year;
         }
+
         return $years;
     }
 
@@ -366,7 +369,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      * @param string $phone
      * @return array
      */
-    private function _extractPhone($phone)
+    protected function _extractPhone($phone)
     {
         $digits = new Zend_Filter_Digits();
         $phone = $digits->filter($phone);
@@ -374,6 +377,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         if (substr($phone, 0, 1) == '0') {
             $phone = substr($phone, 1, strlen($phone));
         }
+
         $originalPhone = $phone;
 
         $phone = preg_replace('/^(\d{2})(\d{7,9})$/', '$1-$2', $phone);
@@ -399,7 +403,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    private function _getShippingType(Mage_Sales_Model_Order $order)
+    protected function _getShippingType(Mage_Sales_Model_Order $order)
     {
         $method =  strtolower($order->getShippingMethod());
         if (strstr($method, 'pac') !== false) {
@@ -407,6 +411,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         } else if (strstr($method, 'sedex') !== false) {
             return '2';
         }
+
         return '3';
     }
 
@@ -419,7 +424,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    private function _getAddressAttributeValue($address, $attributeId)
+    protected function _getAddressAttributeValue($address, $attributeId)
     {
         $isStreetline = preg_match('/^street_(\d{1})$/', $attributeId, $matches);
 
@@ -564,11 +569,15 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         return Mage::getStoreConfig('payment/rm_pagseguro/address_telephone_attribute');
     }
+
     /**
      * Get payment hashes (sender_hash & credit_card_token) from session
+     *
      * @param string $param sender_hash or credit_card_token
      *
      * @return bool|string
+     * @throws Mage_Core_Model_Store_Exception
+     * @throws Zend_Serializer_Exception
      */
     public function getPaymentHash($param=null)
     {
@@ -578,9 +587,13 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         $registry = ($isAdmin)?$registry->get('PsPayment'):$registry->getData('PsPayment');
 
+        if (!$registry) {
+           return false;
+        }
+
         $registry = Zend_Serializer::unserialize($registry);
 
-        if (is_null($param)) {
+        if (null === $param) {
             return $registry;
         }
 

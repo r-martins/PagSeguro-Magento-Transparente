@@ -306,7 +306,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $scriptBlock = Mage::app()->getLayout()->createBlock('core/text', 'pagseguro_direct');
         $scriptBlock->setText(
             sprintf(
-                '<script type="text/javascript" src="%s" defer>', Mage::helper('ricardomartins_pagseguro')->getJsUrl()
+                '<script type="text/javascript" src="%s" defer></script>',
+                Mage::helper('ricardomartins_pagseguro')->getJsUrl()
             )
         );
         return $scriptBlock;
