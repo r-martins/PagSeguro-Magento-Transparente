@@ -5,24 +5,24 @@
 	<script>
     var themeHasJQuery = !!window.jQuery;
 </script>
-<script type="text/javascript" src="../assets/js/jquery.js?1.0.1163"></script>
+<script type="text/javascript" src="../assets/js/jquery.js?1.0.1164"></script>
 <script>
     window._$ = jQuery.noConflict(themeHasJQuery);
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../assets/css/bootstrap.css?1.0.1163" media="screen" />
-<script type="text/javascript" src="../assets/js/bootstrap.min.js?1.0.1163"></script>
+<link rel="stylesheet" href="../assets/css/bootstrap.css?1.0.1164" media="screen" />
+<script type="text/javascript" src="../assets/js/bootstrap.min.js?1.0.1164"></script>
 <!--[if lte IE 9]>
-<link rel="stylesheet" href="../assets/css/layout.ie.css?1.0.1163">
-<script src="../assets/js/layout.ie.js?1.0.1163"></script>
+<link rel="stylesheet" href="../assets/css/layout.ie.css?1.0.1164">
+<script src="../assets/js/layout.ie.js?1.0.1164"></script>
 <![endif]-->
 <link class="data-control-id-9" href='//fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="../assets/js/layout.core.js"></script>
-<script src="../assets/js/CloudZoom.js?1.0.1163"></script>
+<script src="../assets/js/CloudZoom.js?1.0.1164"></script>
 	
     <title>Status</title>
-	<link rel="stylesheet" href="../assets/css/style.css?1.0.1163">
-	<script src="../assets/js/script.js?1.0.1163"></script>
+	<link rel="stylesheet" href="../assets/css/style.css?1.0.1164">
+	<script src="../assets/js/script.js?1.0.1164"></script>
     <meta charset="utf-8">
     
     <link class="" href='//fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
@@ -273,7 +273,7 @@ zE(function() {
 </h1>
 	
 		<p class="data-control-id-2422149 bd-textblock-45 bd-content-element">
-    Serviço não oficial e sem vínculo ou validação do PagSeguro.
+    Serviço não oficial e sem vínculo ou validação do PagSeguro.<br><br><br>Sugestão de uso: compare o momento onde um dos monitores falharam nas duas regiões de teste com o momento que enfrentou algum tipo de problema em sua loja. Note ainda que a falha de apenas um dos monitores, pode representar um problema no monitor e não no serviço do PagSeguro.
 </p>
     </div>
 </section>
@@ -283,6 +283,10 @@ zE(function() {
         <h2 class="data-control-id-2422172 bd-textblock-47 bd-content-element">
     PagSeguro /notifications
 </h2>
+	
+		<p class="data-control-id-2438309 bd-textblock-43 bd-content-element">
+    Endpoint:&nbsp;ws.pagseguro.uol.com.br/v2/transactions/notifications/<br>Timeout: 45 segundos | Intervalo entre os testes: 3 minutos
+</p>
 	
 		<div class="data-control-id-2422080 bd-customhtml-2 bd-tagstyles">
     <div class="bd-container-inner bd-content-element">
@@ -310,6 +314,10 @@ zE(function() {
     PagSeguro /sessions
 </h2>
 	
+		<p class="data-control-id-2438348 bd-textblock-55 bd-content-element">
+    Endpoint:&nbsp;ws.pagseguro.uol.com.br/v2/sessions<br>Timeout: 15 segundos | Intervalo entre os testes: 1 minuto
+</p>
+	
 		<div class="data-control-id-2422793 bd-customhtml-13 bd-tagstyles">
     <div class="bd-container-inner bd-content-element">
         <iframe allowtransparency="-1" frameborder="0" width="800px" height="400px" src="https://dashboard.monitis.com/shareModule.jsp?v=18&amp;height=400&amp;width=800&amp;publicKey=0GCF35nfc4semhudzjhpVKJuyAwhCM6W&amp;readonlyChart=false&amp;readonlyDateRange=false&amp;datePeriod=1&amp;preview=false&amp;detailedError=false&amp;detailedMsg=&amp;selLegend=" id="sessionsIf"></iframe>
@@ -336,6 +344,10 @@ zE(function() {
     PagSeguro /getInstallments
 </h2>
 	
+		<p class="data-control-id-2438356 bd-textblock-239 bd-content-element">
+    Endpoint:&nbsp;pagseguro.uol.com.br/checkout/v2/installments.json<br>Timeout: 10 segundos | Intervalo entre os testes: 1 minuto
+</p>
+	
 		<div class="data-control-id-2423123 bd-customhtml-21 bd-tagstyles">
     <div class="bd-container-inner bd-content-element">
         <iframe allowtransparency="-1" frameborder="0" width="800px" height="400px" src="https://dashboard.monitis.com/shareModule.jsp?v=18&amp;height=400&amp;width=800&amp;publicKey=DOUclPetFYPOOAuLWWAKSXoytxkTAgQs&amp;readonlyChart=false&amp;readonlyDateRange=false&amp;datePeriod=1&amp;preview=false&amp;detailedError=false&amp;detailedMsg=&amp;selLegend=" id="installmentsIf"></iframe>
@@ -344,6 +356,32 @@ zE(function() {
 	
 		<p class="data-control-id-2423112 bd-textblock-243 bd-content-element">
     O getInstallments é uma chamada feita para obter a quantidade de parcelas disponíveis com base nas suas configurações no painel da conta PagSeguro, valor do pedido e bandeira do cartão.<br>A indisponibilidade deste serviço afeta a <b>experiência do usuário nas compras com cartão de crédito</b>, e eventualmente impossibilitando a conclusão de pedidos<b>.</b>
+</p>
+	
+		<div class="bd-separator-40 data-control-id-2438485 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+	
+		<h2 class="data-control-id-2438540 bd-textblock-245 bd-content-element">
+    PagSeguro Credit Card Token
+</h2>
+	
+		<p class="data-control-id-2438558 bd-textblock-247 bd-content-element">
+    Endpoint:&nbsp;df.uol.com.br/df-fe/mvc/creditcard/v1/getBin<br>Timeout: 10 segundos | Intervalo entre os testes: 1 minuto
+</p>
+	
+		<div class="data-control-id-2438619 bd-customhtml-16 bd-tagstyles">
+    <div class="bd-container-inner bd-content-element">
+        <iframe allowtransparency="-1" frameborder="0" width="800px" height="400px" src="https://dashboard.monitis.com/shareModule.jsp?v=18&amp;height=400&amp;width=800&amp;publicKey=JQO2WtpXXNKsNNAawq3urfk4eUNPCHD0&amp;readonlyChart=false&amp;readonlyDateRange=false&amp;datePeriod=1&amp;preview=false&amp;detailedError=false&amp;detailedMsg=&amp;selLegend=" id="cardToken"></iframe>
+    </div>
+</div>
+	
+		<p class="data-control-id-2438649 bd-textblock-249 bd-content-element">
+    Este é o endpoint usado para obter o hash do cartão de crédito durante o checkout.<br>A indisponibilidade deste serviço <b>impede a finalização de vendas com cartão de crédito</b>.
 </p>
 	
 		<div class="bd-separator-41 data-control-id-2423111 bd-separator-center bd-separator-content-center clearfix" >

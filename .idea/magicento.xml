@@ -11,5 +11,7 @@
     <option name="basicAuthPassword" value="" />
     <option name="pathsToMagentoSerialized" value="/private/var/www/paypalpuro" />
     <option name="modmanProjectChecked" value="true" />
+    <option name="customSignatures" value="Mage_Sales_Model_Order.getPaymentsCollection = Mage_Sales_Model_Resource_Order_Payment_Collection;;MODEL=sales/order.getPaymentsCollection==RESOURCEMODEL=sales/order_payment_collection&#10;" />
+    <option name="d" value="is64qI1AGpC55k+s+GsLD7DLSwn6Vlpt0zeVWi8DOH/0OkFZiC7YV/6kIZvHxDSNuFBCS4Rzw056&#13;&#10;e65x/Py9IWVbpISvroFuNzupwrKJr8CDTyCIPLPi2F3+CDrMvXHjWcTH8OE3geW+VOwJNtDktZrn&#13;&#10;2e1/F1NCbJsp+ppwDtg=&#13;&#10;" />
   </component>
 </project>
