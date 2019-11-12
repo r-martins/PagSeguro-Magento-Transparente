@@ -25,12 +25,20 @@ class RicardoMartins_PagSeguro_Block_Product_Installments extends Mage_Core_Bloc
         $this->setTemplate('ricardomartins_pagseguro/product/installments.phtml');
     }
 
+    /**
+     * Checks if display installments on page is enabled and if the maximum number of installments is not 1
+     * @return bool
+     */
     public function isEnabled()
     {
         if ($this->getNameInLayout() != 'ricardomartins.pagseguro.parcelas') {
             return true;
         }
-        return Mage::getStoreConfigFlag('payment/rm_pagseguro_cc/installments_product');
+        $displayInstallmentsOnProductPage = Mage::getStoreConfigFlag('payment/rm_pagseguro_cc/installments_product');
+        $maxInstallments = (int)Mage::getStoreConfig(
+            RicardoMartins_PagSeguro_Helper_Data::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT
+        );
+        return $displayInstallmentsOnProductPage && $maxInstallments !== 1;
     }
 
     protected function _prepareLayout()

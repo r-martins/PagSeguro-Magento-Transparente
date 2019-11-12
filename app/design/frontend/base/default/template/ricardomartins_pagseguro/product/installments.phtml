@@ -2,6 +2,9 @@
 $_helper = Mage::helper('ricardomartins_pagseguro');
 $_ajaxSessionIdUrl = Mage::getUrl('pseguro/ajax/getSessionId', array('_secure' => true));
 $_price = $this->getPrice();
+$_maxInstallments = (int)Mage::getStoreConfig(
+    RicardoMartins_PagSeguro_Helper_Data::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT
+);
 ?>
 
 <div id="rmpagseguro_parcelas_box">
@@ -27,7 +30,11 @@ $_price = $this->getPrice();
             brand: 'visa',
             success: function (response) {
                 var responseVisa = response.installments.visa;
+                var maxInstallmentsConfig = <?php echo $_maxInstallments ?>;
                 var installment = responseVisa[responseVisa.length - 1];
+                if(maxInstallmentsConfig > 0 && maxInstallmentsConfig < responseVisa.length){
+                    installment = responseVisa[maxInstallmentsConfig - 1];
+                }
                 $('installments').innerHTML = installment.quantity.toString();
                 $('installment_value').innerHTML = installment.installmentAmount.toFixed(2).toString().replace('.', ',');
                 $('installment_total').innerHTML = installment.totalAmount.toFixed(2).toString().replace('.', ',');
