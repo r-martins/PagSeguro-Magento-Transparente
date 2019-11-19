@@ -165,11 +165,21 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                         ->addObject($invoice)
                         ->addObject($invoice->getOrder())
                         ->save();
-                    $order->addStatusHistoryComment(sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId()));
+                    $order->addStatusHistoryComment(
+                        sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId())
+                    );
                 }
             }
 
             $payment->save();
+
+            if (isset($resultXML->feeAmount) && isset($resultXML->netAmount)) {
+                $payment
+                    ->setAdditionalInformation('fee_amount', floatval($resultXML->feeAmount))
+                    ->setAdditionalInformation('net_amount', floatval($resultXML->netAmount))
+                    ->save();
+            }
+
             $order->save();
             Mage::dispatchEvent(
                 'pagseguro_proccess_notification_after',
@@ -356,7 +366,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         curl_setopt($ch, CURLOPT_TIMEOUT, 45);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_USERAGENT, $helper->getUserAgent());
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $helper->getCustomHeaders());
         $response = '';
 
         try{

@@ -61,8 +61,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
                 CURLOPT_TIMEOUT         => 45,
                 CURLOPT_SSL_VERIFYPEER  => false,
                 CURLOPT_SSL_VERIFYHOST  => false,
-                CURLOPT_USERAGENT => $this->getUserAgent()
-    )
+                )
         );
 
         $response = null;
@@ -411,5 +410,24 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
                                               'RicardoMartins_PagSeguroPro' => $psProVersion),
                            'magento' => $mageVersion);
         return json_encode($userAgent);
+    }
+
+    /**
+     * Adds usage information about platform and module's versions
+     * @return array of headers
+     */
+    public function getCustomHeaders()
+    {
+        $psVersion = (string)Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguro')->version;
+        $mageVersion = Mage::getVersion();
+
+        $headers = array('Platform: Magento', 'Platform-Version: ' . $mageVersion, 'Module-Version: ' . $psVersion);
+
+        if (Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguroPro')) {
+            $psProVersion = (string)Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguroPro')->version;
+            $headers[] = 'Extra-Version: ' . $psProVersion;
+        }
+
+        return $headers;
     }
 }

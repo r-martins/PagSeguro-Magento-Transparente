@@ -3,6 +3,9 @@
     <br/>
     <?php if($additional = $info->getAdditionalInformation()):?>
         Id Transação: <?php echo (isset($additional['transaction_id']))?$this->escapeHtml($additional['transaction_id']):'Desconhecido';?>
+        <?php if (isset($additional['transaction_id'])): ?>
+            <?php echo sprintf(' | <a href="%s" target="_blank">Ver no PagSeguro</a>', 'https://pagseguro.uol.com.br/transaction/details.jhtml?code=' . $this->escapeHtml($additional['transaction_id']));?>
+        <?php endif; ?>
         <br/>
     <?php endif;?>
     Bandeira: <?php echo ucfirst($this->escapeHtml($info->getCcType()));?>
@@ -11,5 +14,12 @@
     <?php if(isset($additional['installment_quantity']) && isset($additional['installment_value'])):?>
         <br/>
         Parcelas: <?php echo $this->escapeHtml($additional['installment_quantity']);?>x <?php echo Mage::helper('core')->formatCurrency($additional['installment_value']);?>
+    <?php endif;?>
+    <?php if(isset($additional['net_amount']) && isset($additional['fee_amount'])):?>
+        <br/>
+        Taxa PagSeguro: <?php echo  Mage::helper('core')->formatCurrency($additional['fee_amount']);?>
+        <br/>
+        Total líquido a receber: <?php echo  Mage::helper('core')->formatCurrency($additional['net_amount']);?>
+        <br/>
     <?php endif;?>
 <?php endif; ?>
