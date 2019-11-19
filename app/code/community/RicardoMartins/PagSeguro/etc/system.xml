@@ -394,27 +394,6 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Limita o número de parcelas. A configuração de juros é sempre feita no seu painel PagSeguro.]]></comment>
                         </installment_limit>
-                        <allowspecific translate="label" module="Payment">
-                            <label>Payment from Applicable Countries</label>
-                            <frontend_type>allowspecific</frontend_type>
-                            <sort_order>100</sort_order>
-                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </allowspecific>
-                        <specificcountry translate="label" module="Payment">
-                            <label>Payment from Specific Countries</label>
-                            <frontend_type>multiselect</frontend_type>
-                            <sort_order>110</sort_order>
-                            <source_model>adminhtml/system_config_source_country</source_model>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <depends>
-                                <allowspecific>1</allowspecific>
-                            </depends>
-                        </specificcountry>
                         <installments_product>
                             <label>Exibir parcelas na página de produto?</label>
                             <sort_order>120</sort_order>
@@ -426,6 +405,40 @@
                             <tooltip>Pode deixar sua página de produtos mais lenta.</tooltip>
                             <comment><![CDATA[É exibido o parcelamento máximo com base no cartão VISA, de acordo com suas configurações no PagSeguro. Saiba mais <a href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360027562792" target="_blank">aqui</a>.]]></comment>
                         </installments_product>
+                        <installments_product_interestfree_only>
+                            <label>Exibir somente parcelas sem juros?</label>
+                            <sort_order>130</sort_order>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <frontend_type>select</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Será exibido somente a parcela máxima sem juros na página de produto.</comment>
+                            <depends>
+                                <installments_product>1</installments_product>
+                            </depends>
+                        </installments_product_interestfree_only>
+                        <allowspecific translate="label" module="Payment">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>200</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label" module="Payment">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>210</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                        </specificcountry>
                     </fields>
                 </rm_pagseguro_cc>
 

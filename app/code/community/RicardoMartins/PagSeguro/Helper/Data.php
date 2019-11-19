@@ -32,6 +32,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_KEY                = 'payment/pagseguropro/key';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS = 'payment/rm_pagseguro_cc/force_installments_selection';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT  = 'payment/rm_pagseguro_cc/installment_limit';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_INTEREST_FREE_ONLY =
+        'payment/rm_pagseguro_cc/installments_product_interestfree_only';
     const XML_PATH_PAYMENT_PAGSEGURO_NOTIFICATION_URL_NOSID= 'payment/rm_pagseguro/notification_url_nosid';
 
     /**
