@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.7.10
+ * @version 3.8.0
  */
 
 RMPagSeguro = Class.create({
@@ -13,6 +13,12 @@ RMPagSeguro = Class.create({
                 console.log('PagSeguro: Não há métodos de pagamento habilitados em exibição. Execução abortada.');
                 return;
             }
+            var form = methods.first().closest('form');
+            form.observe('submit', function(e){
+                e.preventDefault();
+                RMPagSeguroObj.formElementAndSubmit = e.element();
+                RMPagSeguroObj.updateCreditCardToken();
+            });
         }
 
         if(config.PagSeguroSessionId == false){
@@ -22,6 +28,10 @@ RMPagSeguro = Class.create({
 
         this.config = config;
         this.maxSenderHashAttempts = 30;
+
+        //internal control to avoid duplicated calls to updateCreditCardToken
+        this.updatingCreditCardToken = false;
+        this.formElementAndSubmit = false;
 
         /*@deprecated hashSuccess since 3.7.4*/
         this.hashSuccess = false;
@@ -187,15 +197,21 @@ RMPagSeguro = Class.create({
 
         if(ccNum.length > 6 && ccExpMo != "" && ccExpYr != "" && ccCvv.length >= 3)
         {
+            if(this.updatingCreditCardToken){
+                return;
+            }
+            this.updatingCreditCardToken = true;
             PagSeguroDirectPayment.createCardToken({
                 cardNumber: ccNum,
                 brand: brandName,
                 cvv: ccCvv,
                 expirationMonth: ccExpMo,
                 expirationYear: ccExpYr,
-                success: function(psresponse){
+                success: function(psresponse, formElementAndSubmit){
                     RMPagSeguroObj.creditCardToken = psresponse.card.token;
-                    RMPagSeguroObj.updatePaymentHashes();
+                    var formElementAndSubmit = RMPagSeguroObj.formElementAndSubmit;
+                    RMPagSeguroObj.formElementAndSubmit = false;
+                    RMPagSeguroObj.updatePaymentHashes(formElementAndSubmit);
                     $('card-msg').innerHTML = '';
                 },
                 error: function(psresponse){
@@ -210,17 +226,23 @@ RMPagSeguro = Class.create({
                     }else if(undefined!=psresponse.errors["30403"]){
                         RMPagSeguroObj.updateSessionId(); //Se sessao expirar, atualizamos a session
                     }else{
+                        console.trace('verifique os dados do cartão');
+                        console.log(psresponse);
                         $('card-msg').innerHTML = 'Verifique os dados do cartão digitado.';
                     }
                     console.error('Falha ao obter o token do cartao.');
                     console.log(psresponse.errors);
                     errors = true;
                 },
+                timeout: function(){
+                    console.error('Timeout ao obter token do cartão. Tente novamente.');
+                },
                 complete: function(psresponse){
+                    RMPagSeguroObj.updatingCreditCardToken = false;
                     if(RMPagSeguroObj.config.debug){
                         console.info('Card token updated successfully.');
                     }
-                }
+                },
             });
         }
         if(typeof RMPagSeguroObj.brand != "undefined") {
@@ -260,7 +282,7 @@ RMPagSeguro = Class.create({
             })
         }
     },
-    updatePaymentHashes: function(){
+    updatePaymentHashes: function(formElementAndSubmit=false){
         var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/updatePaymentHashes';
         var _paymentHashes = {
             "payment[sender_hash]": this.senderHash,
@@ -270,6 +292,7 @@ RMPagSeguro = Class.create({
         };
         new Ajax.Request(_url, {
             method: 'post',
+            asynchronous: false,
             parameters: _paymentHashes,
             onSuccess: function(response){
                 if(RMPagSeguroObj.config.debug){
@@ -285,6 +308,22 @@ RMPagSeguro = Class.create({
                 return false;
             }
         });
+        if(formElementAndSubmit){
+            formElementAndSubmit.submit();
+        }
+        /*var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function(e){
+            if(xhr.readyState === 4){
+                if(xhr.status === 200){
+                    console.log('Sucesso ao atualizar hashes');
+                }else{
+                    console.error('Falhou.');
+                }
+            }
+        }
+        xhr.open('post', _url, false);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('payment[sender_hash]='+_paymentHashes['payment[sender_hash]']+'&payment[credit_card_token]='+_paymentHashes['payment[credit_card_token]']+'&payment[cc_type]='+_paymentHashes['payment[cc_type]']+'&payment[is_admin]=' + _paymentHashes['payment[is_admin]']);*/
     },
     getGrandTotal: function(){
         if(this.config.is_admin){

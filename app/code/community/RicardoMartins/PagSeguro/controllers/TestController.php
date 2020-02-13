@@ -57,6 +57,28 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
     }
 
     /**
+     * Used to test creditCard form in development phases
+     * Disabled by default
+     */
+    public function standAloneCcAction()
+    {
+//        return $this->norouteAction();
+        $this->loadLayout();
+        $this->renderLayout();
+    }
+
+    /**
+     * Used to clear credit card hash and session during development
+     * Disabled by default
+     */
+    public function resetCardHashAction()
+    {
+        //        return $this->norouteAction();
+        Mage::getSingleton('checkout/session')->unsetData('PsPayment');
+        $this->_redirectReferer();
+    }
+
+    /**
      * Validates your PRO key. Only for tests purposes.
      * @return mixed|string
      */
@@ -108,39 +130,6 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
     {
         $token = Mage::helper('ricardomartins_pagseguro')->getToken();
         return (strlen($token)!=32 && strlen($token)!=100)?'Wrong size':'Good';
-    }
-
-    public function testSenderHashAction()
-    {
-//        $paymentPost = $this->getRequest()->getPost('payment');
-//        $isAdmin = isset($paymentPost['is_admin']) && $paymentPost['is_admin']=="true";
-//        $session = 'checkout/session';
-//        if ($isAdmin) {
-//            $session = 'core/cookie';
-//            Mage::getSingleton($session)->set('PsPayment', serialize($paymentPost));
-//        } else {
-//            Mage::getSingleton($session)->setData('PsPayment', serialize($paymentPost));
-//        }
-//        Mage::log(var_export($paymentPost, true), null, 'martins.log', true);
-//
-//
-//        $this->getResponse()->setHttpResponseCode(200);
-
-
-
-        // pegando sender hash
-        $isAdmin = Mage::app()->getStore()->isAdmin();
-        $session = ($isAdmin)?'core/cookie':'checkout/session';
-        $registry = Mage::getSingleton($session);
-
-        $registry = ($isAdmin)?$registry->get('PsPayment'):$registry->getData('PsPayment');
-
-        $registry = Zend_Serializer::unserialize($registry);
-
-        Mage::log('Registry:' . var_export($registry, true), null, 'martins.log', true);
-
-
-
     }
 
 }

@@ -44,7 +44,7 @@ if ($_grandTotal && $_grandTotal != 'null') {
     <li>
         <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
         <div class="input-box">
-            <input type="text" id="<?php echo $_code ?>_cc_number" name="payment[ps_cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-cc-number validate-cc-type required-entry" value="" maxlength="16"/>
+            <input type="text" id="<?php echo $_code ?>_cc_number" name="payment[ps_cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text validate-cc-number validate-cc-type required-entry validate-pagseguro" value="" maxlength="16"/>
             <?php #nao remover os campos abaixo ?>
             <span id="card-brand" style="text-transform: capitalize; display: block;"></span>
             <span id="card-msg" style="color: red;clear:left; display: block;"></span>

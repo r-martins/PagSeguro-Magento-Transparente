@@ -1,0 +1,133 @@
+<?php
+$pHelper = Mage::helper('ricardomartins_pagseguro/params');
+$sessionId = (!isset($_COOKIE['ps_sessionid'])) ? Mage::helper('ricardomartins_pagseguro')->getSessionId() : $_COOKIE['ps_sessionid'];
+setcookie('ps_sessionid', $sessionId, time()+300);
+$_grandTotal = 100;
+$_installments = 10;
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="/js/prototype/prototype.js"></script>
+        <script type="text/javascript" src="/js/prototype/validation.js"></script>
+        <script type="text/javascript">var RMPagSeguroSiteBaseURL = "<?=Mage::getBaseUrl()?>";</script>
+        <script type="text/javascript" src="https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js"></script>
+        <script type="text/javascript" src="/js/pagseguro/pagseguro.js"></script>
+        <title>Exemplo CC PagSeguro</title>
+    </head>
+    <body>
+    <?php if(!Mage::getSingleton('checkout/cart')->getItemsCount()) :?>
+        <p style="color: red">Add a product to cart before continue.</p>
+        <?php exit; ?>
+    <?php endif; ?>
+    <?php
+    echo '<p>Loaded at: ' . date('H:i:s') . ' - ' . uniqid() . '</p>';
+    echo sprintf('<p>Session id: %s</p>', var_export($sessionId, true));
+    echo sprintf('<p>Sender hash(cached): %s</p>', var_export($pHelper->getPaymentHash('sender_hash'), true));
+    ?>
+    <?php if(!empty($_POST)):?>
+    <div id="postedData" style="background-color: #b5b4b1">
+        <p><strong>Posted Data: </strong> <pre><?=print_r($_POST);?></pre></p>
+        <p><strong>Sender hash: </strong> <?=$pHelper->getPaymentHash('sender_hash');?></p>
+        <p><strong>Credit card token: </strong> <?=$pHelper->getPaymentHash('credit_card_token');?></p>
+    </div>
+    <?php endif;?>
+    <form action="" method="post">
+        <fieldset id="p_method_rm_pagseguro_cc">
+            <legend>Dados do Cartão</legend>
+            <input type="text" placeholder="cc number" name="payment[ps_cc_number]" id="rm_pagseguro_cc_cc_owner" autocomplete="off"/>
+            <span id="card-brand" style="text-transform: capitalize; display: block;"></span>
+            <span id="card-msg" style="color: red;clear:left; display: block;"></span>
+            <input type="text" placeholder="cvv" name="payment[ps_cc_cid]" id="rm_pagseguro_cc_cid" autocomplete="off"/>
+            <select id="rm_pagseguro_cc_expiration" name="payment[ps_cc_exp_month]" class="month validate-cc-exp required-entry" autocomplete="off">
+                <option value="" selected="selected">Mês</option>
+                <option value="1">01 - janeiro</option>
+                <option value="2">02 - fevereiro</option>
+                <option value="3">03 - março</option>
+                <option value="4">04 - abril</option>
+                <option value="5">05 - maio</option>
+                <option value="6">06 - junho</option>
+                <option value="7">07 - julho</option>
+                <option value="8">08 - agosto</option>
+                <option value="9">09 - setembro</option>
+                <option value="10">10 - outubro</option>
+                <option value="11">11 - novembro</option>
+                <option value="12">12 - dezembro</option>
+            </select>
+            <select id="rm_pagseguro_cc_expiration_yr" name="payment[ps_cc_exp_year]" class="year required-entry" autocomplete="off">
+                <option value="" selected="selected">Ano</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+                <option value="2031">2031</option>
+                <option value="2032">2032</option>
+                <option value="2033">2033</option>
+                <option value="2034">2034</option>
+                <option value="2035">2035</option>
+                <option value="2036">2036</option>
+                <option value="2037">2037</option>
+                <option value="2038">2038</option>
+                <option value="2039">2039</option>
+                <option value="2040">2040</option>
+            </select>
+            <input type="text" placeholder="holder" name="name="payment[ps_cc_owner]"/>
+            <select name="payment[ps_cc_installments]" id="rm_pagseguro_cc_cc_installments">
+                <option value="1|<?=$_grandTotal?>">1x de <?=number_format($_grandTotal, 2, ',', '.');?></option>
+            </select>
+            <input type="submit" value="simulate payment"/>
+            <input type="button" value="reset hashes" onclick="location.href='resetCardHash';"/>
+        </fieldset>
+    </form>
+    <?php
+    $_helper = Mage::helper('ricardomartins_pagseguro');
+    ?>
+    <script type="text/javascript">
+        //<![CDATA[
+        var preparePagSeguro = function(){
+            if(typeof RMPagSeguroObj != "undefined"){
+                <?php if ($_helper->isDebugActive()): ?>
+                console.info('PagSeguro was already started.');
+                <?php endif; ?>
+                return;
+            }
+            <?php if ($_helper->isDebugActive()): ?>
+            console.info('PagSeguro is initiating. Wait for ready message.');
+            <?php endif; ?>
+            RMPagSeguroObj = new RMPagSeguro(<?php echo $_helper->getConfigJs()?>);
+            console.info('PagSeguro ready');
+
+        }
+        preparePagSeguro();
+
+        //]]>
+    </script>
+
+
+    <script type="text/javascript">
+        //<![CDATA[
+        //    if ('undefined' !== typeof RMPagSeguro) {
+        //        RMPagSeguro.getInstallments();
+        //    }
+        if(typeof RMPagSeguroObj != "undefined"){
+            if(RMPagSeguroObj.config.debug){
+                console.info('Adicionando observer para campos de cartão...');
+            }
+            RMPagSeguroObj.addCardFieldsObserver(RMPagSeguroObj);
+            if(typeof RMPagSeguroObj.brand != "undefined"){
+                RMPagSeguroObj.updateBrand();
+                RMPagSeguroObj.getInstallments(<?php echo $_grandTotal . ',' . $_installments;?>);
+            }
+        }
+        //]]
+    </script>
+
+    </body>
+</html>

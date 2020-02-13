@@ -10,4 +10,11 @@
             <block type="ricardomartins_pagseguro/product_installments" name="ricardomartins.pagseguro.parcelas" template="ricardomartins_pagseguro/product/installments.phtml"/>
         </reference>
     </catalog_product_view>
+    <ricardomartins_pagseguro_test_standalonecc>
+        <reference name="root">
+            <action method="setTemplate">
+                <template>ricardomartins_pagseguro/tests/standalonecc.phtml</template>
+            </action>
+        </reference>
+    </ricardomartins_pagseguro_test_standalonecc>
 </layout>
