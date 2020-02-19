@@ -35,6 +35,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_INTEREST_FREE_ONLY =
         'payment/rm_pagseguro_cc/installments_product_interestfree_only';
     const XML_PATH_PAYMENT_PAGSEGURO_NOTIFICATION_URL_NOSID= 'payment/rm_pagseguro/notification_url_nosid';
+    const XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON = 'payment/rm_pagseguro/placeorder_button';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -333,7 +334,9 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             'show_total' => Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_SHOW_TOTAL),
             'force_installments_selection' =>
                 Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS),
-            'installment_limit' => (int)Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT)
+            'installment_limit' => (int)Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT),
+            'placeorder_button' => Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON),
+            'loader_url' => Mage::getDesign()->getSkinUrl('pagseguro/ajax-loader.gif', array('_secure'=>true))
         );
         return json_encode($config);
     }

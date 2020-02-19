@@ -12,13 +12,15 @@ RMPagSeguro = Class.create({
             if(!methods.length){
                 console.log('PagSeguro: Não há métodos de pagamento habilitados em exibição. Execução abortada.');
                 return;
+            }else{
+                var form = methods.first().closest('form');
+                form.observe('submit', function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    RMPagSeguroObj.formElementAndSubmit = e.element();
+                    RMPagSeguroObj.updateCreditCardToken();
+                });
             }
-            var form = methods.first().closest('form');
-            form.observe('submit', function(e){
-                e.preventDefault();
-                RMPagSeguroObj.formElementAndSubmit = e.element();
-                RMPagSeguroObj.updateCreditCardToken();
-            });
         }
 
         if(config.PagSeguroSessionId == false){
@@ -33,9 +35,6 @@ RMPagSeguro = Class.create({
         this.updatingCreditCardToken = false;
         this.formElementAndSubmit = false;
 
-        /*@deprecated hashSuccess since 3.7.4*/
-        this.hashSuccess = false;
-
         PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
 
 
@@ -48,32 +47,10 @@ RMPagSeguro = Class.create({
                 return true;
         });
     },
-
-    /** @deprecated since 3.7.4 - agora usamos o onSenderHashReady ao invés de getSenderHash que dispensa checar disponibilidade*/
-    retryUpdateSender: function() {
-        if (this.hashSuccess){
-            return true;
-        }
-        console.log('Uma nova tentativa de obter o sender_hash será realizada em 3 segundos.');
-
-        var senderHashAttempts = 0;
-        this.intervalSenderHash = setInterval(function(){
-            senderHashAttempts++;
-            // console.log("Tentativa " + senderHashAttempts);
-            if(PagSeguroDirectPayment.ready){
-                RMPagSeguroObj.updateSenderHash();
-                clearInterval(RMPagSeguroObj.intervalSenderHash);
-                return true;
-            }
-            if (senderHashAttempts == RMPagSeguroObj.maxSenderHashAttempts) {
-                clearInterval(RMPagSeguroObj.intervalSenderHash);
-                console.error('Não foi possível obter o sender_hash após várias tentativas.');
-            }
-        }, 3000 );
-    },
     updateSenderHash: function(response) {
-        if(typeof(response) === "undefined"){
-            PagSeguroDirectPayment.onSenderHashReady(this.updateSenderHash);
+        if(typeof response === 'undefined'){
+            PagSeguroDirectPayment.onSenderHashReady(RMPagSeguroObj.updateSenderHash);
+            return false;
         }
         if(response.status == 'error'){
             console.log('PagSeguro: Falha ao obter o senderHash. ' + response.message);
@@ -82,8 +59,6 @@ RMPagSeguro = Class.create({
         RMPagSeguroObj.senderHash = response.senderHash;
         RMPagSeguroObj.updatePaymentHashes();
 
-        /*@deprecated hashSuccess since 3.7.4*/
-        RMPagSeguroObj.hashSuccess = true;
         return true;
     },
 
@@ -201,13 +176,15 @@ RMPagSeguro = Class.create({
                 return;
             }
             this.updatingCreditCardToken = true;
+
+            RMPagSeguroObj.disablePlaceOrderButton();
             PagSeguroDirectPayment.createCardToken({
                 cardNumber: ccNum,
                 brand: brandName,
                 cvv: ccCvv,
                 expirationMonth: ccExpMo,
                 expirationYear: ccExpYr,
-                success: function(psresponse, formElementAndSubmit){
+                success: function(psresponse){
                     RMPagSeguroObj.creditCardToken = psresponse.card.token;
                     var formElementAndSubmit = RMPagSeguroObj.formElementAndSubmit;
                     RMPagSeguroObj.formElementAndSubmit = false;
@@ -219,26 +196,32 @@ RMPagSeguro = Class.create({
                         $('card-msg').innerHTML = 'Dados do cartão inválidos.';
                     }else if(undefined!=psresponse.errors["10001"]){
                         $('card-msg').innerHTML = 'Tamanho do cartão inválido.';
+                    }else if(undefined!=psresponse.errors["10002"]){
+                        $('card-msg').innerHTML = 'Formato de data inválido';
+                    }else if(undefined!=psresponse.errors["10003"]){
+                        $('card-msg').innerHTML = 'Código de segurança inválido';
+                    }else if(undefined!=psresponse.errors["10004"]){
+                        $('card-msg').innerHTML = 'Código de segurança é obrigatório';
                     }else if(undefined!=psresponse.errors["10006"]){
-                        $('card-msg').innerHTML = 'Tamanho do CVV inválido.';
+                        $('card-msg').innerHTML = 'Tamanho do Código de segurança inválido';
                     }else if(undefined!=psresponse.errors["30405"]){
                         $('card-msg').innerHTML = 'Data de validade incorreta.';
                     }else if(undefined!=psresponse.errors["30403"]){
                         RMPagSeguroObj.updateSessionId(); //Se sessao expirar, atualizamos a session
+                    }else if(undefined!=psresponse.errors["20000"]){ // request error (pagseguro fora?)
+                        console.log('Erro 20000 no PagSeguro. Tentando novamente...');
+                        RMPagSeguroObj.updateCreditCardToken(); //tenta de novo
                     }else{
-                        console.trace('verifique os dados do cartão');
+                        console.log('Resposta PagSeguro (dados do cartao incorrreto):');
                         console.log(psresponse);
                         $('card-msg').innerHTML = 'Verifique os dados do cartão digitado.';
                     }
                     console.error('Falha ao obter o token do cartao.');
                     console.log(psresponse.errors);
-                    errors = true;
-                },
-                timeout: function(){
-                    console.error('Timeout ao obter token do cartão. Tente novamente.');
                 },
                 complete: function(psresponse){
                     RMPagSeguroObj.updatingCreditCardToken = false;
+                    RMPagSeguroObj.enablePlaceOrderButton();
                     if(RMPagSeguroObj.config.debug){
                         console.info('Card token updated successfully.');
                     }
@@ -252,7 +235,7 @@ RMPagSeguro = Class.create({
     updateBrand: function(){
         var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/^\s+|\s+$/g,'');
         var currentBin = ccNum.substring(0, 6);
-        var flag = RMPagSeguroObj.config.flag;
+        var flag = RMPagSeguroObj.config.flag; //tamanho da bandeira
 
         if(ccNum.length >= 6){
             if (typeof RMPagSeguroObj.cardBin != "undefined" && currentBin == RMPagSeguroObj.cardBin) {
@@ -282,6 +265,39 @@ RMPagSeguro = Class.create({
             })
         }
     },
+    disablePlaceOrderButton: function(){
+        if (RMPagSeguroObj.config.placeorder_button) {
+            if(typeof $$(RMPagSeguroObj.config.placeorder_button).first() != 'undefined'){
+                $$(RMPagSeguroObj.config.placeorder_button).first().up().insert({
+                    'after': new Element('div',{
+                        'id': 'pagseguro-loader'
+                    })
+                });
+                $$('#pagseguro-loader').first().setStyle({
+                    'background': '#000000a1 url(\'' + RMPagSeguroObj.config.loader_url + '\') no-repeat center',
+                    'height': $$(RMPagSeguroObj.config.placeorder_button).first().getStyle('height'),
+                    'width': $$(RMPagSeguroObj.config.placeorder_button).first().getStyle('width'),
+                    'left': 0,
+                    'z-index': 99,
+                    'opacity': .5,
+                    'position': 'relative',
+                    'top': '-'+$$(RMPagSeguroObj.config.placeorder_button).first().getStyle('height').toString()
+                });
+                // $$(RMPagSeguroObj.config.placeorder_button).first().disable();
+                return;
+            }
+
+            if(RMPagSeguroObj.config.debug){
+                console.error('PagSeguro: Botão configurado não encontrado (' + RMPagSeguroObj.config.placeorder_button + '). Verifique as configurações do módulo.');
+            }
+        }
+    },
+    enablePlaceOrderButton: function(){
+        if(RMPagSeguroObj.config.placeorder_button && typeof $$(RMPagSeguroObj.config.placeorder_button).first() != 'undefined'){
+            $$('#pagseguro-loader').first().remove();
+            // $$(RMPagSeguroObj.config.placeorder_button).first().enable();
+        }
+    },
     updatePaymentHashes: function(formElementAndSubmit=false){
         var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/updatePaymentHashes';
         var _paymentHashes = {
@@ -292,7 +308,6 @@ RMPagSeguro = Class.create({
         };
         new Ajax.Request(_url, {
             method: 'post',
-            asynchronous: false,
             parameters: _paymentHashes,
             onSuccess: function(response){
                 if(RMPagSeguroObj.config.debug){
@@ -311,19 +326,6 @@ RMPagSeguro = Class.create({
         if(formElementAndSubmit){
             formElementAndSubmit.submit();
         }
-        /*var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function(e){
-            if(xhr.readyState === 4){
-                if(xhr.status === 200){
-                    console.log('Sucesso ao atualizar hashes');
-                }else{
-                    console.error('Falhou.');
-                }
-            }
-        }
-        xhr.open('post', _url, false);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.send('payment[sender_hash]='+_paymentHashes['payment[sender_hash]']+'&payment[credit_card_token]='+_paymentHashes['payment[credit_card_token]']+'&payment[cc_type]='+_paymentHashes['payment[cc_type]']+'&payment[is_admin]=' + _paymentHashes['payment[is_admin]']);*/
     },
     getGrandTotal: function(){
         if(this.config.is_admin){
