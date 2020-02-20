@@ -35,13 +35,13 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
             $keyType = $helper->getLicenseType();
             $info['RicardoMartins_PagSeguroPro']['key_type'] = ($keyType)==''?'assinatura':$keyType;
             $info['RicardoMartins_PagSeguroPro']['key_validation'] = $this->_validateKey();
-
         }
 
         $info['compilation'] = $this->_getCompilerState();
 
         $info['token_consistency'] = $this->_getTokenConsistency();
         $info['session_id'] = $helper->getSessionId();
+        $info['jsUrl'] = $helper->getModuleJsUrl(true);
         $info['retry_active'] = $helper->isRetryActive();
 
         $modules = array_keys((array)Mage::getConfig()->getNode('modules')->children());

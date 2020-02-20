@@ -36,6 +36,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         'payment/rm_pagseguro_cc/installments_product_interestfree_only';
     const XML_PATH_PAYMENT_PAGSEGURO_NOTIFICATION_URL_NOSID= 'payment/rm_pagseguro/notification_url_nosid';
     const XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON = 'payment/rm_pagseguro/placeorder_button';
+    const XML_PATH_JSDELIVR_ENABLED                     = 'payment/rm_pagseguro/jsdelivr_enabled';
+    const XML_PATH_JSDELIVR_MINIFY                      = 'payment/rm_pagseguro/jsdelivr_minify';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -291,11 +293,29 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
                 ',
                 Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, $secure),
                 Mage::helper('ricardomartins_pagseguro')->getJsUrl(),
-                Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, $secure) . 'pagseguro/pagseguro.js',
+                $this->getModuleJsUrl($secure),
                 $directPaymentBlock
             )
         );
         return $scriptBlock;
+    }
+
+    /**
+     * Gets /js/pagseguro.js URL (from this store or from jsDelivr CDNs)
+     * @param $secure bool
+     *
+     * @return string
+     */
+    public function getModuleJsUrl($secure)
+    {
+        if (Mage::getStoreConfigFlag(self::XML_PATH_JSDELIVR_ENABLED)) {
+            $min = (Mage::getStoreConfigFlag(self::XML_PATH_JSDELIVR_MINIFY)) ? '.min' : '';
+            $moduleVersion = (string)Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguro')->version;
+            $url = 'https://cdn.jsdelivr.net/gh/r-martins/PagSeguro-Magento-Transparente@%s/js/pagseguro/pagseguro%s.js';
+            $url = sprintf($url, $moduleVersion, $min);
+            return $url;
+        }
+        return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, $secure) . 'pagseguro/pagseguro.js';
     }
 
     /**

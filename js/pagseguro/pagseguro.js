@@ -244,7 +244,7 @@ RMPagSeguro = Class.create({
                 }
                 return;
             }
-            RMPagSeguroObj.cardBin = ccNum.substring(0, 6); 
+            RMPagSeguroObj.cardBin = ccNum.substring(0, 6);
             PagSeguroDirectPayment.getBrand({
                 cardBin: currentBin,
                 success: function(psresponse){
@@ -273,15 +273,16 @@ RMPagSeguro = Class.create({
                         'id': 'pagseguro-loader'
                     })
                 });
+
                 $$('#pagseguro-loader').first().setStyle({
                     'background': '#000000a1 url(\'' + RMPagSeguroObj.config.loader_url + '\') no-repeat center',
                     'height': $$(RMPagSeguroObj.config.placeorder_button).first().getStyle('height'),
                     'width': $$(RMPagSeguroObj.config.placeorder_button).first().getStyle('width'),
-                    'left': 0,
+                    'left': document.querySelector(RMPagSeguroObj.config.placeorder_button).offsetLeft + 'px',
                     'z-index': 99,
                     'opacity': .5,
-                    'position': 'relative',
-                    'top': '-'+$$(RMPagSeguroObj.config.placeorder_button).first().getStyle('height').toString()
+                    'position': 'absolute',
+                    'top': document.querySelector(RMPagSeguroObj.config.placeorder_button).offsetTop + 'px'
                 });
                 // $$(RMPagSeguroObj.config.placeorder_button).first().disable();
                 return;
