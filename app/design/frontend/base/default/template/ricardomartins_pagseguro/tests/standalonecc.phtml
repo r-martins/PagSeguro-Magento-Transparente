@@ -16,18 +16,18 @@ $_installments = 10;
         <title>Exemplo CC PagSeguro</title>
     </head>
     <body>
-    <?php if(!Mage::getSingleton('checkout/cart')->getItemsCount()) :?>
-        <p style="color: red">Add a product to cart before continue.</p>
-        <?php exit; ?>
-    <?php endif; ?>
     <?php
+    if(!Mage::getSingleton('checkout/cart')->getItemsCount()){
+        Mage::getSingleton('customer/session')->addError('Adicione um produto ao carrinho antes de testar');
+        Mage::app()->getResponse()->setRedirect(Mage::getUrl('/'));
+    }
     echo '<p>Loaded at: ' . date('H:i:s') . ' - ' . uniqid() . '</p>';
     echo sprintf('<p>Session id: %s</p>', var_export($sessionId, true));
     echo sprintf('<p>Sender hash(cached): %s</p>', var_export($pHelper->getPaymentHash('sender_hash'), true));
     ?>
-    <?php if(!empty($_POST)):?>
+    <?php if(!empty(Mage::app()->getRequest()->getPost())):?>
     <div id="postedData" style="background-color: #b5b4b1">
-        <p><strong>Posted Data: </strong> <pre><?=print_r($_POST);?></pre></p>
+        <p><strong>Posted Data: </strong> <pre><?=print_r(Mage::app()->getRequest()->getPost());?></pre></p>
         <p><strong>Sender hash: </strong> <?=$pHelper->getPaymentHash('sender_hash');?></p>
         <p><strong>Credit card token: </strong> <?=$pHelper->getPaymentHash('credit_card_token');?></p>
     </div>

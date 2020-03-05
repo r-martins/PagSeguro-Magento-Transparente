@@ -56,11 +56,12 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
     public function getCcYears()
     {
         $years = $this->getData('cc_years');
-        if (is_null($years)) {
+        if (null === $years) {
             $years = Mage::helper('ricardomartins_pagseguro/params')->getYears();
             $years = array(0=>$this->__('Year'))+$years;
             $this->setData('cc_years', $years);
         }
+
         return $years;
     }
 

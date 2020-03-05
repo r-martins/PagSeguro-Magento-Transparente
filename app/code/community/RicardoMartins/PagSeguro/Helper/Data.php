@@ -89,6 +89,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
                     Retorno pagseguro: ' . $response
                 );
             }
+
             return false;
         }
 
@@ -104,6 +105,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         if ($this->isSandbox()) {
             return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL);
         }
+
         return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL);
     }
 
@@ -141,6 +143,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         if ($this->isSandbox()) {
             return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL);
         }
+
         return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_JS_URL);
     }
 
@@ -188,6 +191,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         if ($this->isSandbox()) {
             $token = Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN);
         }
+
         if (empty($token)) {
             return false;
         }
@@ -236,7 +240,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function __()
     {
         $args = func_get_args();
-        $expr = new Mage_Core_Model_Translate_Expr(array_shift($args), $this->_getModuleName());
+        $expr = new Mage_Core_Model_Translate_Expr(array_shift($args), $this->_getModuleName()); //phpcs:ignore
         array_unshift($args, $expr);
 
         $text = $args[0]->getText();
@@ -246,6 +250,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             $matches[0] .= ': %s';
             $args = $matches;
         }
+
         return Mage::app()->getTranslator()->translate($args);
     }
 
@@ -311,10 +316,12 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         if (Mage::getStoreConfigFlag(self::XML_PATH_JSDELIVR_ENABLED)) {
             $min = (Mage::getStoreConfigFlag(self::XML_PATH_JSDELIVR_MINIFY)) ? '.min' : '';
             $moduleVersion = (string)Mage::getConfig()->getModuleConfig('RicardoMartins_PagSeguro')->version;
-            $url = 'https://cdn.jsdelivr.net/gh/r-martins/PagSeguro-Magento-Transparente@%s/js/pagseguro/pagseguro%s.js';
+            $url
+                = 'https://cdn.jsdelivr.net/gh/r-martins/PagSeguro-Magento-Transparente@%s/js/pagseguro/pagseguro%s.js';
             $url = sprintf($url, $moduleVersion, $min);
             return $url;
         }
+
         return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, $secure) . 'pagseguro/pagseguro.js';
     }
 

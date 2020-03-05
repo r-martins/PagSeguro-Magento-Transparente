@@ -12,6 +12,10 @@
  */
 class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front_Action
 {
+
+    //Disables this controller's actions (this should be enabled only for test/development purposes)
+    protected $_disabled = true;
+
     /**
      * Bring us some information about the module configuration and version info.
      * You can remove it, but can make our team to misjudge your configuration or problem.
@@ -51,6 +55,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
                 $info['pagseguro_modules'][] = $module;
             }
         }
+
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody(json_encode($info, $pretty));
 
@@ -62,7 +67,11 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
      */
     public function standAloneCcAction()
     {
-//        return $this->norouteAction();
+        if ($this->_disabled) {
+            Mage::getSingleton('core/session')->addNotice('Route is disabled by default');
+            return $this->norouteAction();
+        }
+
         $this->loadLayout();
         $this->renderLayout();
     }
@@ -73,7 +82,11 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
      */
     public function resetCardHashAction()
     {
-        //        return $this->norouteAction();
+        if ($this->_disabled) {
+            Mage::getSingleton('core/session')->addNotice('Route is disabled by default');
+            return $this->norouteAction();
+        }
+
         Mage::getSingleton('checkout/session')->unsetData('PsPayment');
         $this->_redirectReferer();
     }
@@ -82,13 +95,14 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
      * Validates your PRO key. Only for tests purposes.
      * @return mixed|string
      */
-    private function _validateKey()
+    protected function _validateKey()
     {
         $key = Mage::getStoreConfig('payment/pagseguropro/key');
         if (empty($key)) {
             return 'KEY IS EMPTY';
         }
-            $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $key;
+
+        $url = 'http://ws.ricardomartins.net.br/pspro/v6/auth/' . $key;
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -105,7 +119,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
      * Get compilation config details
      * @return array
      */
-    private function _getCompilerState()
+    protected function _getCompilerState()
     {
         $compiler = Mage::getModel('compiler/process');
         $compilerConfig = MAGENTO_ROOT . '/includes/config.php';
@@ -113,6 +127,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
         if (file_exists($compilerConfig) && !(defined('COMPILER_INCLUDE_PATH') || defined('COMPILER_COLLECT_PATH'))) {
             include $compilerConfig;
         }
+
         $status = defined('COMPILER_INCLUDE_PATH') ? 'Enabled' : 'Disabled';
         $state  = $compiler->getCollectedFilesCount() > 0 ? 'Compiled' : 'Not Compiled';
         return array(
@@ -126,7 +141,7 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
     /**
      * @return string
      */
-    private function _getTokenConsistency()
+    protected function _getTokenConsistency()
     {
         $token = Mage::helper('ricardomartins_pagseguro')->getToken();
         return (strlen($token)!=32 && strlen($token)!=100)?'Wrong size':'Good';
