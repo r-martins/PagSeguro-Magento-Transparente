@@ -2,11 +2,18 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.8.0
+ * @version 3.8.2
  */
 
 RMPagSeguro = Class.create({
     initialize: function (config) {
+        this.config = config;
+
+        PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
+
+        // this.updateSenderHash();
+        PagSeguroDirectPayment.onSenderHashReady(this.updateSenderHash);
+
         if (typeof config.checkoutFormElm == "undefined") {
             var methods= $$('#p_method_rm_pagseguro_cc', '#p_method_pagseguropro_boleto', '#p_method_pagseguropro_tef');
             if(!methods.length){
@@ -28,18 +35,12 @@ RMPagSeguro = Class.create({
         }
         console.log('RMPagSeguro prototype class has been initialized.');
 
-        this.config = config;
         this.maxSenderHashAttempts = 30;
 
         //internal control to avoid duplicated calls to updateCreditCardToken
         this.updatingCreditCardToken = false;
         this.formElementAndSubmit = false;
 
-        PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
-
-
-        // this.updateSenderHash();
-        PagSeguroDirectPayment.onSenderHashReady(this.updateSenderHash);
 
         Validation.add('validate-pagseguro', 'Falha ao atualizar dados do pagaento. Entre novamente com seus dados.',
             function(v, el){

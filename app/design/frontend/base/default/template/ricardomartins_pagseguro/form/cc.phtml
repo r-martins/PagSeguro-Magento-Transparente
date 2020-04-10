@@ -11,8 +11,9 @@ if ($_grandTotal && $_grandTotal != 'null') {
     $_grandTotalToFormat = $_grandTotal; //to be formatted accordingly
 }
 
+$iwdEnabled = Mage::helper('ricardomartins_pagseguro')->isIwdEnabled();
 ?>
-<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="<?php echo (!$iwdEnabled)?'display:none;':'';?>">
 <?php /*
     <li>
         <div class="input-box">

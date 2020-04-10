@@ -462,4 +462,12 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 
         return $headers;
     }
+
+    /**
+     * Checks if IWD Checkout Suite is installed and active
+     */
+    public function isIwdEnabled()
+    {
+        return class_exists('IWD_Opc_Helper_Data') && Mage::helper('iwd_opc')->isEnable();
+    }
 }
