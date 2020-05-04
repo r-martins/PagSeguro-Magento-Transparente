@@ -30,16 +30,21 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
         // prevent this event from firing twice
-        if(Mage::registry('sales_order_invoice_save_after_event_triggered'))
-        {
+        if (Mage::registry('sales_order_invoice_save_after_event_triggered')) {
             return $this; // this method has already been executed once in this request
         }
+
         Mage::register('sales_order_invoice_save_after_event_triggered', true);
 
         if (isset($resultXML->errors)) {
             foreach ($resultXML->errors as $error) {
                 $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
             }
+
+            if ($error->code == '53041') { //installment value invalid value
+                $this->setIsInvalidInstallmentValueError(true);
+            }
+
             Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
         }
 
@@ -47,7 +52,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $error = $resultXML->error;
             $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
 
-            if(count($resultXML->error) > 1){
+            if ($error->code == '53041') { //installment value invalid value
+                $this->setIsInvalidInstallmentValueError(true);
+            }
+
+            if (count($resultXML->error) > 1) {
                 unset($errMsg);
                 foreach ($resultXML->error as $error) {
                     $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
@@ -70,6 +79,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 );
                 $orderNo = $kioskNotification->getOrderNo();
             }
+
             $order = Mage::getModel('sales/order')->loadByIncrementId($orderNo);
             if (!$order->getId()) {
                 $helper->writeLog(
@@ -77,6 +87,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 );
                 return $this;
             }
+
             $this->_order = $order;
             $payment = $order->getPayment();
 
@@ -261,6 +272,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 if ($this->getCode()=='rm_pagseguro_cc') {
                     $return->setStateChanged(false);
                 }
+
                 $return->setMessage(
                     'Aguardando pagamento: o comprador iniciou a transação,
                 mas até o momento o PagSeguro não recebeu nenhuma informação sobre o pagamento.'
@@ -302,7 +314,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 );
                 break;
             case '6':
-                //$return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
                 $return->setData('state', Mage_Sales_Model_Order::STATE_CLOSED);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
@@ -323,6 +334,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $return->setStateChanged(false);
                 $return->setMessage('Codigo de status inválido retornado pelo PagSeguro. (' . $statusCode . ')');
         }
+
         return $return;
     }
 
@@ -341,6 +353,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         if ($useApp) {
             $params['public_key'] = Mage::getStoreConfig('payment/pagseguropro/key');
         }
+
         $params = $this->_convertEncoding($params);
         $paramsObj = new Varien_Object(array('params'=>$params));
 
@@ -403,6 +416,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 default:
                     $helper->writeLog('Retorno inesperado do PagSeguro. Retorno: ' . $response);
             }
+
             Mage::throwException(
                 'Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.'
             );
@@ -420,7 +434,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     public function isAvailable($quote = null)
     {
         return parent::isAvailable($quote) && !empty($quote)
-            && Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) > 0;
+            && (Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) > 0 || $quote->isNominal());
     }
 
 

@@ -37,6 +37,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         if (empty($quote)) {
             return $isAvailable;
         }
+
         if (Mage::getStoreConfigFlag("payment/pagseguro_cc/group_restriction") == false) {
             return $isAvailable;
         }
@@ -141,38 +142,34 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         //seta os paths para bloqueio de validação instantânea definidos no admin no array
         $configPaths = Mage::getStoreConfig('payment/rm_pagseguro/exception_request_validate');
-//        $configPaths = explode(PHP_EOL, $configPaths);
         $configPaths = preg_split('/\r\n|[\r\n]/', $configPaths);
 
         //Valida token e hash se a request atual se encontra na lista de
         //exceções do admin ou se a requisição vem de placeOrder
-        if ( (!$creditCardToken || !$senderHash) && !in_array($pathRequest, $configPaths)) {
+        if ((!$creditCardToken || !$senderHash) && !in_array($pathRequest, $configPaths)) {
             $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             $missingInfo .= '/ URL desta requisição: ' . $pathRequest;
             $helper->writeLog(
-                    "Falha ao obter o token do cartao ou sender_hash.
+                "Falha ao obter o token do cartao ou sender_hash.
                     Ative o modo debug e observe o console de erros do seu navegador.
                     Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido, ou configure
                     a url de exceção.
                     $missingInfo"
-                );
-            if (!$helper->isRetryActive()){
+            );
+            if (!$helper->isRetryActive()) {
                 Mage::throwException(
                     'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
                 );
-            }else{
+            } else {
                 $helper->writeLog(
                     'Apesar da transação ter falhado, o pedido poderá continuar pois a retentativa está ativa.'
                 );
             }
         }
+
         return $this;
     }
-
-
-    // public function processBeforeRefund($invoice, $payment){} //before refund
-    // public function processCreditmemo($creditmemo, $payment){} //after refund
 
     /**
      * Order payment
@@ -196,29 +193,25 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         try {
             $this->proccessNotificatonResult($returnXml);
-            if (isset($returnXml->errors)) {
-                foreach ($returnXml->errors as $error) {
-                    $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-                }
-                Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-            }
-
-            if (isset($xmlRetorno->error)) {
-                $error = $returnXml->error;
-                $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-
-                if(count($returnXml->error) > 1){
-                    unset($errMsg);
-                    foreach ($returnXml->error as $error) {
-                        $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-                    }
-                }
-
-                Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-            }
         } catch (Mage_Core_Exception $e) {
-            if (!$rmHelper->isRetryActive() || !$rmHelper->canRetryOrder($order)) {
-                $order->addStatusHistoryComment('A retentativa de pedido está ativa. O pedido foi concluído mesmo com o seguite erro: ' . $e->getMessage());
+            //retry if error is related to installment value
+            if ($this->getIsInvalidInstallmentValueError()
+                && !$payment->getAdditionalInformation(
+                    'retried_installments'
+                )) {
+                return $this->recalculateInstallmentsAndPlaceOrder($payment, $amount);
+            }
+
+            if ($rmHelper->canRetryOrder($order)) {
+                $order->addStatusHistoryComment(
+                    'A retentativa de pedido está ativa. O pedido foi concluído mesmo com o seguite erro: '
+                    . $e->getMessage()
+                );
+            }
+
+            //only throws exception if payment retry is disabled
+            //read more at https://bit.ly/3b2onpo
+            if (!$rmHelper->isRetryActive()) {
                 Mage::throwException($e->getMessage());
             }
         }
@@ -226,16 +219,16 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $payment->setSkipOrderProcessing(true);
 
         if (isset($returnXml->code)) {
-
             $additional = array('transaction_id'=>(string)$returnXml->code);
             if ($existing = $payment->getAdditionalInformation()) {
                 if (is_array($existing)) {
                     $additional = array_merge($additional, $existing);
                 }
             }
-            $payment->setAdditionalInformation($additional);
 
+            $payment->setAdditionalInformation($additional);
         }
+
         return $this;
     }
 
@@ -248,6 +241,90 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     public function _getStoreConfig($field)
     {
         return Mage::getStoreConfig("payment/pagseguro_cc/{$field}");
+    }
+
+    /**
+     * Make an API call to PagSeguro to retrieve the installment value
+     * @param float     $amount Order amount
+     * @param string    $creditCardBrand visa, mastercard, etc. returned from Pagseguro Api
+     * @param int      $selectedInstallment
+     * @param int     $maxInstallmentNoInterest
+     *
+     * @return bool|double
+     */
+    public function getInstallmentValue(
+        $amount,
+        $creditCardBrand,
+        $selectedInstallment,
+        $maxInstallmentNoInterest = null
+    ) {
+        $amount = number_format($amount, 2, '.', '');
+        $helper = Mage::helper('ricardomartins_pagseguro');
+        $sessionId = $helper->getSessionId();
+        $url = "https://pagseguro.uol.com.br/checkout/v2/installments.json?sessionId=$sessionId&amount=$amount";
+        $url .= "&creditCardBrand=$creditCardBrand";
+        $url .= ($maxInstallmentNoInterest) ? "&maxInstallmentNoInterest=$maxInstallmentNoInterest" : "";
+
+        $ch = curl_init($url);
+
+        curl_setopt_array(
+            $ch,
+            array(
+                CURLOPT_CUSTOMREQUEST => "GET",
+                CURLOPT_RETURNTRANSFER  => 1,
+                CURLOPT_TIMEOUT         => 45,
+                CURLOPT_SSL_VERIFYPEER  => false,
+                CURLOPT_SSL_VERIFYHOST  => false,
+                CURLOPT_MAXREDIRS => 10,
+            )
+        );
+
+        $response = null;
+
+        try{
+            $response = curl_exec($ch);
+            return json_decode($response)->installments->$creditCardBrand[$selectedInstallment-1]->installmentAmount;
+        }catch(Exception $e){
+            Mage::logException($e);
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Recalculate installment value and try to place the order again with the new amount
+     * @param $payment Mage_Sales_Model_Order_Payment
+     * @param $amount
+     */
+    public function recalculateInstallmentsAndPlaceOrder($payment, $amount)
+    {
+        //avoid being fired twice due to error.
+        if ($payment->getAdditionalInformation('retried_installments')) {
+            return;
+        }
+
+        $payment->setAdditionalInformation('retried_installments', true);
+        Mage::log(
+            'Houve uma inconsistência no valor dar parcelas. '
+            . 'As parcelas serão recalculadas e uma nova tentativa será realizada.',
+            null, 'pagseguro.log', true
+        );
+
+        $selectedMaxInstallmentNoInterest = null; //not implemented
+        $installmentValue = $this->getInstallmentValue(
+            $amount, $payment->getCcType(), $payment->getAdditionalInformation('installment_quantity'),
+            $selectedMaxInstallmentNoInterest
+        );
+        $payment->setAdditionalInformation('installment_value', $installmentValue);
+        $payment->setAdditionalInformation('retried_installments', true);
+        Mage::unregister('sales_order_invoice_save_after_event_triggered');
+
+        try {
+            $this->order($payment, $amount);
+        } catch (Exception $e) {
+            Mage::throwException($e->getMessage());
+        }
     }
 
 }

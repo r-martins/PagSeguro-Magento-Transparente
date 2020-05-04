@@ -46,6 +46,10 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getSessionId()
     {
+        if ($fromCache = $this->getSavedSessionId()) {
+            return $fromCache;
+        }
+
         $useApp = $this->getLicenseType() == 'app';
 
         $url = $this->getWsUrl('sessions', $useApp);
@@ -93,7 +97,36 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
+        $this->saveSessionId((string)$xml->id);
         return (string)$xml->id;
+    }
+
+    /**
+     * Saves PagSeguro Session ID in current session to avoid unnecessary calls
+     * @param string $sessionId PagSeguro Session Id
+     * @return void
+     */
+    public function saveSessionId($sessionId)
+    {
+        Mage::getSingleton('core/session')->setData('rm_pagseguro_sessionid', $sessionId);
+
+        $time = Mage::getSingleton('core/date')->timestamp();
+        Mage::getSingleton('core/session')->setData('rm_pagseguro_sessionid_expires', $time + 60*10); //10 minutes
+    }
+
+    /**
+     * Retrieves PagSeguro SessionId from session's cache. Return false if it's not there.
+     * @return bool|string
+     */
+    public function getSavedSessionId()
+    {
+        $time = Mage::getSingleton('core/date')->timestamp();
+        if (($sessionId = Mage::getSingleton('core/session')->getData('rm_pagseguro_sessionid'))
+            && Mage::getSingleton('core/session')->getData('rm_pagseguro_sessionid_expires') >= $time) {
+            return $sessionId;
+        }
+
+        return false;
     }
 
     /**
@@ -470,4 +503,5 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return class_exists('IWD_Opc_Helper_Data') && Mage::helper('iwd_opc')->isEnable();
     }
+
 }
