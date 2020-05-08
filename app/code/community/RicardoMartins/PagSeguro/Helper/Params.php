@@ -37,6 +37,15 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
                 $return['itemQuantity'.$x] = (int)$qtyOrdered;
 
+                if ($items[$y]->getIsQtyDecimal()) {
+                    $txtUnDesc = ' (' . $items[$y]->getQtyOrdered() . ' un.)';
+                    $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100-strlen($txtUnDesc));
+                    $return['itemDescription'.$x] .= $txtUnDesc;
+                    $itemPrice = $items[$y]->getRowTotalInclTax();
+                    $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
+                    $return['itemQuantity'.$x] = 1;
+                }
+
                 //We can't send 0.00 as value to PagSeguro. Will be discounted on extraAmount.
                 if ($itemPrice == 0) {
                     $return['itemAmount'.$x] = 0.01;
@@ -205,6 +214,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                     $shippingCost -= $shippingDiscount;
                 }
 
+                $return['extraAmount'] = number_format($return['extraAmount'], 2, '.', '');
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
             }
         }
