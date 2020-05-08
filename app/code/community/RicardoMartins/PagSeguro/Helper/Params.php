@@ -214,6 +214,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                     $shippingCost -= $shippingDiscount;
                 }
 
+                $return['extraAmount'] = number_format($return['extraAmount'], 2, '.', '');
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
             }
         }
