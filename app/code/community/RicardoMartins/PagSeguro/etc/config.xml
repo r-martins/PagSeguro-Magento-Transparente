@@ -162,6 +162,40 @@
                 <allowspecific>0</allowspecific>
                 <send_neworder_email>1</send_neworder_email>
             </rm_pagseguro_kiosk>
+            <rm_pagseguro_recurring>
+                <active>1</active>
+                <title>Cartão de Crédito Recorrente - via PagSeguro UOL</title>
+<!--                <order_status>pending</order_status>-->
+                <allowspecific>0</allowspecific>
+                <flag>42x20</flag>
+                <payment_action>order</payment_action>
+                <model>ricardomartins_pagseguro/payment_recurring</model>
+                <allowspecific>0</allowspecific>
+                <send_neworder_email>0</send_neworder_email>
+                <!--<specificcountry>BR</specificcountry>-->
+                <group_restriction>0</group_restriction>
+                <info_brl>1</info_brl>
+                <total_installments>0</total_installments>
+                <force_installments_selection>0</force_installments_selection>
+                <installments_product>0</installments_product>
+            </rm_pagseguro_recurring>
+            <!--Para referencia-->
+            <!--<paypal_express>
+                <model>paypal/express</model>
+                <title>PayPal Express Checkout</title>
+                <payment_action>Authorization</payment_action>
+                <solution_type>Mark</solution_type>
+                <line_items_enabled>1</line_items_enabled>
+                <visible_on_cart>1</visible_on_cart>
+                <visible_on_product>1</visible_on_product>
+                <allow_ba_signup>never</allow_ba_signup>
+                <group>paypal</group>
+                <authorization_honor_period>3</authorization_honor_period>
+                <order_valid_period>29</order_valid_period>
+                <child_authorization_number>1</child_authorization_number>
+                <verify_peer>1</verify_peer>
+                <skip_order_review_step>1</skip_order_review_step>
+            </paypal_express>-->
         </payment>
     </default>
     <phpunit>

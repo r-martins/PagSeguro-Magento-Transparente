@@ -13,6 +13,7 @@ class RicardoMartins_PagSeguro_Model_Observer
             'ricardomartins_pagseguropro/form_tef',
             'ricardomartins_pagseguropro/form_boleto',
             'ricardomartins_pagseguro/form_cc',
+            'ricardomartins_pagseguro/form_recurring',
         );
         $blockType = $observer->getBlock()->getType();
         if (in_array($blockType, $pagseguroBlocks)) {

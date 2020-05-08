@@ -363,7 +363,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[Data de nascimento do dono do cartão de crédito é obrigatório para o PagSeguro.]]></comment>
+                            <comment><![CDATA[Data de nascimento do dono do cartão de crédito é obrigatório para o PagSeguro. Este campo também é usado no formulário de pagamento recorrente (caso esteja usando).]]></comment>
                         </owner_dob_attribute>
                         <sort_order translate="label">
                             <label>Sort Order</label>
