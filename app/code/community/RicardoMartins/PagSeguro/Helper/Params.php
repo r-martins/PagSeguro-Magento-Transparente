@@ -209,12 +209,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                     //if extra discount greater, we change extraAmount to get only the difference
                     if (abs($this->_extraDiscount) >= $shippingCost) {
                         $return['extraAmount'] = $this->_extraDiscount + $shippingCost;
+                        $return['extraAmount'] = number_format($return['extraAmount'], 2, '.', '');
                     }
 
                     $shippingCost -= $shippingDiscount;
                 }
 
-                $return['extraAmount'] = number_format($return['extraAmount'], 2, '.', '');
                 $return['shippingCost'] = number_format($shippingCost, 2, '.', '');
             }
         }
