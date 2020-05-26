@@ -23,21 +23,23 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
             $this->getResponse()->setHeader('access-control-allow-origin', 'https://sandbox.pagseguro.uol.com.br');
         }
 
-        if ( $this->getRequest()->getPost('notificationCode', false) == false) {
+        if ($this->getRequest()->getPost('notificationCode', false) == false) {
             $this->getResponse()->setHttpResponseCode(422);
             $this->loadLayout();
             $this->renderLayout();
             return;
         }
+
         $notificationCode = $this->getRequest()->getPost('notificationCode');
 
         //Workaround for duplicated PagSeguro notifications (Issue #215)
         $exists = Mage::app()->getCache()->load($notificationCode);
-        if($exists){
+        if ($exists) {
             $this->getResponse()->setHttpResponseCode(400);
             $this->getResponse()->setBody('Notificação já enviada a menos de 1 minuto.');
             return;
         }
+
         Mage::app()->getCache()->save('in_progress', $notificationCode, array('pagseguro_notification'), 60);
 
         /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
@@ -51,7 +53,16 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
         if (false === $response) {
             Mage::throwException('Falha ao processar retorno XML do PagSeguro.');
         }
-        $model->proccessNotificatonResult($response);
+
+        $processedResult = $model->proccessNotificatonResult($response);
+        if (false === $processedResult) {
+            $this->getResponse()->setBody(
+                'Falha ao processar notificação do PagSeguro. Consulte os logs para mais detalhes.'
+            );
+            $this->getResponse()->setHttpResponseCode(500);
+            return;
+        }
+
         if (isset($response->reference)) {
             $this->getResponse()->setBody('Notificação recebida para o pedido ' . (string)$response->reference);
         }

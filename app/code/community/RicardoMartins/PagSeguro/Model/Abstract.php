@@ -83,9 +83,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $order = Mage::getModel('sales/order')->loadByIncrementId($orderNo);
             if (!$order->getId()) {
                 $helper->writeLog(
-                    sprintf('Pedido %s não encontrado no sistema. Impossível processar retorno.', $orderNo)
+                    sprintf(
+                        'Pedido %s não encontrado no sistema. Impossível processar retorno. '
+                        . 'Uma nova tentativa deverá feita em breve pelo PagSeguro.', $orderNo
+                    )
                 );
-                return $this;
+
+                return false;
             }
 
             $this->_order = $order;
