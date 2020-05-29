@@ -161,3 +161,9 @@
 "credit card holder name invalid value: %s","Nome do titular do cartão inválido: %s"
 "sender cpf or sender cnpj is required.","CPF ou CNPJ do titular do cartão é obrigatório."
 "Expiration Date","Data de Validade"
+"preApproval data is required.","Campo preApproval é obrigatório."
+"You must configure a transactions notifications (Notificação de Transações) URL before using this service.","Você deve configurar a URL de Notificação de Transações antes de usar este serviço."
+"pre-approval cannot be paid twice on the same day.","Pré aprovação não pode ser paga duas vezes no mesmo dia."
+"preApprovalInitialDate invalid value.", "Valor de preApprovalInitialDate é inválido."
+"preApproval auto charged can not inform initialDate.","Pagamentos pré-aprovados com cobrança automática não podem informar data inicial (initialDate)."
+

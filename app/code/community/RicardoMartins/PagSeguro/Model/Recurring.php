@@ -7,6 +7,13 @@
  */
 class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_Model_Abstract
 {
+    const PREAPPROVAL_PERIOD_WEEKLY = 'WEEKLY';
+    const PREAPPROVAL_PERIOD_MONTHLY = 'MONTHLY';
+    const PREAPPROVAL_PERIOD_BIMONTHLY = 'BIMONTHLY';
+    const PREAPPROVAL_PERIOD_TRIMONTHLY = 'TRIMONTHLY';
+    const PREAPPROVAL_PERIOD_SEMIANNUALLY = 'SEMIANNUALLY';
+    const PREAPPROVAL_PERIOD_YEARLY = 'YEARLY';
+
     /** @var RicardoMartins_PagSeguro_Helper_Recurring $_helper */
     protected $_helper;
 
