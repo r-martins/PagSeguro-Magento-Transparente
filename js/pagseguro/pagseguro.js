@@ -5,7 +5,8 @@
  * @version 3.8.2
  */
 
-RMPagSeguro = Class.create({
+var RMPagSeguro = Class.create();
+RMPagSeguro.prototype = {
     initialize: function (config) {
         this.config = config;
 
@@ -20,6 +21,27 @@ RMPagSeguro = Class.create({
                 console.log('PagSeguro: Não há métodos de pagamento habilitados em exibição. Execução abortada.');
                 return;
             }else{
+                /**
+                 * Polyfill: https://developer.mozilla.org/pt-BR/docs/Web/API/Element/closest
+                 */
+                if (!Element.prototype.matches) {
+                    Element.prototype.matches = Element.prototype.msMatchesSelector
+                        || Element.prototype.webkitMatchesSelector
+                    ;
+                }
+
+                if (!Element.prototype.closest) {
+                    Element.prototype.closest = function(s) {
+                        var el = this;
+                        if (!document.documentElement.contains(el)) return null;
+                        do {
+                            if (el.matches(s)) return el;
+                            el = el.parentElement;
+                        } while (el !== null);
+                        return null;
+                    };
+                }
+
                 var form = methods.first().closest('form');
                 form.observe('submit', function(e){
                     e.preventDefault();
@@ -300,7 +322,7 @@ RMPagSeguro = Class.create({
             // $$(RMPagSeguroObj.config.placeorder_button).first().enable();
         }
     },
-    updatePaymentHashes: function(formElementAndSubmit=false){
+    updatePaymentHashes: function(formElementAndSubmit){
         var _url = RMPagSeguroSiteBaseURL + 'pseguro/ajax/updatePaymentHashes';
         var _paymentHashes = {
             "payment[sender_hash]": this.senderHash,
@@ -395,4 +417,4 @@ RMPagSeguro = Class.create({
             }
         });
     }
-});
+};
