@@ -161,3 +161,5 @@
 "credit card holder name invalid value: %s","Nome do titular do cartão inválido: %s"
 "sender cpf or sender cnpj is required.","CPF ou CNPJ do titular do cartão é obrigatório."
 "Expiration Date","Data de Validade"
+"Paid Order Status","Status para Pedido Pago"
+

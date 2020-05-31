@@ -15,6 +15,15 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     /** @var Mage_Sales_Model_Order $_order */
     protected $_order;
 
+    protected $_paymentReview = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->_paymentReview = Mage::getStoreConfigFlag('payment/rm_pagseguro_cc/payment_review');
+    }
+
     /**
      * Processes notification XML data. XML is sent right after order is sent to PagSeguro, and on order updates.
      *
@@ -106,6 +115,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 }
 
                 if ($order->canCancel()) {
+                    if ($this->_paymentReview)
+                    {
+                        $order->setState (Mage_Sales_Model_Order::STATE_NEW, Mage_Sales_Model_Order::STATE_CANCELED, Mage::helper('sales')->__('Denied the payment online.'), true)
+                            ->save ()
+                        ;
+                    }
+
                     $order->cancel();
                     $order->save();
                 } else {
@@ -139,6 +155,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 ));
 
                 if ($orderCancellation->getShouldCancel()) {
+                    if ($this->_paymentReview)
+                    {
+                        $order->setState (Mage_Sales_Model_Order::STATE_NEW, Mage_Sales_Model_Order::STATE_CANCELED, Mage::helper('sales')->__('Denied the payment online.'), true)
+                            ->save ()
+                        ;
+                    }
+
                     $order->cancel();
                 }
             }
@@ -159,6 +182,15 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             }
 
             if ((int)$resultXML->status == 3) { //Quando o pedido foi dado como Pago
+                if ($this->_paymentReview)
+                {
+                    $paidStatus = Mage::getStoreConfig ('payment/rm_pagseguro_cc/paid_status');
+
+                    $order->setState (Mage_Sales_Model_Order::STATE_NEW, $paidStatus, Mage::helper('sales')->__('Approved the payment online.'), false)
+                        ->save ()
+                    ;
+                }
+
                 // cria fatura e envia email (se configurado)
                 // $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
                 if(!$order->hasInvoices()){
