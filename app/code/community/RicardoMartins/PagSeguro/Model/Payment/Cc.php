@@ -229,6 +229,12 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $payment->setAdditionalInformation($additional);
         }
 
+        if (Mage::getStoreConfigFlag('payment/rm_pagseguro_cc/payment_review'))
+        {
+            $payment->setSkipOrderProcessing(false);
+            $payment->setIsTransactionPending (true);
+        }
+
         return $this;
     }
 

@@ -40,6 +40,13 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
 
         $noSID = $helper->isNoSidUrlEnabled();
 
+        if (Mage::getStoreConfigFlag('payment/rm_pagseguro/notification_url_storecode'))
+        {
+            $storeCode = Mage::app ()->getStore ($order->getStoreId ())->getCode ();
+
+            $queryString = array('___store' => $storeCode);
+        }
+
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
         $pHelper = Mage::helper('ricardomartins_pagseguro/params'); //params helper - helper auxiliar de parametrização
         $params = array(
@@ -54,9 +61,10 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'extraAmount'       => $pHelper->getExtraAmount($order),
             'notificationURL'   => Mage::getUrl(
                 'ricardomartins_pagseguro/notification',
-                array('_secure' => true, '_nosid' => $noSID)
+                array('_secure' => true, '_nosid' => $noSID, '_query' => $queryString)
             ),
         );
+
         $params = array_merge($params, $pHelper->getItemsParams($order));
         $params = array_merge($params, $pHelper->getSenderParams($order, $payment));
         $params = array_merge($params, $pHelper->getAddressParams($order, 'shipping'));
