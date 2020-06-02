@@ -182,10 +182,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             }
 
             if ((int)$resultXML->status == 3) { //Quando o pedido foi dado como Pago
+                $paidStatus = Mage::getStoreConfig ('payment/rm_pagseguro_cc/paid_status');
+
                 if ($this->_paymentReview)
                 {
-                    $paidStatus = Mage::getStoreConfig ('payment/rm_pagseguro_cc/paid_status');
-
                     $order->setState (Mage_Sales_Model_Order::STATE_NEW, $paidStatus, Mage::helper('sales')->__('Approved the payment online.'), false)
                         ->save ()
                     ;
@@ -213,7 +213,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                         ->addObject($invoice->getOrder())
                         ->save();
                     $order->addStatusHistoryComment(
-                        sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId())
+                        sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId()),
+                        $paidStatus
                     );
                 }
             }
