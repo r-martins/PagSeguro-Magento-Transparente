@@ -343,7 +343,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     }
 
     /**
-     * Call PagSeguro API to place an order (/transactions)
+     * Call PagSeguro API
      * @param $params
      * @param $payment
      * @param $type
@@ -427,6 +427,99 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
 
         return $xml;
+    }
+
+    /**
+     * Call PagSeguro API with JSON Content
+     * @param $params
+     * @param $payment
+     * @param $type
+     *
+     * @return string
+     */
+    public function callJsonApi($body, $headers, $type='pre-approvals', $noV2=false)
+    {
+        $helper = Mage::helper('ricardomartins_pagseguro');
+        $useApp = $helper->getLicenseType() == 'app';
+        if (!$useApp) {
+            Mage::throwException('Autorize sua loja no modelo de aplicação antes de usar este método.');
+        }
+
+        $key = Mage::getStoreConfig('payment/pagseguropro/key');
+        $paramsObj = new Varien_Object(array('body'=>$body));
+
+        //you can create a module to modify some parameter using the following observer
+        Mage::dispatchEvent(
+            'ricardomartins_pagseguro_params_calljsonapi_before_send',
+            array(
+                'body' => $body,
+                'type' => $type
+            )
+        );
+        $params = $paramsObj->getBody();
+
+        $helper->writeLog('Parametros sendo enviados para API (/'.$type.'): '. var_export($params, true));
+
+        $headers = array_merge($helper->getCustomHeaders(), $headers);
+
+        $urlws = $helper->getWsUrl($type . "?public_key={$key}", true);
+        if ($noV2) {
+            $urlws = str_replace('/v2/', '/', $urlws);
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $urlws);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = '';
+
+        try{
+            $response = curl_exec($ch);
+            //{"code":"34D028CAE7E7839AA4596F941B8E7AC7"}
+        }catch(Exception $e){
+            Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
+        }
+
+        if (curl_error($ch)) {
+            Mage::throwException(
+                sprintf('Falha ao tentar enviar parametros ao PagSeguro: %s (%s)', curl_error($ch), curl_errno($ch))
+            );
+        }
+        curl_close($ch);
+
+        $helper->writeLog('Retorno PagSeguro (/'.$type.'): ' . var_export($response, true));
+
+
+        if (is_string($response)) {
+            switch($response){
+                case 'Unauthorized':
+                    $helper->writeLog(
+                        'Token/email não autorizado pelo PagSeguro. Verifique suas configurações no painel.'
+                    );
+                    break;
+                case 'Forbidden':
+                    $helper->writeLog(
+                        'Acesso não autorizado à Api Pagseguro. Verifique se você tem permissão para
+                         usar este serviço. Retorno: ' . var_export($response, true)
+                    );
+                    break;
+            }
+        }
+
+        if (is_string($response) && json_decode($response) === null) {
+            $helper->writeLog('Retorno inesperado do PagSeguro. Retorno: ' . $response);
+            Mage::throwException(
+                'Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.'
+            );
+        }
+
+        return json_decode($response);
     }
 
     /**
@@ -516,6 +609,20 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     protected function _getHelper()
     {
         return Mage::helper('ricardomartins_pagseguro');
+    }
+
+    /**
+     * Merge $data array to existing additionalInformation
+     * @param [] $data
+     *
+     * @return Mage_Payment_Model_Info
+     * @throws Mage_Core_Exception
+     */
+    protected function mergeAdditionalInfo($data)
+    {
+        $infoInstance = $this->getInfoInstance();
+        $current = $infoInstance->getAdditionalInformation();
+        return $infoInstance->setAdditionalInformation(array_merge($current, $data));
     }
 }
 

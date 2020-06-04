@@ -17,11 +17,16 @@ class RicardoMartins_PagSeguro_AjaxController extends Mage_Core_Controller_Front
      */
     public function getGrandTotalAction()
     {
+        //if nominal, there's no installment to be calculated. This will just shut down the ajax attempts
+        $total = true;
+
         /** @var Mage_Sales_Model_Quote $quote */
         $quote = Mage::helper('checkout/cart')->getQuote();
-        $quote->getPayment()->setMethod('rm_pagseguro_cc');
-        $quote->collectTotals();
-        $total = $quote->getGrandTotal();
+        if (!$quote->isNominal()) {
+            $quote->getPayment()->setMethod('rm_pagseguro_cc');
+            $quote->collectTotals();
+            $total = $quote->getGrandTotal();
+        }
 
         $this->getResponse()->setHeader('Content-type', 'application/json', true);
         $this->getResponse()->setBody(json_encode(array('total'=>$total)));

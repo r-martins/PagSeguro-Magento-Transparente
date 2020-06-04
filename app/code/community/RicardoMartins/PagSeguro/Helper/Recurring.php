@@ -18,13 +18,12 @@ class RicardoMartins_PagSeguro_Helper_Recurring extends Mage_Core_Helper_Abstrac
         }
 
         $name = $product->getName();
+        $reference = $profile->getAdditionalInfo('reference') . '|';
         $name = ($profile->getScheduleDescription()) ? $profile->getScheduleDescription() : $name;
         $sku = $product->getSku();
-        $orderId = $profile->getOrderInfo()['entity_id'];
-        $suffix = ' - ' . $orderId . ' - ' . $sku;
-        $prefix = substr($name, 0, 100 - strlen($suffix));
+        $suffix = '|' . $sku . ' - ';
 
-        return $prefix . $suffix;
+        return substr($reference . $suffix . $name, 0, 100);
     }
 
     /**
@@ -118,7 +117,7 @@ class RicardoMartins_PagSeguro_Helper_Recurring extends Mage_Core_Helper_Abstrac
     {
         $params = array();
 
-        $params['reference'] = $profile->getOrderInfo()['entity_id'];
+        $params['reference'] = $profile->getAdditionalInfo('reference');
         $params['preApprovalName'] = $this->getProductName($profile);
         $params['preApprovalCharge'] = 'AUTO';
         $params['preApprovalPeriod'] = $this->getPagSeguroPeriod($profile);
@@ -142,30 +141,5 @@ class RicardoMartins_PagSeguro_Helper_Recurring extends Mage_Core_Helper_Abstrac
 
 
         return $params;
-//        $params['preApproval']
-        /*
-         * * $profile->getData()
-         * result = {array} [19]
-                 start_date_is_editable = "0"
-                 period_unit = "day" //period
-                 period_frequency = "1"
-                 init_amount = "10.0000" //membershipFee
-                 start_datetime = "2020-04-30 07:23:22" // initialDate
-                 state = "unknown"
-                 quote = {Mage_Sales_Model_Quote} [22]
-                 order_info = {array} [93]
-                 billing_address_info = {array} [121]
-                 shipping_address_info = {array} [128]
-                 currency_code = "BRL"
-                 customer_id = null
-                 store_id = "1"
-                 quote_item_info = {Mage_Sales_Model_Quote_Item} [25]
-                 billing_amount = "100.0000" //amountPerPayment + shipping_amount
-                 shipping_amount = "10.7300" //não esquecer de somar no valor do plano
-                 schedule_description = "Assinatura Boletim Diario"
-                 order_item_info = {array} [82]
-                 method_code = "rm_pagseguro_recurring"
-         */
-
     }
 }

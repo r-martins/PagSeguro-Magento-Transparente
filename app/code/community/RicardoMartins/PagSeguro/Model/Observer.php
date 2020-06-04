@@ -61,14 +61,15 @@ class RicardoMartins_PagSeguro_Model_Observer
             if (!$profile['trial_period_max_cycles']) {
                 Mage::getSingleton('core/session')->addWarning(
                     'Periodo máximo de cobranças te'
-                    . 'mporárias deve ser especificado. Este valor será ignorado quando usado no PagSeguro.'
+                    . 'mporárias deve ser especificado. Este valor será ignorado quando usado no PagSeguro, '
+                    . 'mas o Magento impedirá a finalização de um pedido.'
                 );
             }
 
             if (!$profile['trial_billing_amount']) {
                 Mage::getSingleton('core/session')->addWarning(
                     'Valor temporário de cobranças deve ser especificado. Este valor será ignorado quando usado'
-                    . ' no PagSeguro.'
+                    . ' no PagSeguro, mas o Magento impedirá a finalização de um pedido.'
                 );
             }
         }

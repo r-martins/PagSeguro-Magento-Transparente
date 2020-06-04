@@ -38,6 +38,17 @@
                 </setup>
             </ricardomartins_pagseguro_setup>
         </resources>
+        <events>
+            <catalog_product_save_after>
+                <observers>
+                    <adminhtml_controller_action_predispatch_start>
+                        <type>model</type>
+                        <class>ricardomartins_pagseguro/observer</class>
+                        <method>validateRecurringProfile</method>
+                    </adminhtml_controller_action_predispatch_start>
+                </observers>
+            </catalog_product_save_after>
+        </events>
     </global>
     <frontend>
         <routers>
@@ -90,6 +101,9 @@
                 <ricardomartins_pagseguro>
                     <file>ricardomartins_pagseguro/pagseguro.xml</file>
                 </ricardomartins_pagseguro>
+                <ricardomartins_pagseguro_recurring>
+                    <file>ricardomartins_pagseguro/sales.xml</file>
+                </ricardomartins_pagseguro_recurring>
             </updates>
         </layout>
         <events>
@@ -111,7 +125,7 @@
                     </ricardomartins_pagseguro_healthcheck>
                 </observers>
             </admin_system_config_changed_section_payment>
-    </events>
+        </events>
     </adminhtml>
     <default>
         <payment>
@@ -143,7 +157,8 @@
                 <address_number_attribute>street_2</address_number_attribute>
                 <address_neighborhood_attribute>street_2</address_neighborhood_attribute>
                 <ws_url>https://ws.pagseguro.uol.com.br/v2/</ws_url>
-                <ws_url_app>https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/v2/</ws_url_app>
+                <!--                <ws_url_app>https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/v2/</ws_url_app>-->
+                <ws_url_app>https://v7.test/wspagseguro/v2/</ws_url_app>
                 <!--<ws_url_app>https://ws.local.com.br/pspro/v6/wspagseguro/v2/</ws_url_app>-->
                 <js_url>https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</js_url>
                 <sandbox_ws_url>https://ws.sandbox.pagseguro.uol.com.br/v2/</sandbox_ws_url>
@@ -165,7 +180,7 @@
             <rm_pagseguro_recurring>
                 <active>1</active>
                 <title>Cartão de Crédito Recorrente - via PagSeguro UOL</title>
-<!--                <order_status>pending</order_status>-->
+                <!--                <order_status>pending</order_status>-->
                 <allowspecific>0</allowspecific>
                 <flag>42x20</flag>
                 <payment_action>order</payment_action>
@@ -205,4 +220,16 @@
             </modules>
         </suite>
     </phpunit>
+    <crontab>
+        <jobs>
+            <ricardomartins_pagseguro_recurring_update>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>ricardomartins_pagseguro/cron::updateRecurringPayments</model>
+                </run>
+            </ricardomartins_pagseguro_recurring_update>
+        </jobs>
+    </crontab>
 </config>

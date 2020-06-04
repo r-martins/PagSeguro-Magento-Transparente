@@ -8,3 +8,5 @@ app/etc/modules/RicardoMartins_PagSeguro.xml app/etc/modules/RicardoMartins_PagS
 app/code/community/RicardoMartins/PagSeguro/* app/code/community/RicardoMartins/PagSeguro/
 js/pagseguro/pagseguro.js js/pagseguro/pagseguro.js
 js/pagseguro/card.js js/pagseguro/card.js
+app/design/adminhtml/default/default/layout/ricardomartins_pagseguro/* app/design/adminhtml/default/default/layout/ricardomartins_pagseguro/
+app/design/adminhtml/default/default/template/ricardomartins_pagseguro/* app/design/adminhtml/default/default/template/ricardomartins_pagseguro/

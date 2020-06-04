@@ -1,0 +1,11 @@
+<strong><?php echo $this->escapeHtml($this->getMethod()->getTitle()) ?> (PagSeguro)</strong>
+<?php if($info = $this->getInfo()): ?>
+    <br/>
+    Bandeira: <?php echo ucfirst($this->escapeHtml($info->getCcType()));?>
+    <br/>
+    Últimos 4 dígitos: <?php echo $this->escapeHtml($info->getCcLast4());?>
+    <?php if(isset($additional['installment_quantity']) && isset($additional['installment_value'])):?>
+        <br/>
+        Parcelas: <?php echo $this->escapeHtml($additional['installment_quantity']);?>x <?php echo Mage::helper('core')->formatCurrency($additional['installment_value']);?>
+    <?php endif;?>
+<?php endif; ?>

@@ -487,7 +487,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      *
      * @return mixed
      */
-    private function _getCustomerCpfValue(Mage_Sales_Model_Order $order, $payment)
+    private function _getCustomerCpfValue($order, $payment)
     {
         $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
 
@@ -496,6 +496,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 return $payment['additional_information'][$payment->getMethod() . '_cpf'];
             }
         }
+
         $cpfAttributeCnf = explode('|', $customerCpfAttribute);
         $entity = reset($cpfAttributeCnf);
         $attrName = end($cpfAttributeCnf);
@@ -690,5 +691,97 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             return $directory->getRegionCollection()->addFieldToFilter('code', $uf)->getFirstItem()->getRegionId();
         }
         return false;
+    }
+
+    /**
+     * Return sender node params for JSON requests (i.e. recurring)
+     * @param Mage_Sales_Model_Quote $quote
+     */
+    public function getSenderParamsJson($quote)
+    {
+        $address = $quote->getBillingAddress();
+
+        $digits = new Zend_Filter_Digits();
+        $addressStreetAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_street_attribute');
+        $addressNumberAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_number_attribute');
+        $addressComplementAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_complement_attribute');
+        $addressNeighborhoodAttribute = Mage::getStoreConfig('payment/rm_pagseguro/address_neighborhood_attribute');
+
+        //gathering address data
+        $addressStreet = $this->_getAddressAttributeValue($address, $addressStreetAttribute);
+        $addressNumber = $this->_getAddressAttributeValue($address, $addressNumberAttribute);
+        $addressComplement = $this->_getAddressAttributeValue($address, $addressComplementAttribute);
+        $addressDistrict = $this->_getAddressAttributeValue($address, $addressNeighborhoodAttribute);
+        $addressPostalCode = $digits->filter($address->getPostcode());
+        $addressCity = $address->getCity();
+        $addressState = $this->getStateCode($address->getRegion());
+
+        $cpf = $digits->filter($this->_getCustomerCpfValue($quote, $quote->getPayment()));
+
+        $phone = $this->_extractPhone($address->getData($this->_getTelephoneAttribute()));
+        $sender = array(
+            'email' => $quote->getCustomerEmail(),
+            'ip' => Mage::helper('core/http')->getRemoteAddr(false),
+            'phone' => array(
+                'areaCode' => $phone['area'],
+                'number' => $phone['number']
+            ),
+            'address' => array(
+                'street' => $addressStreet,
+                'number' => $addressNumber,
+                'complement' => $addressComplement,
+                'district' => $addressDistrict,
+                'city' => $addressCity,
+                'state' => $addressState,
+                'country' => 'BRA',
+                'postalCode' => $addressPostalCode
+            ),
+            'documents' => array(array(
+                'type' => (strlen($cpf) > 11)? 'CNPJ':'CPF',
+                'value' => $cpf
+                ))
+            );
+        $sender['name'] = $this->removeDuplicatedSpaces(
+            sprintf('%s %s', $quote->getCustomerFirstname(), $quote->getCustomerLastname())
+        );
+
+        return $sender;
+    }
+
+    /**
+     * Returns paymentMethod node used in JSon requests (i.e. recurring) with CreditCard
+     * @param $paymentInfo
+     *
+     * @return array
+     */
+    public function getPaymentParamsJson($paymentInfo)
+    {
+        $quote = $paymentInfo->getQuote();
+        $address = $quote->getBillingAddress();
+        $phone = $this->_extractPhone($address->getData($this->_getTelephoneAttribute()));
+        $digits = new Zend_Filter_Digits();
+        $cpf = $digits->filter($this->_getCustomerCpfValue($quote, $quote->getPayment()));
+
+        return array(
+            'type' => 'creditCard',
+            'creditCard' => array(
+                'token' => $paymentInfo->getAdditionalInformation('credit_card_token'),
+                'holder' => array(
+                    'name' => $this->removeDuplicatedSpaces(
+                        $paymentInfo->getAdditionalInformation('credit_card_owner')
+                    ),
+                    'birthDate' => $paymentInfo->getAdditionalInformation('credit_card_owner_birthdate'),
+                    'phone' => array(
+                        'areaCode' => $phone['area'],
+                        'number' => $phone['number']
+                    ),
+                    'documents' => array(array(
+                        'type' => (strlen($cpf) > 11)? 'CNPJ':'CPF',
+                        'value' => $cpf
+                               ))
+                )
+            )
+        );
+
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<layout>
+    <adminhtml_sales_recurring_profile_view>
+        <reference name="sales.recurring.profile.tab.info">
+            <block type="ricardomartins_pagseguro/adminhtml_recurring_sales_view" name="sales.recurring.profile.view.pagseguro" as="pagseguro" template="ricardomartins_pagseguro/sales/recurring/profile/view/info/pagseguro.phtml">
+                <action method="prepareReferenceInfo"/>
+                <action method="addToParentGroup">
+                    <value>info_blocks_row_5</value>
+                </action>
+                <action method="setViewColumn">
+                    <value>1</value>
+                </action>
+                <action method="setViewLabel" translate="value">
+                    <value>PagSeguro</value>
+                </action>
+            </block>
+        </reference>
+    </adminhtml_sales_recurring_profile_view>
+</layout>
