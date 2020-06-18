@@ -75,4 +75,55 @@ class RicardoMartins_PagSeguro_Model_Observer
         }
 
     }
+
+    public function updateRecurringCustomerId($observer)
+    {
+        if (!$observer->getObject() || $observer->getObject()->getResourceName() != 'sales/recurring_profile') {
+            return;
+        }
+
+        $quote = $observer->getObject()->getQuote();
+        if (!$quote || !$quote->getId()) {
+            return;
+        }
+
+        if ($quote->getData('checkout_method') != Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER) {
+            return;
+        }
+
+        #registers the client (extracted from \Mage_Checkout_Model_Type_Onepage::_prepareNewCustomerQuote)
+        $billing    = $quote->getBillingAddress();
+        $shipping   = $quote->isVirtual() ? null : $quote->getShippingAddress();
+
+        //$customer = Mage::getModel('customer/customer');
+        $customer = $quote->getCustomer();
+        /* @var $customer Mage_Customer_Model_Customer */
+        $customerBilling = $billing->exportCustomerAddress();
+        $customer->addAddress($customerBilling);
+        $billing->setCustomerAddress($customerBilling);
+        $customerBilling->setIsDefaultBilling(true);
+        if ($shipping && !$shipping->getSameAsBilling()) {
+            $customerShipping = $shipping->exportCustomerAddress();
+            $customer->addAddress($customerShipping);
+            $shipping->setCustomerAddress($customerShipping);
+            $customerShipping->setIsDefaultShipping(true);
+        } else {
+            $customerBilling->setIsDefaultShipping(true);
+        }
+
+        Mage::helper('core')->copyFieldset('checkout_onepage_quote', 'to_customer', $quote, $customer);
+        $customer->setPassword($customer->decryptPassword($quote->getPasswordHash()));
+        $passwordCreatedTime = Mage::getSingleton('checkout/session')->getData('_session_validator_data')['session_expire_timestamp']
+            - Mage::getSingleton('core/cookie')->getLifetime();
+        $customer->setPasswordCreatedAt($passwordCreatedTime);
+        $quote->setCustomer($customer)
+            ->setCustomerId(true);
+        $quote->setPasswordHash('');
+
+        $customer->save();
+        $customerId = $customer->getEntityId();
+        $observer->getObject()->setCustomerId($customerId);
+        Mage::log(var_export('oi2', true), null, 'martins.log', true);
+        $a = 1;
+    }
 }

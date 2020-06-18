@@ -35,4 +35,34 @@ class RicardoMartins_PagSeguro_Block_Form_Info_Recurring extends Mage_Payment_Bl
         $this->setTemplate('ricardomartins_pagseguro/form/info/recurring.phtml');
     }
 
+
+    public function getOrder()
+    {
+        $orderPayment = $this->getInfo('order');
+        if (!$orderPayment->getId()) {
+            return false;
+        }
+
+        return $orderPayment->getOrder();
+    }
+    /**
+     * Get recurring profile id for the current order
+     * @return bool|string
+     */
+    public function getRecurringProfileId()
+    {
+        $order = $this->getOrder();
+
+        return Mage::getModel('ricardomartins_pagseguro/recurring')->getRecurringProfileIdFromOrder($order);
+    }
+
+    /**
+     * @return Mage_Core_Model_Abstract|Mage_Sales_Model_Recurring_Profile|null
+     */
+    public function getProfile()
+    {
+        return Mage::getModel('ricardomartins_pagseguro/recurring')
+            ->getProfileFromOrder($this->getOrder());
+    }
+
 }

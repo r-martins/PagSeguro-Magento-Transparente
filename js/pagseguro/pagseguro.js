@@ -9,6 +9,9 @@ RMPagSeguro = Class.create({
     initialize: function (config) {
         this.config = config;
 
+        if (!config.PagSeguroSessionId) {
+            console.error('Falha ao obter sessão junto ao PagSeguro. Verifique suas credenciais, configurações e logs de erro.')
+        }
         PagSeguroDirectPayment.setSessionId(config.PagSeguroSessionId);
 
         // this.updateSenderHash();

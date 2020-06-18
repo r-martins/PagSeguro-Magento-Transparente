@@ -44,12 +44,12 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
 
     protected function _checkSandbox()
     {
-        $helper = Mage::helper('ricardomartins_pagseguro');
+        /*$helper = Mage::helper('ricardomartins_pagseguro');
         $keyType = $helper->getLicenseType();
 
         if (Mage::getStoreConfigFlag('payment/rm_pagseguro/sandbox') && $keyType == 'app') {
             $this->_errors[] = 'Ambiente de testes (sandbox) não disponível no modelo de aplicação.';
-        }
+        }*/
     }
 
     protected function _checkVersions()

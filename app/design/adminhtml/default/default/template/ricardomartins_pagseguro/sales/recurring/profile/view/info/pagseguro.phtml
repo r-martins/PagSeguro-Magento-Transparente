@@ -32,9 +32,12 @@
 <?php endforeach;?>
 
 <?php else:?>
-
+    <?php if ($this->_profile->getAdditionalInfo('isSandbox')) : ?>
+        <strong>Transação Sandbox</strong>
+    <?php endif; ?>
 <table cellspacing="0" class="form-list">
 <tbody>
+
 <?php foreach ($this->getRenderedInfo() as $row):?>
 <?php $isAmount = $this->getObjectData($row, 'is_amount');?>
     <tr>
@@ -44,6 +47,18 @@
     </td>
     </tr>
 <?php endforeach;?>
+<?php if($email = $this->_profile->getOrderInfo('customer_email')) :
+    $customerId = $this->_profile->getCustomerId();
+?>
+    <tr>
+        <td class="label"><label>E-mail do cliente</label></td>
+        <td><?php echo $email; ?>
+        <?php if ($customerId):?>
+            (<a href="<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/customer/edit', array('id'=>$customerId));?>">Ver Cliente</a>)
+        <?php endif;?>
+        </td>
+    </tr>
+<?php endif; ?>
 </tbody>
 </table>
 <?php endif;?>

@@ -48,6 +48,16 @@
                     </adminhtml_controller_action_predispatch_start>
                 </observers>
             </catalog_product_save_after>
+            <core_abstract_save_before>
+                <observers>
+                    <update_recurring_customer_id>
+                        <type>model</type>
+                        <class>ricardomartins_pagseguro/observer</class>
+                        <method>updateRecurringCustomerId</method>
+                    </update_recurring_customer_id>
+                </observers>
+            </core_abstract_save_before>
+
         </events>
     </global>
     <frontend>
@@ -162,7 +172,7 @@
                 <!--<ws_url_app>https://ws.local.com.br/pspro/v6/wspagseguro/v2/</ws_url_app>-->
                 <js_url>https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</js_url>
                 <sandbox_ws_url>https://ws.sandbox.pagseguro.uol.com.br/v2/</sandbox_ws_url>
-                <sandbox_ws_url_app>https://ws.ricardomartins.net.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>
+                <sandbox_ws_url_app>https://v7.test/wspagseguro/v2/</sandbox_ws_url_app>
                 <!--<sandbox_ws_url_app>http://ws.local.com.br/pspro/v6/wspagseguro/sandbox/v2/</sandbox_ws_url_app>-->
                 <sandbox_js_url>https://stc.sandbox.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</sandbox_js_url>
                 <exception_request_validate>onestepcheckout/ajax/savePaymentMethod</exception_request_validate>

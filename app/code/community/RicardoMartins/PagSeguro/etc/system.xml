@@ -81,7 +81,6 @@
                             <depends>
                                 <sandbox>1</sandbox>
                             </depends>
-                            <comment>E-mail da loja (conta vendedor) no ambiente de testes</comment>
                         </sandbox_merchant_email>
                         <sandbox_token translate="label">
                             <label>Token Sandbox</label>
@@ -95,44 +94,15 @@
                                 <sandbox>1</sandbox>
                             </depends>
                         </sandbox_token>
-                        <!--<sandbox_appid>
-                            <label>AppId Sandbox</label>
+                        <sandbox_appkey translate="label">
+                            <label>Sandbox PRO Key</label>
                             <frontend_type>text</frontend_type>
-                            <comment>AppId fornecido na Sandbox para contas com modelo de aplicação</comment>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
                             <sort_order>24</sort_order>
-                            <depends>
-                                <sandbox>1</sandbox>
-                            </depends>
-                        </sandbox_appid>
-                        <sandbox_appkey>
-                            <label>AppKey Sandbox</label>
-                            <frontend_type>text</frontend_type>
-                            <comment>AppKey fornecido na Sandbox para contas com modelo de aplicação</comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <sort_order>25</sort_order>
-                            <depends>
-                                <sandbox>1</sandbox>
-                            </depends>
+                            <comment><![CDATA[Você só precisa informá-la caso esteja usando o <a href="//pagseguro.ricardomartins.net.br/pro/app.html" target="_blank">modelo de aplicação</a>. Nestes casos, também deverá autorizar sua conta Sandbox <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">neste link</a>.]]></comment>
                         </sandbox_appkey>
-                        <sandbox_appauthcode>
-                            <label>Authorization Key Sandbox</label>
-                            <frontend_type>text</frontend_type>
-                            <comment><![CDATA[
-                                Utilizado apenas no modo Sandbox. Clique aqui para autorizar sua aplicação no modo sandbox. Tenha os dados do <a href="https://sandbox.pagseguro.uol.com.br/aplicacao/configuracoes.html#virtual-seller-data">Vendedor de Testes</a> em mão.
-                            ]]></comment>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <sort_order>26</sort_order>
-                            <depends>
-                                <sandbox>1</sandbox>
-                            </depends>
-                        </sandbox_appauthcode>-->
                         <debug translate="label">
                             <label>Debug</label>
                             <frontend_type>select</frontend_type>

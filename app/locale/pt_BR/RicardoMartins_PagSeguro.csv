@@ -180,3 +180,5 @@
 "addressState invalid value: %s must fit the pattern: \w{2} (e. g. ""SP"")","Formato do Estado inválido: %s. Deve conter apenas 2 letras (ex: SP)"
 "cpf is invalid: %s","CPF Inválido: %s"
 "cnpj is invalid: %s","CNPJ Inválido: %s"
+"sender email invalid domain: %s","E-mail do comprador com domínio inválido: %s. Você deve usar um e-mail @sandbox.pagseguro.com.br"
+"invalid pre-approval status to execute the requested operation. Pre-approval status is ACTIVE.","Status inválido para operação atual. O status da assinatura atual é ACTIVE."

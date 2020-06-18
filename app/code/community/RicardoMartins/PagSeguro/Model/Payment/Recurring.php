@@ -165,99 +165,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
                 a url de exceção.
                 $missingInfo"
             );
-            if (!$helper->isRetryActive()) {
-                Mage::throwException(
-                    'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
-                );
-            } else {
-                $helper->writeLog(
-                    'Apesar da transação ter falhado, o pedido poderá continuar pois a retentativa está ativa.'
-                );
-            }
         }
 
         return $this;
     }
 
-
-    /**
-     * Order payment
-     *
-     * @obsolete not used in recurring
-     * @TODO Remove this method. It's not used in Recurring.
-     * @param Varien_Object $payment
-     * @param float $amount
-     *
-     * @return RicardoMartins_PagSeguro_Model_Payment_Cc
-     */
-    public function order(Varien_Object $payment, $amount)
-    {
-        /** @var Mage_Sales_Model_Order $order */
-        $order = $payment->getOrder();
-
-        //will grab data to be send via POST to API inside $params
-        $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
-        $rmHelper = Mage::helper('ricardomartins_pagseguro');
-
-        //call API
-        $returnXml = $this->callApi($params, $payment);
-
-        try {
-            $this->proccessNotificatonResult($returnXml);
-            if (isset($returnXml->errors)) {
-                foreach ($returnXml->errors as $error) {
-                    $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-                }
-                Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-            }
-
-            if (isset($returnXml->error)) {
-                $error = $returnXml->error;
-                $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-
-                if(count($returnXml->error) > 1){
-                    unset($errMsg);
-                    foreach ($returnXml->error as $error) {
-                        $errMsg[] = $rmHelper->__((string)$error->message) . ' (' . $error->code . ')';
-                    }
-                }
-
-                Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-            }
-        } catch (Mage_Core_Exception $e) {
-            if (!$rmHelper->isRetryActive() || !$rmHelper->canRetryOrder($order)) {
-                $order->addStatusHistoryComment('A retentativa de pedido está ativa. O pedido foi concluído mesmo com o seguite erro: ' . $e->getMessage());
-                Mage::throwException($e->getMessage());
-            }
-        }
-
-        $payment->setSkipOrderProcessing(true);
-
-        if (isset($returnXml->code)) {
-
-            $additional = array('transaction_id'=>(string)$returnXml->code);
-            if ($existing = $payment->getAdditionalInformation()) {
-                if (is_array($existing)) {
-                    $additional = array_merge($additional, $existing);
-                }
-            }
-            $payment->setAdditionalInformation($additional);
-
-        }
-        return $this;
-    }
-
-    /**
-     * Generically get module's config field value
-     * @param $field
-     *
-     * @return mixed
-     */
-    public function _getStoreConfig($field)
-    {
-        //@TODO Change _cc
-        return Mage::getStoreConfig("payment/pagseguro_cc/{$field}");
-    }
 
     /**
      * Validate data
@@ -283,11 +195,15 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
         Mage_Payment_Model_Recurring_Profile $profile,
         Mage_Payment_Model_Info $paymentInfo
     ) {
-        $reference =
-        //@TODO Uncomment and remove second line
         $pagseguroPlanCode = $this->createPagseguroPlan($profile);
-//        $pagseguroPlanCode = '22EBA81C22223BF5541C3FB3AE839355';
 
+        /*if ($profile->getQuote()->getData('checkout_method') == Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER) {
+            $email = $profile->getQuote()->getCustomerEmail();
+            $customer = Mage::getModel('customer/customer')->loadByEmail($email);
+            if ($customer->getId()) {
+                $profile->setCustomerId($customer->getId());
+            }
+        }*/
         $profile->setToken($pagseguroPlanCode);
         $subResp = $this->subscribeToPlan($pagseguroPlanCode, $paymentInfo, $profile);
 
@@ -298,10 +214,14 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
         $profile->setReferenceId((string)$subResp->code);
         $profile->setState(Mage_Sales_Model_Recurring_Profile::STATE_PENDING);
 
+        $additionalInfo = $profile->getAdditionalInfo();
+        $profile->setAdditionalInfo(
+            array_merge(
+                $additionalInfo, array('isSandbox' => Mage::helper('ricardomartins_pagseguro')->isSandbox())
+            )
+        );
 
-//        Mage::throwException('em testes' . __METHOD__);
-
-        //acontece em segundo lugar, depois do validate profile
+        //método chamado em segundo lugar durante o processo de compra, depois do validate profile
     }
 
     /**
@@ -312,9 +232,15 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
      */
     public function getRecurringProfileDetails($referenceId, Varien_Object $result)
     {
+        $profile = Mage::registry('current_recurring_profile');
+
         $subscriptionDetails = Mage::getModel('ricardomartins_pagseguro/recurring')->getPreApprovalDetails(
-            $referenceId
+            $referenceId, $profile->getAdditionalInfo('isSandbox')
         );
+        if (!isset($subscriptionDetails->status)) {
+            return false;
+        }
+
         switch ((string)$subscriptionDetails->status) {
             case 'ACTIVE':
                 $result->setIsProfileActive(true);
@@ -331,9 +257,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
             case 'EXPIRED':
                 $result->setIsProfileExpired(true);
                 break;
+            case 'SUSPENDED':
+                $result->setIsProfileSuspended(true);
+                break;
         }
 
-        $profile = Mage::registry('current_recurring_profile');
         if ($profile->getId()) {
            $currentInfo = $profile->getAdditionalInfo();
            $currentInfo = is_array($currentInfo) ? $currentInfo : array();
@@ -346,11 +274,12 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
                 )
             );
             $profile->save();
+//            Mage::getModel('ricardomartins_pagseguro/recurring')->createOrders($profile);
         }
 
-        $result->setAdditionalInformation(['tracker'=>(string)$subscriptionDetails->tracker]);
+        $result->setAdditionalInformation(array('tracker' =>(string)$subscriptionDetails->tracker));
 
-        // TODO: Implement getRecurringProfileDetails() method.
+        //este método é chamado quando forçamos a atualização de um perfil no admin e via cron
     }
 
     /**
@@ -360,7 +289,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
      */
     public function canGetRecurringProfileDetails()
     {
-        $a = 1;
         return true;
         //chamado quando entramos no perfil recorrente em Vendas > Perfil recorrente > clicamos em um perfil
         // TODO: Implement canGetRecurringProfileDetails() method.
@@ -373,8 +301,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
      */
     public function updateRecurringProfile(Mage_Payment_Model_Recurring_Profile $profile)
     {
+        //quando um perfil suspenso é reativado
         $a = 1;
-
         // TODO: Implement updateRecurringProfile() method.
     }
 
@@ -385,9 +313,21 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
      */
     public function updateRecurringProfileStatus(Mage_Payment_Model_Recurring_Profile $profile)
     {
-        $a = 1;
+        switch ($profile->getNewState()) {
+            case Mage_Sales_Model_Recurring_Profile::STATE_SUSPENDED:
+                $this->changePagseguroStatus($profile, 'SUSPENDED');
+                break;
+            case Mage_Sales_Model_Recurring_Profile::STATE_ACTIVE:
+                $this->changePagseguroStatus($profile, 'ACTIVE');
+                break;
+            case Mage_Sales_Model_Recurring_Profile::STATE_CANCELED:
+                $this->cancelPagseguroProfile($profile);
+                break;
+        }
+        
+        $this->getRecurringProfileDetails($profile, new Varien_Object());
 
-        // TODO: Implement updateRecurringProfileStatus() method.
+        //método chamado quando clicamos em Suspender, Ativar ou Cancelar um perfil
     }
 
     /**
@@ -405,6 +345,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
         $uniqIdRef = substr(strtoupper(uniqid()), 0, 7); //reference that will be used in product name and subscription
         $profile->setAdditionalInfo(array_merge($currentInfo, array('reference'=>$uniqIdRef)));
         $params = $helper->getCreatePlanParams($profile);
+        $helper->writeLog('Criando plano de assinatura junto ao PagSeguro: ' . $params['preApprovalName']);
         $returnXml = $this->callApi($params, null, 'pre-approvals/request');
 
         $this->validateCreatePlanResponse($returnXml);
@@ -412,7 +353,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
         $profile->setReferenceId($params['reference']);
         $this->mergeAdditionalInfo(
             array('recurringReference'         => $params['reference'],
-                  'recurringPagseguroPlanCode' => (string)$returnXml->code)
+                  'recurringPagseguroPlanCode' => (string)$returnXml->code,
+                  'isSandbox'                 => Mage::helper('ricardomartins_pagseguro')->isSandbox(),
+            )
         );
 
         $this->setPlanCode((string)$returnXml->code);
@@ -427,10 +370,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
      */
     public function subscribeToPlan($pagseguroPlanCode, $paymentInfo, $profile)
     {
-
-        $creditCardToken = $paymentInfo->getAdditionalInformation('credit_card_token');
-//        $reference = $paymentInfo->getQuote()->getData()
-
         $reference = $profile->getAdditionalInfo('reference');
         $profile->setReferenceId($reference);
         $profileInfo = $profile->getAdditionalInfo();
@@ -443,11 +382,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
             'paymentMethod' => Mage::helper('ricardomartins_pagseguro/params')->getPaymentParamsJson($paymentInfo),
         );
 
-        #paramos aqui. :) continuar cuidando desse json pra fazer o request bunitu
         $body = Zend_Json::encode($jsonArray);
 
         $headers[] = 'Content-Type: application/json';
         $headers[] = 'Accept: application/vnd.pagseguro.com.br.v1+json;charset=ISO-8859-1';
+        Mage::helper('ricardomartins_pagseguro/recurring')->writeLog('Aderindo cliente ao plano');
         $response = $this->callJsonApi($body, $headers, 'pre-approvals', true);
         $this->validateJsonResponse($response);
         return $response;
@@ -459,7 +398,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
      *
      * @throws Mage_Core_Exception
      */
-    private function validateCreatePlanResponse(SimpleXMLElement $returnXml)
+    protected function validateCreatePlanResponse(SimpleXMLElement $returnXml)
     {
         $errMsg = array();
         $rmHelper = Mage::helper('ricardomartins_pagseguro');
@@ -501,25 +440,5 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
         }
     }
 
-    /**
-     * @param stdObject $response
-     *
-     * @throws Mage_Core_Exception
-     */
-    private function validateJsonResponse($response)
-    {
-        if (isset($response->error) && $response->error) {
-            $err = array();
-            $rmHelper = Mage::helper('ricardomartins_pagseguro');
-            foreach ($response->errors as $code => $msg) {
-                $err[] = $rmHelper->__((string)$msg) . ' (' . $code . ')';
-            }
 
-            Mage::throwException(
-                'Um erro ocorreu junto ao PagSeguro.' . PHP_EOL . implode(
-                    PHP_EOL, $err
-                )
-            );
-        }
-    }
 }

@@ -23,6 +23,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL     = 'payment/rm_pagseguro/sandbox_ws_url';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_WS_URL_APP = 'payment/rm_pagseguro/sandbox_ws_url_app';
     const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL     = 'payment/rm_pagseguro/sandbox_js_url';
+    const XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_APPKEY     = 'payment/rm_pagseguro/sandbox_appkey';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_ACTIVE          = 'payment/rm_pagseguro_cc/active';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_FLAG            = 'payment/rm_pagseguro_cc/flag';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INFO_BRL        = 'payment/rm_pagseguro_cc/info_brl';
@@ -59,6 +60,12 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $params['token'] = $this->getToken();
         if ($useApp) {
             $params['public_key'] = $this->getPagSeguroProKey();
+            unset($params['email']);
+            unset($params['token']);
+
+            if ($this->isSandbox()) {
+                $params['isSandbox'] = '1';
+            }
         }
 
         curl_setopt_array(
@@ -261,6 +268,20 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      * @return string
      */
     public function getPagSeguroProKey()
+    {
+        if ($this->getLicenseType() == 'app' && $this->isSandbox()) {
+            return $this->getPagSeguroProNonSandboxKey();
+        }
+
+        return $this->getPagSeguroProSandboxKey();
+    }
+
+    public function getPagSeguroProSandboxKey()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_APPKEY);
+    }
+
+    public function getPagSeguroProNonSandboxKey()
     {
         return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_KEY);
     }
@@ -504,4 +525,41 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         return class_exists('IWD_Opc_Helper_Data') && Mage::helper('iwd_opc')->isEnable();
     }
 
+    /**
+     * Adds GET params to some url
+     *
+     * @param string $existingUrl
+     * @param array  $params
+     */
+    public static function addUrlParam($existingUrl, $params = array())
+    {
+        $urlParts = parse_url($existingUrl);
+        // If URL doesn't have a query string.
+        $existingParams = array();
+        if (isset($urlParts['query'])) { // Avoid 'Undefined index: query'
+            parse_str($urlParts['query'], $existingParams);
+        }
+
+        if (!$existingParams) {
+            return  '?' . http_build_query($params);
+        }
+
+        return '&' . http_build_query($params);
+
+        /*$parsedSuffix = parse_url($suffix);
+        $finalSuffix = '';
+        $finalSuffix .= isset($parsedSuffix['path']) ? $parsedSuffix['path'] : '';
+        $finalSuffix .= isset($parsedSuffix['query']) ? '?' . $parsedSuffix['query'] : '';
+
+        $query = http_build_query($params);
+        $finalSuffix .= (strpos($finalSuffix, '?') === false) ? '?' : '&';
+
+        $prefix = '';
+        if (filter_var($suffix, FILTER_VALIDATE_URL) === false) {
+            $prefix = isset($parsedSuffix['scheme']) ? $parsedSuffix['scheme'] . '://' : '';
+            $prefix .= isset($parsedSuffix['host']) ? $parsedSuffix['host'] : '';
+        }
+
+        return $prefix . $finalSuffix . $query;*/
+    }
 }

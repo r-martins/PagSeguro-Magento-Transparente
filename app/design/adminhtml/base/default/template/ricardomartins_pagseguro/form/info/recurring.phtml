@@ -1,0 +1,25 @@
+<?php
+$_profile = $this->getProfile();
+$_dataToShow = array(
+        'Reference' => 'reference',
+        'Código do Plano' => 'pagSeguroPlanCode',
+        'Identificador' => 'tracker'
+);
+?>
+
+<?php if ($_profile->getAdditionalInfo('isSandbox')) : ?>
+    <strong>Transação Sandbox</strong>
+<?php endif; ?>
+<?php foreach ($_dataToShow as $label => $key):
+    if ($value = $_profile->getAdditionalInfo($key)): ?>
+        <div><?php echo $label?>: <?php echo $value;?></div>
+<?php
+    endif;
+endforeach;
+?>
+
+<?php if ($_profile->getId() && Mage::app()->getStore()->isAdmin()) :
+    $link = Mage::helper('adminhtml')->getUrl('adminhtml/sales_recurring_profile/view', ['profile'=> $_profile->getId()]);
+    ?>
+    <div>Perfil recorrente: <a href="<?php echo $link?>"><?php echo $_profile->getId();?></a></div>
+<?php endif; ?>

@@ -14,11 +14,17 @@ class RicardoMartins_PagSeguro_Block_Adminhtml_Recurring_Sales_View extends Mage
                 . "?asBuyer=false&tracker=$tracker\" "
                 . "target='_blank' title='ver no PagSeguro'>$tracker</a>";
 
+            if ($this->_profile->getAdditionalInfo('isSandbox')) {
+                $link = "<a href=\"https://sandbox.pagseguro.uol.com.br/aplicacao/assinaturas/detalhes.html?code="
+                    . $this->_profile->getReferenceId() . "\" "
+                    . "target='_blank' title='ver no PagSeguro'>$tracker</a>";
+            }
+
             $this->_addInfo(array('label' => 'Identificador', 'value' => $link, 'skip_html_escaping' => true));
         }
 
         $otherFields = array('Status PagSeguro'   => 'status', 'Reference' => 'reference',
-                             'Última atualização' => 'last_event_date');
+                             'Última atualização' => 'last_event_date', 'Sandbox' => 'is_sandbox', 'Código do plano' => 'pagSeguroPlanCode');
         foreach ($otherFields as $label => $field) {
             $this->_addFieldIfAvailable($label, $field);
         }

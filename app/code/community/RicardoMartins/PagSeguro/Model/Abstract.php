@@ -218,9 +218,14 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     public function getNotificationStatus($notificationCode)
     {
         $helper =  Mage::helper('ricardomartins_pagseguro');
-        $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode, false);
+        $useApp = $helper->getLicenseType() == 'app';
+        $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode, $useApp);
 
         $params = array('token' => $helper->getToken(), 'email' => $helper->getMerchantEmail(),);
+        if ($useApp && $helper->isSandbox()) {
+            $params = array('public_key' => $helper->getPagSeguroProKey(), 'isSandbox'=>1);
+        }
+
         $url .= '?' . http_build_query($params);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -356,6 +361,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         $useApp = $helper->getLicenseType() == 'app';
         if ($useApp) {
             $params['public_key'] = Mage::getStoreConfig('payment/pagseguropro/key');
+            if ($helper->isSandbox()) {
+                $params['public_key'] = Mage::getStoreConfig('payment/rm_pagseguro/sandbox_appkey');
+                $params['isSandbox'] = '1';
+                unset($params['token'], $params['email']);
+            }
         }
 
         $params = $this->_convertEncoding($params);
@@ -430,22 +440,27 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     }
 
     /**
-     * Call PagSeguro API with JSON Content
-     * @param $params
-     * @param $payment
-     * @param $type
+     * Call PagSeguro API (POST) with JSON Content
+     *
+     * @param        $body
+     * @param        $headers
+     * @param string $type
+     *
+     * @param bool   $noV2 removes /v2/ from api endpoint (used to other api versions)
      *
      * @return string
+     * @throws Mage_Core_Exception
      */
-    public function callJsonApi($body, $headers, $type='pre-approvals', $noV2=false)
+    public function callJsonApi($body, $headers, $type='pre-approvals', $noV2=false) //phpcs:ignore
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
+        $isSandbox = $helper->isSandbox();
         $useApp = $helper->getLicenseType() == 'app';
         if (!$useApp) {
             Mage::throwException('Autorize sua loja no modelo de aplicação antes de usar este método.');
         }
 
-        $key = Mage::getStoreConfig('payment/pagseguropro/key');
+        $key = $helper->getPagSeguroProKey();
         $paramsObj = new Varien_Object(array('body'=>$body));
 
         //you can create a module to modify some parameter using the following observer
@@ -458,14 +473,21 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         );
         $params = $paramsObj->getBody();
 
-        $helper->writeLog('Parametros sendo enviados para API (/'.$type.'): '. var_export($params, true));
+
+        $sandbox = $isSandbox ? '(sandbox)' : '';
+        $helper->writeLog(
+            'Parametros sendo enviados para API Json ' . $sandbox . '(/' . $type . '): ' . var_export($params, true)
+        );
 
         $headers = array_merge($helper->getCustomHeaders(), $headers);
 
         $urlws = $helper->getWsUrl($type . "?public_key={$key}", true);
-        if ($noV2) {
+        if ($noV2) { //phpcs:ignore
             $urlws = str_replace('/v2/', '/', $urlws);
         }
+
+        $urlws .= $isSandbox ? '&isSandbox=1' : '';
+
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $urlws);
@@ -481,7 +503,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         try{
             $response = curl_exec($ch);
-            //{"code":"34D028CAE7E7839AA4596F941B8E7AC7"}
         }catch(Exception $e){
             Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
         }
@@ -624,6 +645,148 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         $current = $infoInstance->getAdditionalInformation();
         return $infoInstance->setAdditionalInformation(array_merge($current, $data));
     }
+
+
+    /**
+     * @param       $suffix
+     * @param array $headers
+     * @param bool  $noV2
+     *
+     * @return mixed
+     * @throws Mage_Core_Exception
+     */
+    public function callGetAPI($suffix, $headers = array(), $noV2 = false) //phpcs:ignore
+    {
+        $helper = Mage::helper('ricardomartins_pagseguro');
+//        $key = $helper->getPagSeguroProKey();
+
+        $urlws = $helper->getWsUrl($suffix, true);
+//        $urlws .= $helper->addUrlParam($urlws, array('public_key'=>$key));
+        if ($noV2) { //phpcs:ignore
+            $urlws = str_replace('/v2/', '/', $urlws);
+        }
+
+        $helper->writeLog('Chamando API GET (/'. $suffix .')');
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $urlws);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = '';
+
+        try{
+            $response = curl_exec($ch);
+            $helper->writeLog('Retorno PagSeguro API GET: ' . $response);
+
+            if (json_decode($response) !== null) {
+                return json_decode($response);
+            }
+
+            Mage::throwException(
+                'Falha ao decodificar retorno das informações. Formato retornado inesperado. JSON esperado.'
+            );
+        }catch(Exception $e){
+            Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
+        }
+
+        if (curl_error($ch)) {
+            Mage::throwException(
+                sprintf(
+                    'A operação cURL falhou: %s (%s)',
+                    curl_error($ch),
+                    curl_errno($ch)
+                )
+            );
+        }
+    }
+
+    public function callPutAPI($suffix, $headers = array(), $body, $noV2 = false) //phpcs:ignore
+    {
+        $helper = Mage::helper('ricardomartins_pagseguro');
+//        $key = $helper->getPagSeguroProKey();
+
+        $urlws = $helper->getWsUrl($suffix, true);
+//        $urlws .= $helper->addUrlParam($urlws, array('public_key'=>$key));
+        if ($noV2) { //phpcs:ignore
+            $urlws = str_replace('/v2/', '/', $urlws);
+        }
+
+        $helper->writeLog('Chamando API PUT (/'. $suffix .') com body: ' . $body);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $urlws);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+//        curl_setopt($ch, CURLOPT_HEADER, true);
+//        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $response = '';
+
+        try{
+            $response = curl_exec($ch);
+            $helper->writeLog('Retorno PagSeguro API PUT: (' . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ')' . $response );
+
+            if (json_decode($response) !== null) {
+                $response = json_decode($response);
+                $this->validateJsonResponse($response);
+                return $response;
+            }
+
+            if ($response === '') {
+                return true;
+            }
+
+            if (curl_error($ch)) {
+                Mage::throwException(
+                    sprintf(
+                        'A operação cURL falhou: %s (%s)',
+                        curl_error($ch),
+                        curl_errno($ch)
+                    )
+                );
+            }
+
+            Mage::throwException(
+                'Falha ao decodificar retorno das informações. '
+                . 'Formato retornado inesperado. JSON ou vazio era esperado.'
+                . 'HTTP Status: ' . curl_getinfo($ch, CURLINFO_HTTP_CODE) //phpcs:ignore
+            );
+        }catch(Exception $e){
+            Mage::throwException('Falha na comunicação com Pagseguro (' . $e->getMessage() . ')');
+        }
+    }
+
+    /**
+     * @param stdObject $response
+     *
+     * @throws Mage_Core_Exception
+     */
+    protected function validateJsonResponse($response)
+    {
+        if (isset($response->error) && $response->error) {
+            $err = array();
+            $rmHelper = Mage::helper('ricardomartins_pagseguro');
+            foreach ($response->errors as $code => $msg) {
+                $err[] = $rmHelper->__((string)$msg) . ' (' . $code . ')';
+            }
+
+            Mage::throwException(
+                'Um erro ocorreu junto ao PagSeguro.' . PHP_EOL . implode(
+                    PHP_EOL, $err
+                )
+            );
+        }
+    }
+
 }
 
 

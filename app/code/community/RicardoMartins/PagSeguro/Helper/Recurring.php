@@ -136,10 +136,15 @@ class RicardoMartins_PagSeguro_Helper_Recurring extends Mage_Core_Helper_Abstrac
         $params['preApprovalMaxTotalAmount'] = min($params['preApprovalAmountPerPayment'] * 3, 35000);
         $params['preApprovalMaxTotalAmount'] = number_format($params['preApprovalMaxTotalAmount'], 2, '.', '');
 
-        //not sure if notificationURL works
-        $params['notificationURL'] = 'https://webhook.site/244c5253-831d-4872-9aeb-df49838f16d1';
-
-
         return $params;
+    }
+    
+    public function writeLog($obj)
+    {
+        if (is_string($obj)) {
+            Mage::log($obj, Zend_Log::DEBUG, 'pagseguro_recurring.log', true);
+        } else {
+            Mage::log(var_export($obj, true), Zend_Log::DEBUG, 'pagseguro_recurring.log', true);
+        }
     }
 }
