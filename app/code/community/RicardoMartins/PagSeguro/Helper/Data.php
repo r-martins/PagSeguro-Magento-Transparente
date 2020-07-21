@@ -115,10 +115,11 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function saveSessionId($sessionId)
     {
-        Mage::getSingleton('core/session')->setData('rm_pagseguro_sessionid', $sessionId);
+        $sandbox = ($this->isSandbox()) ? '_sandbox' : '';
+        Mage::getSingleton('core/session')->setData('rm_pagseguro_sessionid' . $sandbox, $sessionId);
 
         $time = Mage::getSingleton('core/date')->timestamp();
-        Mage::getSingleton('core/session')->setData('rm_pagseguro_sessionid_expires', $time + 60*10); //10 minutes
+        Mage::getSingleton('core/session')->setData('rm_pagseguro_sessionid_expires' . $sandbox, $time + 60*10);
     }
 
     /**
@@ -127,9 +128,10 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getSavedSessionId()
     {
+        $sandbox = ($this->isSandbox()) ? '_sandbox' : '';
         $time = Mage::getSingleton('core/date')->timestamp();
-        if (($sessionId = Mage::getSingleton('core/session')->getData('rm_pagseguro_sessionid'))
-            && Mage::getSingleton('core/session')->getData('rm_pagseguro_sessionid_expires') >= $time) {
+        if (($sessionId = Mage::getSingleton('core/session')->getData('rm_pagseguro_sessionid' .$sandbox))
+            && Mage::getSingleton('core/session')->getData('rm_pagseguro_sessionid_expires' .$sandbox) >= $time) {
             return $sessionId;
         }
 
@@ -270,10 +272,10 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function getPagSeguroProKey()
     {
         if ($this->getLicenseType() == 'app' && $this->isSandbox()) {
-            return $this->getPagSeguroProNonSandboxKey();
+            return $this->getPagSeguroProSandboxKey();
         }
 
-        return $this->getPagSeguroProSandboxKey();
+        return $this->getPagSeguroProNonSandboxKey();
     }
 
     public function getPagSeguroProSandboxKey()
@@ -531,7 +533,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      * @param string $existingUrl
      * @param array  $params
      */
-    public static function addUrlParam($existingUrl, $params = array())
+    public function addUrlParam($existingUrl, $params = array())
     {
         $urlParts = parse_url($existingUrl);
         // If URL doesn't have a query string.

@@ -58,15 +58,18 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
 
         $successUrl = Mage::getUrl('pseguro/kiosk/success', array('_secure'=> true));
         $redirectAfter = $this->getRequest()->getParam('redirectUrl');
-        $successUrl = Mage::helper('core/url')->addRequestParam($successUrl, array(
-            'temporaryReference' => $temporaryReference
-        ));
+        $successUrl = Mage::helper('core/url')->addRequestParam(
+            $successUrl, array('temporaryReference' => $temporaryReference)
+        );
 
-        if($redirectAfter){
-            $redirectAfter = Mage::helper('core/url')->addRequestParam($redirectAfter, array(
-                'temporaryReference' => $temporaryReference
-            ));
+        if ($redirectAfter) {
+            $redirectAfter = Mage::helper('core/url')->addRequestParam(
+                $redirectAfter, array('temporaryReference' => $temporaryReference)
+            );
         }
+
+        $noSID = $pHelper->isNoSidUrlEnabled();
+        $isSandbox = $pHelper->isSandbox() ? '1':'0';
 
         $params = array(
             'reference' => $temporaryReference,
@@ -77,7 +80,10 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
             'itemAmount1' => number_format($product->getFinalPrice(), 2, '.', ''),
             'shippingAddressRequired' => false,
             'redirectURL' => $successUrl,
-            'notificationURL' => Mage::getUrl('ricardomartins_pagseguro/notification'),
+            'notificationURL' => Mage::getUrl(
+                'ricardomartins_pagseguro/notification',
+                array('_secure' => true, '_nosid' => $noSID, 'isSandbox' => $isSandbox)
+            ),
             'email' => $pHelper->getMerchantEmail(),
             'token' => $pHelper->getToken()
         );
@@ -88,7 +94,7 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
             return $this->redirectException($e->getMessage());
         }
 
-        if(!isset($checkout->code)){
+        if (!isset($checkout->code)) {
             $this->redirectException('Falha ao obter código de checkout.');
         }
 
@@ -113,13 +119,13 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
         $kHelper = Mage::helper('ricardomartins_pagseguro/kiosk');
         $temporaryReference = $this->getRequest()->getParam('temporaryReference');
         $kiosk = Mage::getModel('ricardomartins_pagseguro/kiosk')->loadByTemporaryReference($temporaryReference);
-        if(!$kiosk->getId()){
+        if (!$kiosk->getId()) {
             return $this->redirectException($kHelper->__('Temporary order reference is missing or was not found.'));
         }
 
-        Mage::getSingleton('customer/session')->addData(array(
-           'kiosk_order' => $kiosk
-        ));
+        Mage::getSingleton('customer/session')->addData(
+            array('kiosk_order' => $kiosk)
+        );
 
         if ($url = $kiosk->getRedirectAfter()) {
             return $this->_redirectUrl($url);

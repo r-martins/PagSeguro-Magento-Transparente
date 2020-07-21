@@ -18,8 +18,18 @@ $_dataToShow = array(
 endforeach;
 ?>
 
-<?php if ($_profile->getId() && Mage::app()->getStore()->isAdmin()) :
-    $link = Mage::helper('adminhtml')->getUrl('adminhtml/sales_recurring_profile/view', ['profile'=> $_profile->getId()]);
+<?php
+if (Mage::app()->getStore()->isAdmin()) {
+    if ($_profile->getId()) {
+        $link = Mage::helper('adminhtml')->getUrl('adminhtml/sales_recurring_profile/view', ['profile'=> $_profile->getId()]);
     ?>
     <div>Perfil recorrente: <a href="<?php echo $link?>"><?php echo $_profile->getId();?></a></div>
-<?php endif; ?>
+    <?php
+    }
+    if ($codTransacao = $this->getOrder()->getExtOrderId()) {
+        //@TODO linkar https://pagseguro.uol.com.br/transaction/details.jhtml?code=$codTransacao se não for sandbox
+        ?>
+     <div>Código da Transação: <?php echo $codTransacao; ?></div>
+<?php
+    }
+}

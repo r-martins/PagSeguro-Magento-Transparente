@@ -24,7 +24,6 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
                 'Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1');
 
 
-
     /** @var RicardoMartins_PagSeguro_Helper_Recurring $_helper */
     protected $_helper;
 
@@ -33,33 +32,6 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
         $this->_helper = Mage::helper('ricardomartins_pagseguro/recurring');
     }
 
-    /**
-     * @param Mage_Catalog_Model_Product $product
-     */
-    public function createPlanFromProduct($product)
-    {
-       if (!$product->isRecurring()) {
-           return false;
-       }
-
-       $params = array(
-         'reference' => $this->_helper->getProductReference($product),
-         'preApprovalName' => $product->getName(),
-         'preApprovalCharge' => '',
-         'preApprovalPeriod' => '',
-         'preApprovalAmountPerPayment' => '',
-         'preApprovalMembershipFee' => '',
-         'preApprovalTrialPeriodDuration' => '',
-         'preApprovalExpirationValue' => '',
-         'preApprovalExpirationUnit' => '',
-         'preApprovalDetails' => $product->getShortDescription(),
-         'preApprovalMaxTotalAmount' =>'',
-         'preApprovalCancelURL' =>'',
-         'reviewURL' =>'',
-         'maxUses' =>'',
-         'receiver[email]' => '',
-       );
-    }
 
     /**
      * Retrieve current status of the subscription at PagSeguro
@@ -119,6 +91,17 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
                     . $profile->getState() . '.'
                 );
             }
+
+            $currentInfo = is_array($additionalInfo) ? $additionalInfo : array();
+            $profile->setAdditionalInfo(
+                array_merge(
+                    $currentInfo,
+                    array('tracker'   => (string)$currentStatus->tracker,
+                          'reference' => (string)$currentStatus->reference,
+                          'status'    => (string)$currentStatus->status)
+                )
+            );
+            $profile->save();
         }
     }
 
@@ -187,10 +170,10 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
             $shippingAmount = $subscription->getShippingAmount();
             $productItemInfo->setShippingAmount($shippingAmount);
             $productItemInfo->setPrice($amount - $shippingAmount - $taxAmount);
-//            $order->setExtOrderId($transaction['code']); //@TODO uncomment
 
             /** @var $order Mage_Sales_Model_Order */
             $order = $subscription->createOrder($productItemInfo);
+            $order->setExtOrderId($transaction['code']);
 
             /** @var Mage_Sales_Model_Order_Payment $payment */
             $payment = $order->getPayment();
@@ -228,9 +211,12 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
     {
         $helper = Mage::helper('ricardomartins_pagseguro');
 
-        $isSandbox = $subscription->getAdditionalInfo('isSandbox') ? '?isSandbox=1' : '';
+        $isSandbox = $subscription->getAdditionalInfo('isSandbox') ? 1 : 0;
+        $key = $isSandbox ? $helper->getPagSeguroProSandboxKey() : $helper->getPagSeguroProNonSandboxKey();
+        $suffix = 'pre-approvals/' . $subscription->getReferenceId() . '/payment-orders';
+        $suffix.= $helper->addUrlParam($suffix, array('isSandbox' => $isSandbox, 'public_key' => $key));
         $apiReturn = $this->callGetAPI(
-            'pre-approvals/' . $subscription->getReferenceId() . '/payment-orders' . $isSandbox,
+            $suffix,
             self::HEADER_V3_JSON, true
         );
 
@@ -337,7 +323,7 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
         $suffix .= $helper->addUrlParam($suffix, array('isSandbox'=> $isSandbox));
 
 
-        $apiReturn = $this->callPutAPI(
+        return $this->callPutAPI(
             $suffix,
             self::HEADER_V3_JSON,
             '',

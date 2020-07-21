@@ -211,7 +211,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
     /**
      * Grab statuses changes when receiving a new notification code
-     * @param $notificationCode
+     *
+     * @param string $notificationCode
      *
      * @return SimpleXMLElement
      */
@@ -221,12 +222,17 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         $useApp = $helper->getLicenseType() == 'app';
         $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode, $useApp);
 
-        $params = array('token' => $helper->getToken(), 'email' => $helper->getMerchantEmail(),);
-        if ($useApp && $helper->isSandbox()) {
-            $params = array('public_key' => $helper->getPagSeguroProKey(), 'isSandbox'=>1);
+        $params = array('token' => $helper->getToken(), 'email' => $helper->getMerchantEmail());
+        if ($useApp) {
+            $params = array_merge(
+                $params,
+                array('public_key' => $helper->getPagSeguroProKey(), 'isSandbox' => $helper->isSandbox() ? 1 : 0)
+            );
+            unset($params['email'], $params['token']);
         }
 
-        $url .= '?' . http_build_query($params);
+        $url .= $helper->addUrlParam($url, $params);
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

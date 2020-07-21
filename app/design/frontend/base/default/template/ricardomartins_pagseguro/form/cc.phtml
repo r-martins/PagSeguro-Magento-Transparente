@@ -5,6 +5,8 @@ $_grandTotal = Mage::helper('checkout/cart')->getQuote()->getGrandTotal();
 $_grandTotal = (!$_grandTotal)?'null':$_grandTotal;
 $_installments = Mage::getSingleton('checkout/session')->getQuote()->getPayment()->getAdditionalInformation('installment_quantity');
 $_installments = (!$_installments)?'null':$_installments;
+$_isSandbox = Mage::helper('ricardomartins_pagseguro')->isSandbox();
+
 
 $_grandTotalToFormat = false;
 if ($_grandTotal && $_grandTotal != 'null') {
@@ -105,6 +107,11 @@ $iwdEnabled = Mage::helper('ricardomartins_pagseguro')->isIwdEnabled();
 		</p>
 	</li>
 	<?php endif;?>
+    <?php if ($_isSandbox) :?>
+        <li>
+            <p>&#9888; Transação de Teste - Sandbox Ativo</p>
+        </li>
+    <?php endif;?>
 </ul>
 <script type="text/javascript">
 //<![CDATA[

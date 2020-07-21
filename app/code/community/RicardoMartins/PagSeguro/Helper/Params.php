@@ -78,14 +78,18 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
 
         $emailPrefix = $this->_dispatchHashEmail($order) ? 'hash' : 'customer';
 
+        $customerEmail = trim($order->getData($emailPrefix . '_email'));
         $return = array(
             'senderName'    => $senderName,
-            'senderEmail'   => trim($order->getData($emailPrefix . '_email')),
+            'senderEmail'   => $customerEmail,
             'senderHash'    => $this->getPaymentHash('sender_hash'),
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
+            'isSandbox'     => (strpos('@sandbox.pagseguro', $customerEmail) !== false)
         );
+
+
         if (strlen($return['senderCPF']) > 11) {
             $return['senderCNPJ'] = $return['senderCPF'];
             unset($return['senderCPF']);
@@ -546,7 +550,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      *
      * @return bool
      */
-    private function _shouldSplit($order)
+    protected function _shouldSplit($order)
     {
         $discount = $order->getDiscountAmount();
         $taxAmount = $order->getTaxAmount();
@@ -556,21 +560,24 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         foreach ($order->getAllVisibleItems() as $item) {
             $totalAmount += $item->getRowTotal();
         }
+
         return (abs($extraAmount) == $totalAmount);
     }
 
-    private function _dispatchHashEmail (&$order)
+    protected function _dispatchHashEmail (&$order)
     {
-        if (Mage::getStoreConfigFlag('payment/rm_pagseguro/hash_email_active'))
-        {
+        $isSandbox = strpos($order->getCustomerEmail(), '@sandbox.pagseguro') !== false;
+
+        if (Mage::getStoreConfigFlag('payment/rm_pagseguro/hash_email_active') && !$isSandbox) {
             $algo   = Mage::getStoreConfig('payment/rm_pagseguro/hash_email_algo');
             $domain = Mage::getStoreConfig('payment/rm_pagseguro/hash_email_domain');
 
             $order->setHashEmail(hash($algo, $order->getCustomerEmail()) . '@' . $domain);
 
-            Mage::dispatchEvent ('ricardomartins_pagseguro_hash_email_before', array(
-                'customer_email' => $order->getCustomerEmail(), 'hash_email' => $order->getHashEmail()
-            ));
+            Mage::dispatchEvent(
+                'ricardomartins_pagseguro_hash_email_before',
+                array('customer_email' => $order->getCustomerEmail(), 'hash_email' => $order->getHashEmail())
+            );
 
             return true;
         }

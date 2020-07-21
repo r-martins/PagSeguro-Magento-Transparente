@@ -1,9 +1,17 @@
 <strong><?php echo $this->escapeHtml($this->getMethod()->getTitle()) ?> (PagSeguro)</strong>
-<?php if($info = $this->getInfo()): ?>
+<?php if($info = $this->getInfo()):
+    /** @var Mage_Sales_Model_Order $order */
+    $order = $info->getOrder();
+    $isSandbox = (!$order || !$order->getId() || strpos($order->getCustomerEmail(), '@sandbox.pagseguro') === false) ? false : true;
+    if ($isSandbox) { echo "(Ambiente de Testes)"; }
+    ?>
     <br/>
-    <?php if($additional = $info->getAdditionalInformation()):?>
-        Id Transação: <?php echo (isset($additional['transaction_id']))?$this->escapeHtml($additional['transaction_id']):'Desconhecido';?>
-        <?php if (isset($additional['transaction_id'])): ?>
+    <?php if($additional = $info->getAdditionalInformation()):
+        $codTransacao = (isset($additional['transaction_id']))?$this->escapeHtml($additional['transaction_id']):'Desconhecido';
+        $codTransacao = $isSandbox ? str_replace('-', '', $codTransacao) : $codTransacao;
+            ?>
+        Código da Transação: <?php echo $codTransacao;?>
+        <?php if (isset($additional['transaction_id']) && !$isSandbox): ?>
             <?php echo sprintf(' | <a href="%s" target="_blank">Ver no PagSeguro</a>', 'https://pagseguro.uol.com.br/transaction/details.jhtml?code=' . $this->escapeHtml($additional['transaction_id']));?>
         <?php endif; ?>
         <br/>

@@ -197,13 +197,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
     ) {
         $pagseguroPlanCode = $this->createPagseguroPlan($profile);
 
-        /*if ($profile->getQuote()->getData('checkout_method') == Mage_Checkout_Model_Type_Onepage::METHOD_REGISTER) {
-            $email = $profile->getQuote()->getCustomerEmail();
-            $customer = Mage::getModel('customer/customer')->loadByEmail($email);
-            if ($customer->getId()) {
-                $profile->setCustomerId($customer->getId());
-            }
-        }*/
         $profile->setToken($pagseguroPlanCode);
         $subResp = $this->subscribeToPlan($pagseguroPlanCode, $paymentInfo, $profile);
 
@@ -274,7 +267,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
                 )
             );
             $profile->save();
-//            Mage::getModel('ricardomartins_pagseguro/recurring')->createOrders($profile);
+            Mage::getModel('ricardomartins_pagseguro/recurring')->createOrders($profile);
         }
 
         $result->setAdditionalInformation(array('tracker' =>(string)$subscriptionDetails->tracker));
@@ -325,7 +318,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
                 break;
         }
         
-        $this->getRecurringProfileDetails($profile, new Varien_Object());
+        $this->getRecurringProfileDetails($profile->getReferenceId(), new Varien_Object());
 
         //método chamado quando clicamos em Suspender, Ativar ou Cancelar um perfil
     }

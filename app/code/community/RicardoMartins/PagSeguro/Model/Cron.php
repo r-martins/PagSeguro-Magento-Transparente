@@ -10,10 +10,13 @@ class RicardoMartins_PagSeguro_Model_Cron
             ->addFieldToFilter('state', array('nin' => $statesToIgnore))
             ->addExpressionFieldToSelect('now', 'CURRENT_TIMESTAMP()', array())
             ->addFieldToFilter('reference_id', array('neq' => ''))
-//            ->addFieldToFilter('profile_id', 57) //@TODO REMOVE FIXED FILTER
             ->addFieldToFilter('method_code', 'rm_pagseguro_recurring');
-        $subscriptionsToUpdate->addFieldToFilter('updated_at', array('to'=>date("Y-m-d H:i:s", time()-3600*6)));
-//        $subscriptionsToUpdate->getSelect()->where("updated_at >= DATE_SUB(NOW(), INTERVAL 6 HOUR)");
+
+        $fields = array('updated_at', 'created_at');
+        $filters = array(array('to'=>date("Y-m-d H:i:s", time()-3600*6)), array('from'=>date("Y-m-d H:i:s", time()-60*5)));
+        $filter1 = array('updated_at', array('to'=>date("Y-m-d H:i:s", time()-3600*6)));
+        $filter2 = array('created_at', array('from'=>date("Y-m-d H:i:s", time()-60*5)));
+        $subscriptionsToUpdate->addFieldToFilter($fields, $filters);
 
         if (!$subscriptionsToUpdate->getAllIds()) {
             return;

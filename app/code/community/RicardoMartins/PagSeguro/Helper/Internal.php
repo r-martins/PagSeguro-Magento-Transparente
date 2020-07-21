@@ -42,6 +42,7 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
 
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
         $pHelper = Mage::helper('ricardomartins_pagseguro/params'); //params helper - helper auxiliar de parametrização
+
         $params = array(
         'email'                 => $helper->getMerchantEmail(),
             'token'             => $helper->getToken(),

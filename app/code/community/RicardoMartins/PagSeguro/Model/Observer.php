@@ -76,6 +76,13 @@ class RicardoMartins_PagSeguro_Model_Observer
 
     }
 
+    /**
+     * This will create a new customer and update customer_id in the recurring profile if checkout is METHOD_REGISTER
+     * This solves a Magento bug in recurring profiles
+     * @param $observer
+     *
+     * @throws Exception
+     */
     public function updateRecurringCustomerId($observer)
     {
         if (!$observer->getObject() || $observer->getObject()->getResourceName() != 'sales/recurring_profile') {
@@ -91,13 +98,11 @@ class RicardoMartins_PagSeguro_Model_Observer
             return;
         }
 
-        #registers the client (extracted from \Mage_Checkout_Model_Type_Onepage::_prepareNewCustomerQuote)
+        #registers the customer (extracted from \Mage_Checkout_Model_Type_Onepage::_prepareNewCustomerQuote)
         $billing    = $quote->getBillingAddress();
         $shipping   = $quote->isVirtual() ? null : $quote->getShippingAddress();
 
-        //$customer = Mage::getModel('customer/customer');
         $customer = $quote->getCustomer();
-        /* @var $customer Mage_Customer_Model_Customer */
         $customerBilling = $billing->exportCustomerAddress();
         $customer->addAddress($customerBilling);
         $billing->setCustomerAddress($customerBilling);
@@ -112,8 +117,9 @@ class RicardoMartins_PagSeguro_Model_Observer
         }
 
         Mage::helper('core')->copyFieldset('checkout_onepage_quote', 'to_customer', $quote, $customer);
-        $customer->setPassword($customer->decryptPassword($quote->getPasswordHash()));
-        $passwordCreatedTime = Mage::getSingleton('checkout/session')->getData('_session_validator_data')['session_expire_timestamp']
+        $customer->setPassword($customer->getPassword());
+        $passwordCreatedTime = Mage::getSingleton('checkout/session')
+                                   ->getData('_session_validator_data')['session_expire_timestamp']
             - Mage::getSingleton('core/cookie')->getLifetime();
         $customer->setPasswordCreatedAt($passwordCreatedTime);
         $quote->setCustomer($customer)
@@ -122,8 +128,9 @@ class RicardoMartins_PagSeguro_Model_Observer
 
         $customer->save();
         $customerId = $customer->getEntityId();
+        $observer->getObject()->getQuote()->setCustomerId($customerId);
+        $data = array('customer_id' => $customerId);
+        $observer->getObject()->setOrderInfo(array_merge($observer->getObject()->getOrderInfo(), $data));
         $observer->getObject()->setCustomerId($customerId);
-        Mage::log(var_export('oi2', true), null, 'martins.log', true);
-        $a = 1;
     }
 }

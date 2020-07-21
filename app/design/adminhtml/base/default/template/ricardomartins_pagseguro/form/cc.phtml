@@ -6,7 +6,7 @@ $_grandTotal = Mage::getSingleton($_singleton)->getQuote()->getGrandTotal();
 $_grandTotal = (!$_grandTotal)?'null':$_grandTotal;
 $_installments = Mage::getSingleton('checkout/session')->getQuote()->getPayment()->getAdditionalInformation('installment_quantity');
 $_installments = (!$_installments)?'null':$_installments;
-
+$_isSandbox = Mage::helper('ricardomartins_pagseguro')->isSandbox();
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
 <?php /*
@@ -86,6 +86,11 @@ $_installments = (!$_installments)?'null':$_installments;
             </div>
         </div>
     </li>
+    <?php if ($_isSandbox) :?>
+        <li>
+            <p>&#9888; Transação de Teste - Sandbox Ativo</p>
+        </li>
+    <?php endif;?>
     <?php echo $this->getChildHtml() ?>
 </ul>
 <script type="text/javascript">

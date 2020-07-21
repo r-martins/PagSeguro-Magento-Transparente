@@ -68,7 +68,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[No modo de testes, os dados são enviados para sandbox do PagSeguro. Habilite o acesso à Sandbox <a href="http://sandbox.pagseguro.uol.com.br/" target="_blank">aqui</a><br/>Obs: O modo Sandbox ainda não funciona no modelo de aplicação.]]></comment>
+                            <comment><![CDATA[No modo de testes, os dados são enviados para sandbox do PagSeguro. Habilite o acesso à Sandbox <a href="https://pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">aqui</a>]]></comment>
                         </sandbox>
                         <sandbox_merchant_email translate="label">
                             <label>E-mail Sandbox</label>
@@ -102,6 +102,9 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                             <comment><![CDATA[Você só precisa informá-la caso esteja usando o <a href="//pagseguro.ricardomartins.net.br/pro/app.html" target="_blank">modelo de aplicação</a>. Nestes casos, também deverá autorizar sua conta Sandbox <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">neste link</a>.]]></comment>
+                            <depends>
+                                <sandbox>1</sandbox>
+                            </depends>
                         </sandbox_appkey>
                         <debug translate="label">
                             <label>Debug</label>
@@ -484,6 +487,156 @@
                         </order_status>
                     </fields>
                 </rm_pagseguro_kiosk>
+
+
+                <rm_pagseguro_recurring module="ricardomartins_pagseguro">
+                    <label>PagSeguro - Pagamento Recorrente (beta) - Ricardo Martins</label>
+                    <comment>Certifique-se de ler e entender as condições, requisitos e como utilizar a recorrência no Magento.</comment>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>114</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </active>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </title>
+                        <title translate="label">
+                            <label>Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </title>
+                        <flag>
+                            <label>Tamanho da bandeira do cartão</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_ccbrand</source_model>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip><![CDATA[Exemplos: <br/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/visa.png" title="42x20"/><img src="//stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/visa.png" title="68x30"/>]]></tooltip>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </flag>
+                        <info_brl>
+                            <label>Exibir aviso que a transação é feita no Brasil.</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>26</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Esta informação DEVE conter em seu checkout por determinação da Visa.]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </info_brl>
+                        <owner_dob_attribute>
+                            <label>Data de Nascimento</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>ricardomartins_pagseguro/source_customer_dob</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment><![CDATA[Data de nascimento do dono do cartão de crédito é obrigatório para o PagSeguro. Este campo também é usado no formulário de pagamento recorrente (caso esteja usando).]]></comment>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </owner_dob_attribute>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </sort_order>
+                        <group_restriction>
+                            <label>Habilitar restrição por grupos</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>50</sort_order>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </group_restriction>
+                        <customer_groups>
+                            <label>Grupos de Cliente</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>ricardomartins_pagseguro/system_config_source_customer_groups</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Grupos de clientes que podem usar este método.]]></comment>
+                            <depends>
+                                <group_restriction>1</group_restriction>
+                            </depends>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </customer_groups>
+                        <allowspecific translate="label" module="Payment">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>200</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </allowspecific>
+                        <specificcountry translate="label" module="Payment">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>210</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <allowspecific>1</allowspecific>
+                            </depends>
+                            <depends>
+                                <active>1</active>
+                            </depends>
+                        </specificcountry>
+                    </fields>
+                </rm_pagseguro_recurring>
             </groups>
         </payment>
     </sections>
