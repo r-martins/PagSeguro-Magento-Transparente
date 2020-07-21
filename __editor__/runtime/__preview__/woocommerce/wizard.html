@@ -5,24 +5,24 @@
 	<script>
     var themeHasJQuery = !!window.jQuery;
 </script>
-<script type="text/javascript" src="../../assets/js/jquery.js?1.0.1209"></script>
+<script type="text/javascript" src="../../assets/js/jquery.js?1.0.1250"></script>
 <script>
     window._$ = jQuery.noConflict(themeHasJQuery);
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../../assets/css/bootstrap.css?1.0.1209" media="screen" />
-<script type="text/javascript" src="../../assets/js/bootstrap.min.js?1.0.1209"></script>
+<link rel="stylesheet" href="../../assets/css/bootstrap.css?1.0.1250" media="screen" />
+<script type="text/javascript" src="../../assets/js/bootstrap.min.js?1.0.1250"></script>
 <!--[if lte IE 9]>
-<link rel="stylesheet" href="../../assets/css/layout.ie.css?1.0.1209">
-<script src="../../assets/js/layout.ie.js?1.0.1209"></script>
+<link rel="stylesheet" href="../../assets/css/layout.ie.css?1.0.1250">
+<script src="../../assets/js/layout.ie.js?1.0.1250"></script>
 <![endif]-->
 <link class="data-control-id-9" href='//fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="../../assets/js/layout.core.js"></script>
-<script src="../../assets/js/CloudZoom.js?1.0.1209"></script>
+<script src="../../assets/js/CloudZoom.js?1.0.1250"></script>
 	
     <title>Woocommerce - Começar</title>
-	<link rel="stylesheet" href="../../assets/css/style.css?1.0.1209">
-	<script src="../../assets/js/script.js?1.0.1209"></script>
+	<link rel="stylesheet" href="../../assets/css/style.css?1.0.1250">
+	<script src="../../assets/js/script.js?1.0.1250"></script>
     <meta charset="utf-8">
     
     <link class="" href='//fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
@@ -263,6 +263,12 @@ zE(function() {
 </section>
 </header>
 	
+		<section class="data-control-id-2454591 bd-section-31 bd-tagstyles" id="section31" data-section-title="Section">
+    <div class="bd-container-inner bd-margins clearfix">
+        
+    </div>
+</section>
+	
 		<div class="data-control-id-2133718 bd-stretchtobottom-2 bd-stretch-to-bottom" data-control-selector=".bd-content-12"><div class="data-control-id-369417 bd-content-12 ">
     
     <div class="data-control-id-2395898 bd-htmlcontent-20 bd-margins" 
@@ -305,7 +311,7 @@ zE(function() {
  col-sm-6">
     <div class="bd-layoutcolumn-135 bd-column" ><div class="bd-vertical-align-wrapper"><div class="data-control-id-2396387 bd-customhtml-20 bd-tagstyles">
     <div class="bd-container-inner bd-content-element">
-        <form id="formAppNew" target="_blank" method="POST" action="https://ws.local.com.br/pspro/v6/app/new" accept-charset="ISO-8859-1">
+        <form id="formAppNew" target="_blank" method="POST" action="https://v7.test/app/new" accept-charset="ISO-8859-1">
 						<table class="table table-stripped table-bordered">
 							<tbody>
 							<tr>
@@ -354,6 +360,7 @@ zE(function() {
 										<option value="pagseguro-30">Recebimento em 30 dias: 3,15%</option>
                                       <option value="pagseguro-transparente-invisible">Invisível Antecipado (Exige convite)</option>
                                       <option value="pagseguro-transparente-invisible-fluxo">Invisível no Fluxo (Exige convite)</option>
+                                      <option value="pagseguro-flex-01">Flex 01 (Exige convite)</option>
 									</select> *
 								</td>
 							</tr>
@@ -372,9 +379,9 @@ zE(function() {
                                   <input type="button" onclick="validateAndSubmit();" value="Avançar" class="btn btn-cta-primary"></td></tr></tbody></table></form>
 <script type="text/javascript">
     if(document.URL.search('local') > 0 || document.URL.search('127.0.0.1') > 0){
-    document.getElementById("formAppNew").action = "https://ws.local.com.br/pspro/v6/app/new";
+    document.getElementById("formAppNew").action = "https://v7.test/app/new";
     }else{
-      document.getElementById("formAppNew").action = "https://ws.ricardomartins.net.br/pspro/v6/app/new";
+      document.getElementById("formAppNew").action = "https://ws.ricardomartins.net.br/pspro/v7/app/new";
     }
 var validateAndSubmit = function(){
     var email = document.getElementById("email").value;
@@ -414,7 +421,7 @@ var checkInvite = function()
  	 var appType = document.getElementById("app_type").value;
    	 var inviteRow = document.getElementById("inviteRow");
   
-  if(appType.indexOf('pagseguro-transparente-invisible') >= 0){
+  if(jQuery('#app_type').prop('selectedIndex') > 1){
    	jQuery(inviteRow).show(); 
   }else{
        	jQuery(inviteRow).hide();
@@ -468,7 +475,7 @@ if(appVar != undefined){
 </h2>
 	
 		<p class="data-control-id-2396292 bd-textblock-294 bd-content-element">
-    Este ainda é um módulo em fase beta, porém funcional.<br>Fique à vontade para reportar problemas ou dúvidas no processo de instalação.
+    Siga os passos ao lado para realizar a instalação do módulo.<br>Fique à vontade para <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br">reportar problemas ou dúvidas</a> no processo de instalação.
 </p>
 	
 		<p class="data-control-id-2396291 bd-textblock-293 bd-content-element">
@@ -637,10 +644,12 @@ if(appVar != undefined){
     E-mail PagSeguro</b>: e-mail da conta PagSeguro<br><b>Token PagSeguro</b>: token PagSeguro informado no painel da conta<br><b>APP Key</b>: chave do módulo informado no passo 1 e também enviada para o e-mail informado no primeiro passo
 </p>
 	
+		<img class="bd-imagelink-10 bd-own-margins bd-imagestyles   data-control-id-2484781"  src="../../assets/images/b3beca3c23278e6a1233e287eeccdc4d_Configuracoes_do_WooCommerce__PagSeguro_Woocommerce__WordPress.png">
+	
 		<div class="data-control-id-2395950 bd-customhtml-17 bd-tagstyles">
     <div class="bd-container-inner bd-content-element">
-        <ol start="5"><li>Salve as configurações e teste seu checkout.</li>
-</ol><div><br></div><div>Certifique-se que o Sandbox está desabilitado, pois o mesmo não é suportado neste modelo (logo será removido).</div>
+        <ol start="3"><li>Salve as configurações e teste seu checkout.</li>
+</ol><div><br></div><div>⚠Certifique-se que o Sandbox está desabilitado, pois o mesmo ainda não é suportado na integração com Woocommerce.</div>
     </div>
 </div></div></div>
 </div>
