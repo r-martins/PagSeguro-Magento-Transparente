@@ -100,7 +100,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
             $message = $processedState->getMessage();
 
-            if ((int)$resultXML->status == 6) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
+            if (in_array((int)$resultXML->status, array(6,8))) { //valor devolvido (gera credit memo e tenta cancelar o pedido)
                 if ($order->canUnhold()) {
                     $order->unhold();
                 }
@@ -220,7 +220,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     {
         $helper =  Mage::helper('ricardomartins_pagseguro');
         $useApp = $helper->getLicenseType() == 'app';
-        $url =  $helper->getWsUrl('transactions/notifications/' . $notificationCode, $useApp);
+        $url =  $helper->getWsV3Url('transactions/notifications/' . $notificationCode, $useApp);
 
         $params = array('token' => $helper->getToken(), 'email' => $helper->getMerchantEmail());
         if ($useApp) {
@@ -341,8 +341,24 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 if ($this->_order && Mage::helper('ricardomartins_pagseguro')->canRetryOrder($this->_order)) {
                     $return->setState(Mage_Sales_Model_Order::STATE_HOLDED);
                     $return->setIsCustomerNotified(false);
-                    $return->setMessage('Retentativa: a transação ia ser cancelada (status 7), mas a opção de retentativa estava ativada. O pedido será cancelado posteriormente caso o cliente não use o link de retentativa no prazo estabelecido.');
+                    $return->setMessage(
+                        'Retentativa: a transação ia ser cancelada (status 7), mas '
+                        . 'a opção de retentativa estava ativada. O pedido será cancelado posteriormente '
+                        . 'caso o cliente não use o link de retentativa no prazo estabelecido.'
+                    );
                 }
+                break;
+            case '8':
+                $return->setState(Mage_Sales_Model_Order::STATE_CANCELED);
+                $return->setIsCustomerNotified(false);
+                $return->setMessage('Debitado: o valor da transação foi devolvida ao comprador após processo'
+                    . ' de disputa.');
+                break;
+            case '9':
+                $return->setState(Mage_Sales_Model_Order::STATE_HOLDED);
+                $return->setIsCustomerNotified(false);
+                $return->setMessage('Retenção Temporária: O comprador abriu uma solicitação de chargeback junto à'
+                    . ' operadora do cartão de crédito.');
                 break;
             default:
                 $return->setIsCustomerNotified(false);

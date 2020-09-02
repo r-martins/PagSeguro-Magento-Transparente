@@ -176,6 +176,22 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_WS_URL) . $amend;
     }
 
+
+    /**
+     * Returns Webservice V3 URL based on selected environment (prod or sandbox)
+     * This API endpoint should be used only for GET requests
+     *
+     * @param string $amend suffix
+     * @param bool $useApp uses app?
+     *
+     * @return string
+     */
+    public function getWsV3Url($amend='', $useApp = false)
+    {
+        $url = $this->getWsUrl($amend, $useApp);
+        return str_ireplace('/v2/', '/v3/', $url);
+    }
+
     /**
      * Return PagSeguro's lib url based on selected environment (prod or sandbox)
      * @return string

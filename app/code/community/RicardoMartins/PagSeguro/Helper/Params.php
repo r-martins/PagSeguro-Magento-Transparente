@@ -86,9 +86,10 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             'senderCPF'     => $digits->filter($cpf),
             'senderAreaCode'=> $phone['area'],
             'senderPhone'   => $phone['number'],
-            'isSandbox'     => (strpos('@sandbox.pagseguro', $customerEmail) !== false)
+            'isSandbox'     => (strpos('@sandbox.pagseguro', $customerEmail) !== false),
         );
 
+        $return = $this->addSenderIp($return);
 
         if (strlen($return['senderCPF']) > 11) {
             $return['senderCNPJ'] = $return['senderCPF'];
@@ -789,6 +790,25 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 )
             )
         );
+    }
 
+    /**
+     * Adds sender ip to $originalParameters array or return original array if unsuccessful or not ip_v4 address
+     * @param array $originalParameters
+     *
+     * @return array
+     */
+    public function addSenderIp($originalParameters)
+    {
+        $senderIp = $_SERVER['REMOTE_ADDR'];
+
+        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) { //Cloudflare
+            $senderIp = $_SERVER['HTTP_CF_CONNECTING_IP'];
+        }
+
+        if (false === filter_var($senderIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+            return $originalParameters;
+
+        return array_merge($originalParameters, array('senderIp'=>$senderIp));
     }
 }
