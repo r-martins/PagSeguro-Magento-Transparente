@@ -540,7 +540,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isIwdEnabled()
     {
-        return class_exists('IWD_Opc_Helper_Data') && Mage::helper('iwd_opc')->isEnable();
+        return Mage::helper('core')->isModuleEnabled('IWD_Opc') && Mage::helper('iwd_opc')->isEnable();
     }
 
     /**
