@@ -16,12 +16,10 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
 
 
     const HEADER_V3_JSON
-        = array('Accept: application/vnd.pagseguro.com.br.v3+json;charset=ISO-8859-1',
-                'Content-Type: application/json');
+        = 'Accept: application/vnd.pagseguro.com.br.v3+json;charset=ISO-8859-1,Content-Type: application/json';
 
     const HEADER_V3_URLENCODED
-        = array('Accept: application/vnd.pagseguro.com.br.v3+json;charset=ISO-8859-1',
-                'Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1');
+        = 'Accept: application/vnd.pagseguro.com.br.v3+json;charset=ISO-8859-1,Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1';
 
 
     /** @var RicardoMartins_PagSeguro_Helper_Recurring $_helper */
@@ -54,7 +52,7 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
         $key = $isSandbox ? $helper->getPagSeguroProSandboxKey() : $helper->getPagSeguroProNonSandboxKey();
         $suffix .= $helper->addUrlParam($suffix, array('public_key'=> $key));
 
-        $response = $this->callGetAPI($suffix, self::HEADER_V3_JSON, true);
+        $response = $this->callGetAPI($suffix, explode(',', self::HEADER_V3_JSON), true);
 
         if (isset($response->errors)) {
             foreach ($response->errors as $code => $error) {
@@ -217,7 +215,7 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
         $suffix.= $helper->addUrlParam($suffix, array('isSandbox' => $isSandbox, 'public_key' => $key));
         $apiReturn = $this->callGetAPI(
             $suffix,
-            self::HEADER_V3_JSON, true
+            explode(',', self::HEADER_V3_JSON), true
         );
 
         if (!$apiReturn || !isset($apiReturn->paymentOrders)) {
@@ -299,7 +297,7 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
 
         $apiReturn = $this->callPutAPI(
             $suffix,
-            self::HEADER_V3_JSON,
+            explode(',', self::HEADER_V3_JSON),
             '{"status": "'. $newStatus . '"}',
             true
         );
@@ -325,7 +323,7 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
 
         return $this->callPutAPI(
             $suffix,
-            self::HEADER_V3_JSON,
+            explode(',', self::HEADER_V3_JSON),
             '',
             true
         );

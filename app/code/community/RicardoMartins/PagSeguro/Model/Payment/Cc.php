@@ -283,7 +283,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         try{
             $response = curl_exec($ch);
-            return json_decode($response)->installments->$creditCardBrand[$selectedInstallment-1]->installmentAmount;
+            return json_decode($response)->installments->{$creditCardBrand}[$selectedInstallment-1]->installmentAmount;
         }catch(Exception $e){
             Mage::logException($e);
             return false;
