@@ -2,8 +2,125 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9969a77e-c24c-4834-ba49-b71119d07ea5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/magicento.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/magicento.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/bounty.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/bounty.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/compare.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/compare.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/demo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/download-wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/download-wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/download.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/download.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/faq.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/magento1.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/magento1.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/magento2.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/magento2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/magento2/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/magento2/wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro/app/autorizar.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro/app/autorizar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro/app/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro/app/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro/app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro/app/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro/app/liberacao2dias.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro/app/liberacao2dias.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/pro/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/pro/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/sandbox.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/sandbox.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/sandbox/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/sandbox/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/sandbox/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/sandbox/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/sobre.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/sobre.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/status.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/status.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/woocommerce.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/woocommerce.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/woocommerce/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/woocommerce/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/preview/woocommerce/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/preview/woocommerce/wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/project/cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/project/cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/project/hashes.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/project/hashes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/project/model.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/project/model.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/data/project/project.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/data/project/project.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/cache.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/hashes.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/hashes.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/model.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/model.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/project.json" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__editor__/data/project/project.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/bounty.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/bounty.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/compare.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/compare.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/demo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/download-wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/download-wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/download.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/download.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/faq.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/magento1.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/magento1.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/magento2.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/magento2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/magento2/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/magento2/wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/autorizar.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/autorizar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/liberacao2dias.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/app/liberacao2dias.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/pro/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/sandbox.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/sandbox.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/sandbox/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/sandbox/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/sandbox/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/sandbox/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/sobre.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/sobre.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/status.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/status.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/woocommerce.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/woocommerce.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/woocommerce/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/woocommerce/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/__preview__/woocommerce/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/__preview__/woocommerce/wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/assets/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/assets/images/7eab0e1a7829adb6b444397296b062fe_screenshotcheckoutcc.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/assets/images/preview.png" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/assets/images/preview.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/bounty.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/bounty.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/compare.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/compare.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/demo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/download-wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/download-wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/download.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/download.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/faq.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/magento1.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/magento1.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/magento2.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/magento2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/magento2/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/magento2/wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro/app/autorizar.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro/app/autorizar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro/app/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro/app/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro/app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro/app/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro/app/liberacao2dias.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro/app/liberacao2dias.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/pro/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/pro/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/sandbox.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/sandbox.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/sandbox/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/sandbox/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/sandbox/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/sandbox/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/sobre.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/sobre.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/status.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/status.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/woocommerce.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/woocommerce.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/woocommerce/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/woocommerce/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__editor__/runtime/woocommerce/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/__editor__/runtime/woocommerce/wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/7eab0e1a7829adb6b444397296b062fe_screenshotcheckoutcc.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/preview.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/preview.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bounty.html" beforeDir="false" afterPath="$PROJECT_DIR$/bounty.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compare.html" beforeDir="false" afterPath="$PROJECT_DIR$/compare.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/demo.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/download-wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/download-wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/download.html" beforeDir="false" afterPath="$PROJECT_DIR$/download.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/faq.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/magento1.html" beforeDir="false" afterPath="$PROJECT_DIR$/magento1.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/magento2.html" beforeDir="false" afterPath="$PROJECT_DIR$/magento2.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/magento2/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/magento2/wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro/app.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro/app.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro/app/autorizar.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro/app/autorizar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro/app/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro/app/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro/app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro/app/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro/app/liberacao2dias.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro/app/liberacao2dias.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pro/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/pro/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sandbox.html" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sandbox/created.html" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/created.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sandbox/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sobre.html" beforeDir="false" afterPath="$PROJECT_DIR$/sobre.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/status.html" beforeDir="false" afterPath="$PROJECT_DIR$/status.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/woocommerce.html" beforeDir="false" afterPath="$PROJECT_DIR$/woocommerce.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/woocommerce/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/woocommerce/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/woocommerce/wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/woocommerce/wizard.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,15 +128,17 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ComposerSettings">
-    <execution>
-      <executable />
-    </execution>
+    <execution />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
-  <component name="FavoritesManager">
-    <favorites_list name="pagsegurosite" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -32,16 +151,18 @@
   <component name="ProjectId" id="1SuQFe129q4lQE6YDU5wnMuONH7" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="js-jscs-nodeInterpreter" value="/usr/local/bin/node" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Issue.Navigation" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
@@ -77,6 +198,7 @@
       <method v="2" />
     </configuration>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -95,7 +217,7 @@
     <option name="totallyTimeSpent" value="2888000" />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -104,5 +226,11 @@
     <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
       <collection />
     </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="625" y="288" width="670" height="676" key="search.everywhere.popup" timestamp="1601525896792">
+      <screen x="0" y="23" width="1920" height="1177" />
+    </state>
+    <state x="625" y="288" width="670" height="676" key="search.everywhere.popup/1920.-780.2560.1440/0.23.1920.1177@0.23.1920.1177" timestamp="1601525896792" />
   </component>
 </project>

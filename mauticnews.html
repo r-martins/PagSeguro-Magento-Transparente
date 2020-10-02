@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"/>
+</head>
+<body>
+<script type="text/javascript">
+    /** This section is only needed once per page if manually copying **/
+    if (typeof MauticSDKLoaded == 'undefined') {
+        var MauticSDKLoaded = true;
+        var head            = document.getElementsByTagName('head')[0];
+        var script          = document.createElement('script');
+        script.type         = 'text/javascript';
+        script.src          = 'https://mkt.magenteiro.com/media/js/mautic-form.js';
+        script.onload       = function() {
+            MauticSDK.onLoad();
+        };
+        head.appendChild(script);
+        var MauticDomain = 'https://mkt.magenteiro.com';
+        var MauticLang   = {
+            'submittingMessage': "Please wait..."
+        }
+    }
+</script>
+<script type="text/javascript">
+    function verifyCallback_80f1f43d3d7687f81a828dac6f7e3e61( response ) {
+        document.getElementById("mauticform_input_pagseguronovidades_nao_sou_um_robo").value = response;
+    }
+</script>
+<!--<script src="https://www.google.com/recaptcha/api.js"></script>-->
+<script type="text/javascript">
+    jQuery(document).ready(function (jQuery) {
+        jQuery('#mauticform_input_pagseguronovidades_nome').focus(function () {
+            if (typeof loadedRecaptcha != 'undefined') {
+                return;
+            }
+            jQuery.getScript("https://www.google.com/recaptcha/api.js?render=6LemGHsUAAAAAITFL13bw0ujJQuIFSpPsEbo3St7")
+                .done(function (script, textStatus) {
+                    if (typeof grecaptcha !== "undefined") {
+                        grecaptcha.ready(function () {
+                            var siteKey = '6LemGHsUAAAAAITFL13bw0ujJQuIFSpPsEbo3St7';
+                            jQuery('body').append(jQuery('<div id="captcha_container" class="google-cpatcha"></div>'));
+                            setTimeout(function () {
+                                grecaptcha.render('captcha_container', {
+                                    'sitekey': siteKey
+                                });
+                            }, 1000);
+                        });
+                    }
+                    loadedRecaptcha = true;
+                });
+        });
+    });
+</script>
+
+
+
+<style type="text/css" scoped>
+    .mauticform_wrapper { max-width: 600px; margin: 10px auto; }
+    .mauticform-innerform {}
+    .mauticform-post-success {}
+    .mauticform-name { font-weight: bold; font-size: 1.5em; margin-bottom: 3px; }
+    .mauticform-description { margin-top: 2px; margin-bottom: 10px; }
+    .mauticform-error { margin-bottom: 10px; color: red; }
+    .mauticform-message { margin-bottom: 10px;color: green; }
+    .mauticform-row { display: block; margin-bottom: 20px; }
+    .mauticform-label { font-size: 1.1em; display: block; font-weight: bold; margin-bottom: 5px; }
+    .mauticform-row.mauticform-required .mauticform-label:after { color: #e32; content: " *"; display: inline; }
+    .mauticform-helpmessage { display: block; font-size: 0.9em; margin-bottom: 3px; }
+    .mauticform-errormsg { display: block; color: red; margin-top: 2px; }
+    .mauticform-selectbox, .mauticform-input, .mauticform-textarea { width: 100%; padding: 0.5em 0.5em; border: 1px solid #CCC; background: #fff; box-shadow: 0px 0px 0px #fff inset; border-radius: 4px; box-sizing: border-box; }
+    .mauticform-checkboxgrp-row {}
+    .mauticform-checkboxgrp-label { font-weight: normal; }
+    .mauticform-checkboxgrp-checkbox {}
+    .mauticform-radiogrp-row {}
+    .mauticform-radiogrp-label { font-weight: normal; }
+    .mauticform-radiogrp-radio {}
+    .mauticform-button-wrapper .mauticform-button.btn-default, .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default { color: #5d6c7c;background-color: #ffffff;border-color: #dddddd;}
+    .mauticform-button-wrapper .mauticform-button, .mauticform-pagebreak-wrapper .mauticform-pagebreak { display: inline-block;margin-bottom: 0;font-weight: 600;text-align: center;vertical-align: middle;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;padding: 6px 12px;font-size: 13px;line-height: 1.3856;border-radius: 3px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}
+    .mauticform-button-wrapper .mauticform-button.btn-default[disabled], .mauticform-pagebreak-wrapper .mauticform-pagebreak.btn-default[disabled] { background-color: #ffffff; border-color: #dddddd; opacity: 0.75; cursor: not-allowed; }
+    .mauticform-pagebreak-wrapper .mauticform-button-wrapper {  display: inline; }
+</style>
+<div id="mauticform_wrapper_pagseguronovidades" class="mauticform_wrapper">
+    <form autocomplete="false" role="form" method="post" action="https://mkt.magenteiro.com/form/submit?formId=1" id="mauticform_pagseguronovidades" data-mautic-form="pagseguronovidades" enctype="multipart/form-data">
+        <div class="mauticform-error" id="mauticform_pagseguronovidades_error"></div>
+        <div class="mauticform-message" id="mauticform_pagseguronovidades_message"></div>
+        <div class="mauticform-innerform">
+
+
+            <div class="mauticform-page-wrapper mauticform-page-1" data-mautic-form-page="1">
+
+                <div id="mauticform_pagseguronovidades_nome" class="mauticform-row mauticform-text mauticform-field-1">
+                    <input id="mauticform_input_pagseguronovidades_nome" name="mauticform[nome]" value="" placeholder="Primeiro nome" class="mauticform-input" type="text">
+                    <span class="mauticform-errormsg" style="display: none;"></span>
+                </div>
+
+                <div id="mauticform_pagseguronovidades_seu_email" data-validate="seu_email" data-validation-type="email" class="mauticform-row mauticform-email mauticform-field-2 mauticform-required">
+                    <input id="mauticform_input_pagseguronovidades_seu_email" name="mauticform[seu_email]" value="" placeholder="Seu e-mail" class="mauticform-input" type="email">
+                    <span class="mauticform-errormsg" style="display: none;">e-mail inválido</span>
+                </div>
+
+                <div id="mauticform_pagseguronovidades_url_da_loja" class="mauticform-row mauticform-url mauticform-field-3">
+                    <input id="mauticform_input_pagseguronovidades_url_da_loja" name="mauticform[url_da_loja]" value="" placeholder="URL da Loja" class="mauticform-input" type="url">
+                    <span class="mauticform-errormsg" style="display: none;"></span>
+                </div>
+
+
+
+
+
+                <div id="mauticform_pagseguronovidades_nao_sou_um_robo" class="mauticform-row mauticform-div-wrapper mauticform-field-4">
+
+                    <div class="g-recaptcha" id="captcha_container" data-sitekey="6LemGHsUAAAAAITFL13bw0ujJQuIFSpPsEbo3St7" data-callback="verifyCallback_80f1f43d3d7687f81a828dac6f7e3e61"></div>
+                    <input id="mauticform_input_pagseguronovidades_nao_sou_um_robo" name="mauticform[nao_sou_um_robo]" value="" class="mauticform-input" type="hidden">
+                    <span class="mauticform-errormsg" style="display: none;"></span>
+                </div>
+
+                <div id="mauticform_pagseguronovidades_submit" class="mauticform-row mauticform-button-wrapper mauticform-field-5">
+                    <button type="submit" name="mauticform[submit]" id="mauticform_input_pagseguronovidades_submit" value="" class="mauticform-button btn btn-default">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" name="mauticform[formId]" id="mauticform_pagseguronovidades_id" value="1">
+        <input type="hidden" name="mauticform[return]" id="mauticform_pagseguronovidades_return" value="">
+        <input type="hidden" name="mauticform[formName]" id="mauticform_pagseguronovidades_name" value="pagseguronovidades">
+
+    </form>
+</div>
+
+
+
+
+</body>
+</html>

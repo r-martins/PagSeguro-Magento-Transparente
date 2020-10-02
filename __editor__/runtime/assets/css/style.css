@@ -19266,6 +19266,9 @@ h2.bd-postheader-4 a {
 .bd-sliderindicators-2:before {
   vertical-align: bottom;
 }
+.bd-slide-8 {
+  position: relative;
+}
 .bd-slide-11 {
   background-color: #000000;
   background-image: url(../../assets/images/c08d0c4222bdbace2b09427f36057552_ScreenShot20160530at9.39.35PM.png), linear-gradient(315deg, #ffffff 0%, rgba(255, 255, 255, 0) 100%);
@@ -19289,17 +19292,6 @@ h2.bd-postheader-4 a {
   background-attachment: scroll;
   background-position: right center;
   background-color: #b7b7b7;
-  position: relative;
-}
-.bd-slide-8 {
-  position: relative;
-}
-.bd-slide-1 {
-  background-image: url(../../assets/images/7eab0e1a7829adb6b444397296b062fe_screenshotcheckoutcc.jpg);
-  background-repeat: no-repeat;
-  background-attachment: scroll;
-  background-position: right center;
-  background-color: #ffffff;
   position: relative;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNsaWRlcjI {}
@@ -19592,20 +19584,6 @@ h4.bd-textblock-104 {
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyMA {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyMQ {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyMQ {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyMg {}
-.bd-textblock-122 {
-  position: absolute;
-  top: 13.928%;
-  left: 6.086%;
-  right: auto;
-  bottom: auto;
-}
-.bd-textblock-122 {
-  line-height: 68.57142859px;
-  font-size: 48px;
-  color: #269ccb;
-}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyMg {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyMw {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyMw {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazEyNA {}
@@ -19946,18 +19924,6 @@ h2.bd-textblock-189 {
   margin-bottom: 0px;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazE5OQ {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazI {}
-.bd-textblock-2 {
-  position: absolute;
-  top: 65.357%;
-  left: 6.431%;
-  right: auto;
-  bottom: auto;
-}
-.bd-textblock-2 {
-  color: #269ccb;
-}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazI {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazIw {}
 .bd-textblock-20 {
   position: absolute;
