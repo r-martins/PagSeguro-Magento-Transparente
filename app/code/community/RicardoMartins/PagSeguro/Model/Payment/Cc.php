@@ -153,8 +153,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $helper->writeLog(
                 "Falha ao obter o token do cartao ou sender_hash.
                     Ative o modo debug e observe o console de erros do seu navegador.
-                    Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido, ou configure
-                    a url de exceção.
+                    Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido, ou adicione
+                    a URL desta requisição como exceção nas configurações do módulo.
                     $missingInfo"
             );
             if (!$helper->isRetryActive()) {
@@ -202,7 +202,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 return $this->recalculateInstallmentsAndPlaceOrder($payment, $amount);
             }
 
-            if ($rmHelper->canRetryOrder($order)) {
+            $resultXMLErrorCodes = $this->getData('resultXMLErrorCodes');
+            if ($rmHelper->canRetryOrder($order) && !$this->containsUserError($resultXMLErrorCodes)) {
                 $order->addStatusHistoryComment(
                     'A retentativa de pedido está ativa. O pedido foi concluído mesmo com o seguite erro: '
                     . $e->getMessage()
@@ -211,7 +212,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
             //only throws exception if payment retry is disabled
             //read more at https://bit.ly/3b2onpo
-            if (!$rmHelper->isRetryActive()) {
+            if (!$rmHelper->isRetryActive() || $this->containsUserError($resultXMLErrorCodes)) {
                 Mage::throwException($e->getMessage());
             }
         }
@@ -289,7 +290,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             return false;
         }
 
-        return false;
     }
 
     /**
@@ -325,6 +325,25 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
+    }
+
+    /**
+     * Checks if one of the error was caused by the user (i.e.: invalid address data)
+     *
+     * @param $errorCodes array
+     *
+     * @return bool
+     */
+    public function containsUserError($errorCodes)
+    {
+        if (!is_array($errorCodes)) {
+            return true;
+        }
+        // Errors that are not fixed by the user
+        // See https://dev.pagseguro.uol.com.br/reference/checkout-transparente#transparente-apendice
+        $nonUserErrors = array (53005, 53008, 53009, 53010, 53011, 53012, 53017, 53037, 53039, 53040, 53041,
+                                53045, 53046);
+        return array_intersect($errorCodes, $nonUserErrors) == false;
     }
 
 }

@@ -161,8 +161,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Recurring extends RicardoMartins_Pa
             $helper->writeLog(
                 "Falha ao obter o token do cartao ou sender_hash.
                 Ative o modo debug e observe o console de erros do seu navegador.
-                Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido, ou configure
-                a url de exceção.
+                Se esta for uma atualização via Ajax, ignore esta mensagem até a finalização do pedido, ou adicione
+                a URL desta requisição como exceção nas configurações do módulo.
                 $missingInfo"
             );
         }

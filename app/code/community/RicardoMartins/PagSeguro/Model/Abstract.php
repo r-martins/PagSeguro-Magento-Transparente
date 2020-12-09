@@ -36,21 +36,24 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         Mage::register('sales_order_invoice_save_after_event_triggered', true);
 
+        $resultXMLErrorCodes = array();
         if (isset($resultXML->errors)) {
             foreach ($resultXML->errors as $error) {
                 $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
+                $resultXMLErrorCodes[] = (int)$error->code;
             }
 
             if ($error->code == '53041') { //installment value invalid value
                 $this->setIsInvalidInstallmentValueError(true);
             }
-
+            $this->setData('resultXMLErrorCodes', $resultXMLErrorCodes);
             Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
         }
 
         if (isset($resultXML->error)) {
             $error = $resultXML->error;
             $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
+            $resultXMLErrorCodes[] = (int)$error->code;
 
             if ($error->code == '53041') { //installment value invalid value
                 $this->setIsInvalidInstallmentValueError(true);
@@ -60,9 +63,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 unset($errMsg);
                 foreach ($resultXML->error as $error) {
                     $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
+                    $resultXMLErrorCodes[] = (int)$error->code;
                 }
             }
 
+            $this->setData('resultXMLErrorCodes', $resultXMLErrorCodes);
             Mage::throwException('Um erro ocorreu em seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
         }
 

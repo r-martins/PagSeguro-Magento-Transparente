@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.8.2
+ * @version 3.10.3
  */
 
 RMPagSeguro = Class.create({
@@ -197,7 +197,7 @@ RMPagSeguro = Class.create({
                 },
                 error: function(psresponse){
                     if(undefined!=psresponse.errors["30400"]) {
-                        $('card-msg').innerHTML = 'Dados do cartão inválidos.';
+                        $('card-msg').innerHTML = 'Dados do cartão inválidos. Confira os dados e validade do cartão.';
                     }else if(undefined!=psresponse.errors["10001"]){
                         $('card-msg').innerHTML = 'Tamanho do cartão inválido.';
                     }else if(undefined!=psresponse.errors["10002"]){
