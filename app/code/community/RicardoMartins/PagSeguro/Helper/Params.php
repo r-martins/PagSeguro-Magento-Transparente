@@ -800,7 +800,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function addSenderIp($originalParameters)
     {
-        $senderIp = Mage::helper('core/http')->getRemoteAddr(true);
+        $senderIp = Mage::helper('core/http')->getRemoteAddr();
 
         if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) { //Cloudflare
             $senderIp = $_SERVER['HTTP_CF_CONNECTING_IP'];
