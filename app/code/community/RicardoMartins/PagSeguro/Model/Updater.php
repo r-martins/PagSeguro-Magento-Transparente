@@ -93,10 +93,6 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
      */
     public function listPendingPayments()
     {
-        //@TODO REMOVE
-        return Mage::getModel('sales/order_payment')->getCollection()
-            ->join('order', 'main_table.parent_id = order.entity_id', 'state')
-            ->addFieldToFilter('parent_id', 389); //order id;
         return Mage::getModel('sales/order_payment')->getCollection()
             ->join('order', 'main_table.parent_id = order.entity_id', 'state')
             ->addFieldToFilter('method', array(array('like'=>'rm_pagseguro%'), array('like'=>'pagseguropro%')))
