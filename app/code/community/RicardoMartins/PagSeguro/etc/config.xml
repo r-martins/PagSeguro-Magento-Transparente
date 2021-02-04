@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.10.3</version>
+            <version>3.11.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -176,6 +176,7 @@
                 <exception_request_validate>onestepcheckout/ajax/savePaymentMethod</exception_request_validate>
                 <jsdelivr_enabled>1</jsdelivr_enabled>
                 <jsdelivr_minify>1</jsdelivr_minify>
+                <updater_enabled>0</updater_enabled>
             </rm_pagseguro>
             <rm_pagseguro_kiosk>
                 <active>0</active>
@@ -235,6 +236,25 @@
                     <model>ricardomartins_pagseguro/cron::updateRecurringPayments</model>
                 </run>
             </ricardomartins_pagseguro_recurring_update>
+            <ricardomartins_pagseguro_update_orders>
+                <schedule>
+                    <cron_expr>*/2 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>ricardomartins_pagseguro/updater::updateOrders</model>
+                </run>
+            </ricardomartins_pagseguro_update_orders>
         </jobs>
     </crontab>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <RicardoMartins_PagSeguro before="-">RicardoMartins_PagSeguro_Adminhtml</RicardoMartins_PagSeguro>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
 </config>

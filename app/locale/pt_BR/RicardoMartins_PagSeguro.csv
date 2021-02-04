@@ -182,3 +182,6 @@
 "cnpj is invalid: %s","CNPJ Inválido: %s"
 "sender email invalid domain: %s","E-mail do comprador com domínio inválido: %s. Você deve usar um e-mail @sandbox.pagseguro.com.br"
 "invalid pre-approval status to execute the requested operation. Pre-approval status is ACTIVE.","Status inválido para operação atual. O status da assinatura atual é ACTIVE."
+"YYYY","AAAA"
+"Year","Ano"
+"Month","Mês"

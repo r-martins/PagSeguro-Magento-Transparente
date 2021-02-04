@@ -13,7 +13,9 @@
         Código da Transação: <?php echo $codTransacao;?>
         <?php if (isset($additional['transaction_id']) && !$isSandbox): ?>
             <?php echo sprintf(' | <a href="%s" target="_blank">Ver no PagSeguro</a>', 'https://pagseguro.uol.com.br/transaction/details.jhtml?code=' . $this->escapeHtml($additional['transaction_id']));?>
-        <?php endif; ?>
+        <?php elseif ($isSandbox): ?>
+            <?php echo sprintf(' | <a href="%s" target="_blank">Ver no PagSeguro</a>', 'https://sandbox.pagseguro.uol.com.br/aplicacao/transacoes.html');?>
+        <?php endif;?>
         <br/>
     <?php endif;?>
     Bandeira: <?php echo ucfirst($this->escapeHtml($info->getCcType()));?>
@@ -29,5 +31,9 @@
         <br/>
         Total líquido a receber: <?php echo  Mage::helper('core')->formatCurrency($additional['net_amount']);?>
         <br/>
+    <?php endif;?>
+    <?php if(Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/pagseguro_update') && isset($additional['transaction_id'])): ?>
+        <br/>
+        <button class="scalable psupdate" title="Forçar atualização" onclick="if(confirm('Você tem certeza?'))setLocation('<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/updatePayment/index', array('id'=>$info->getId()))?>')"><span><span>Forçar atualização</span></span></button>
     <?php endif;?>
 <?php endif; ?>

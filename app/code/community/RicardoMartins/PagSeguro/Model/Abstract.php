@@ -34,6 +34,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             return $this; // this method has already been executed once in this request
         }
 
+
         Mage::register('sales_order_invoice_save_after_event_triggered', true);
 
         if (isset($resultXML->errors)) {
@@ -85,7 +86,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $helper->writeLog(
                     sprintf(
                         'Pedido %s não encontrado no sistema. Impossível processar retorno. '
-                        . 'Uma nova tentativa deverá feita em breve pelo PagSeguro.', $orderNo
+                        . 'Uma nova tentativa será feita em breve pelo PagSeguro ou pelo módulo.', $orderNo
                     )
                 );
 
@@ -97,6 +98,10 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
             $this->_code = $payment->getMethod();
             $processedState = $this->processStatus((int)$resultXML->status);
+
+            if (!$payment->getAdditionalInformation('transaction_id') && isset($resultXML->code)) {
+                $payment->setAdditionalInformation('transaction_id', (string)$resultXML->code);
+            }
 
             $message = $processedState->getMessage();
 
@@ -158,7 +163,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $order->addStatusHistoryComment($message);
             }
 
-            if ((int)$resultXML->status == 3) { //Quando o pedido foi dado como Pago
+            if (in_array((int)$resultXML->status, array(3, 4))) { //Quando o pedido foi dado como Pago ou Disponivel
                 // cria fatura e envia email (se configurado)
                 // $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
                 if(!$order->hasInvoices()){
@@ -253,12 +258,22 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             );
         }
 
-        $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode, $return));
+        $helper->writeLog(sprintf('Retorno do Pagseguro para notificationCode %s: %s', $notificationCode,
+            Mage::helper('core/string')
+                ->truncate(@iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $return), 400, '...(continua)'))
+        );
 
         libxml_use_internal_errors(true);
         $xml = simplexml_load_string(trim($return));
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $isServerProblem = substr($httpCode, 0, 1) == 5;
         if (false === $xml) {
-            $helper->writeLog('Retorno de notificacao XML PagSeguro em formato não esperado. Retorno: ' . $return);
+            $helper->writeLog('Retorno de notificacao XML PagSeguro em formato não esperado.');
+
+            if ($isServerProblem) {
+                $helper->writeLog('A API de Notificações do PagSeguro está indisponível no momento e retornou erro '
+                    . $httpCode . '. Uma nova tentativa será feita em breve.');
+            }
         }
 
         curl_close($ch);
@@ -403,6 +418,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             )
         );
         $params = $paramsObj->getParams();
+        if (strpos($params['senderEmail'], '@sandbox.pagseguro') !== false && !$helper->isSandbox())
+        {
+            Mage::throwException('E-mail @sandbox.pagseguro não deve ser usado em produção');
+        }
+
         $paramsString = $this->_convertToCURLString($params);
 
         $helper->writeLog('Parametros sendo enviados para API (/'.$type.'): '. var_export($params, true));

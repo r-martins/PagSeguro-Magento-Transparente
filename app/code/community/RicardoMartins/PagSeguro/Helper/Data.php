@@ -480,7 +480,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $paymentMethod = $order->getPayment()->getMethod();
-        if ($paymentMethod != 'rm_pagseguro_cc') {
+        if ($paymentMethod != 'rm_pagseguro_cc' || Mage::registry('is_pagseguro_updater_session')) {
             return false;
         }
 
@@ -563,21 +563,57 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return '&' . http_build_query($params);
+    }
 
-        /*$parsedSuffix = parse_url($suffix);
-        $finalSuffix = '';
-        $finalSuffix .= isset($parsedSuffix['path']) ? $parsedSuffix['path'] : '';
-        $finalSuffix .= isset($parsedSuffix['query']) ? '?' . $parsedSuffix['query'] : '';
-
-        $query = http_build_query($params);
-        $finalSuffix .= (strpos($finalSuffix, '?') === false) ? '?' : '&';
-
-        $prefix = '';
-        if (filter_var($suffix, FILTER_VALIDATE_URL) === false) {
-            $prefix = isset($parsedSuffix['scheme']) ? $parsedSuffix['scheme'] . '://' : '';
-            $prefix .= isset($parsedSuffix['host']) ? $parsedSuffix['host'] : '';
+    /**
+     * Calls /transactions API to get current order situation. Returns returned XML or false if fails.
+     *
+     * @param $transactionCode
+     * @param $isSandbox
+     *
+     * @return bool|string
+     */
+    public function getOrderStatusXML($transactionCode, $isSandbox)
+    {
+        $email = $isSandbox ? Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_EMAIL)
+            : Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_EMAIL);
+        $token = $isSandbox ? Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_TOKEN)
+            : Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_TOKEN);
+        $token = !empty($token) ? Mage::helper('core')->decrypt($token) : $token;
+        $pk = $isSandbox ? $this->getPagSeguroProSandboxKey() : $this->getPagSeguroProNonSandboxKey();
+        $sandbox = $isSandbox ? 'sandbox.' : '';
+        $url = "https://ws.{$sandbox}pagseguro.uol.com.br/v3/transactions/{$transactionCode}/"
+            . "?email={$email}&token={$token}";
+        if ($isSandbox && $this->getLicenseType() == 'app') {
+            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionCode}/?public_key={$pk}&isSandbox=1";
         }
 
-        return $prefix . $finalSuffix . $query;*/
+        return $this->quickGet($url);
+    }
+
+    /**
+     * Performs a simple get request to $url with $headers
+     * @param       $url
+     * @param array $headers
+     *
+     * @return bool|string
+     */
+    public function quickGet($url, $headers = array())
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $response = curl_exec($ch);
+        if (curl_errno($ch)) {
+            return false;
+        }
+        curl_close($ch);
+        return $response;
     }
 }
