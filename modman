@@ -1,4 +1,4 @@
-skin/frontend/base/default/pagseguro/* skin/frontend/base/default/pagseguro/selo/
+skin/frontend/base/default/pagseguro/* skin/frontend/base/default/pagseguro/
 app/design/frontend/base/default/layout/ricardomartins_pagseguro.xml app/design/frontend/base/default/layout/ricardomartins_pagseguro.xml
 app/design/frontend/base/default/template/ricardomartins_pagseguro/* app/design/frontend/base/default/template/ricardomartins_pagseguro/
 app/design/adminhtml/base/default/layout/ricardomartins_pagseguro/* app/design/adminhtml/base/default/layout/ricardomartins_pagseguro/

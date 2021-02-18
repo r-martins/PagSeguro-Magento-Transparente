@@ -14,6 +14,7 @@ if ($_grandTotal && $_grandTotal != 'null') {
 }
 
 $iwdEnabled = Mage::helper('ricardomartins_pagseguro')->isIwdEnabled();
+$multiCcEnabled = Mage::helper('ricardomartins_pagseguro')->isMultiCcEnabled();
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="<?php echo (!$iwdEnabled)?'display:none;':'';?>">
 <?php /*
@@ -24,6 +25,17 @@ $iwdEnabled = Mage::helper('ricardomartins_pagseguro')->isIwdEnabled();
         </div>
     </li>
 */ ?>
+    <?php if ($multiCcEnabled):?>
+    <li>
+        <label for="multicc"><?php echo __('Pay with 2 cards')?></label>
+        <div class="input-box" id="multicc" name="multicc">
+            <label class="switch">
+                <input type="checkbox">
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </li>
+    <?php endif; ?>
     <li>
         <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
         <div class="input-box">
@@ -34,7 +46,7 @@ $iwdEnabled = Mage::helper('ricardomartins_pagseguro')->isIwdEnabled();
         </div>
     </li>
     <li id="<?php echo $_code ?>_cc_type_exp_div">
-        <label for="<?php echo $_code ?>_expiration" class="required"><em>*</em><?php echo $this->__('Expiration Date') ?></label>
+        <label for="<?php echo $_code ?>_expiration" class="required"><em>*</em><?php echo $this->__('Expiry Date') ?></label>
         <div class="input-box">
             <div class="v-fix">
                 <select id="<?php echo $_code ?>_expiration" name="payment[ps_cc_exp_month]" class="month validate-cc-exp required-entry">

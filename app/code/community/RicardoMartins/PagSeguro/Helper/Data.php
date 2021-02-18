@@ -39,6 +39,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON = 'payment/rm_pagseguro/placeorder_button';
     const XML_PATH_JSDELIVR_ENABLED                     = 'payment/rm_pagseguro/jsdelivr_enabled';
     const XML_PATH_JSDELIVR_MINIFY                      = 'payment/rm_pagseguro/jsdelivr_minify';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE  = 'payment/rm_pagseguro_cc/multicc_active';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -212,6 +213,11 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function isDebugActive()
     {
         return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_DEBUG);
+    }
+
+    public function isMultiCcEnabled()
+    {
+        return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE);
     }
 
     /**
