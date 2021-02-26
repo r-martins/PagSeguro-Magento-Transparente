@@ -45,7 +45,7 @@ RMPagSeguro = Class.create({
         this.formElementAndSubmit = false;
 
 
-        Validation.add('validate-pagseguro', 'Falha ao atualizar dados do pagaento. Entre novamente com seus dados.',
+        Validation.add('validate-pagseguro', 'Falha ao atualizar dados do pagamento. Entre novamente com seus dados.',
             function(v, el){
                 RMPagSeguroObj.updatePaymentHashes();
                 return true;
@@ -397,5 +397,998 @@ RMPagSeguro = Class.create({
                 PagSeguroDirectPayment.setSessionId(session_id);
             }
         });
+    }
+});
+
+
+RMPagSeguro_Multicc_Control = Class.create
+({
+    initialize: function(paymentMethodCode, params)
+    {
+        this.paymentMethodCode = paymentMethodCode;
+        this.params = params;
+        this.forms = {};
+        this.syncLocks = {};
+
+        this._initForms();
+        this._initObservers();
+    },
+
+    /**
+     * Create class instances to control each card form
+     * and show first one for conventional payment flow
+     */
+    _initForms: function()
+    {
+        this.forms["cc1"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 1, paymentMethodCode: this.paymentMethodCode, grandTotal: this.params.grandTotal });
+        this.forms["cc2"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 2, paymentMethodCode: this.paymentMethodCode, grandTotal: this.params.grandTotal, config: {_summary: false} });
+
+        this._disableMultiCc();
+    },
+
+    /**
+     * Initialize all navigation observers
+     */
+    _initObservers: function()
+    {
+        // multi cc switch
+        this._getSwitch().observe('change', (function(event)
+        {
+            var checkbox = event.currentTarget;
+            checkbox.checked 
+                ? this._enableMultiCc() 
+                : this._disableMultiCc();
+            
+        }).bind(this));
+
+        // {go to card 2 form} button
+        this._getGoToCard2FormButton().observe('click', (function()
+        {
+            if(this.forms["cc1"].validate())
+            {
+                this._goToCard("cc2");
+            }
+        
+        }).bind(this));
+
+        // summary links 
+        // TO DO !!! this kind of link must be inside a form
+        this.forms["cc1"].getSummaryBox().observe('click', this._goToCard.bind(this, "cc1"));
+
+        // sync totals between forms
+        var updateOtherTotalFunc = (function(newValue) { return this.params.grandTotal - newValue; }).bind(this);
+        this._syncData("total", "cc1", "cc2", updateOtherTotalFunc);
+        this._syncData("total", "cc2", "cc1", updateOtherTotalFunc);
+    },
+    
+    /**
+     * Sync card data between two forms and avoid infinite loop
+     * @param string data 
+     * @param string callingForm 
+     * @param string destForm 
+     * @param function relationFunction 
+     */
+    _syncData: function(data, callingForm, destForm, relationFunction)
+    {
+        // register the data bind and its fulfillment in the other form
+        var self = this;
+        var passedFunction = function(newValue, previousValue)
+        {
+            if(self._hasSyncLock(data, callingForm, destForm)) return;
+
+            var updatingValue = relationFunction(newValue, previousValue);
+
+            if(typeof updatingValue !== "undefined")
+            {
+                self.forms[destForm].setCardData("total", updatingValue);
+            }
+        };
+
+        this.forms[callingForm].addCardDataBind(data, passedFunction);
+    },
+
+    /**
+     * Apply and remove sync lock 
+     * @param string data 
+     * @param string callingForm 
+     * @param string destForm 
+     */
+    _hasSyncLock: function(data, callingForm, destForm)
+    {
+        // create the syncLock group, if it doesnt exists
+        if(typeof this.syncLocks[data] === "undefined")
+        {
+            this.syncLocks[data] = {};
+        }
+
+        // verify if there is a sync lock for this execution
+
+        // First case: this means that the lock didnt exists  
+        // and we must create it
+        if(typeof this.syncLocks[data][callingForm] === "undefined")
+        {
+            this.syncLocks[data][callingForm] = true;
+            return false;
+        }
+        // Second case: this means that there is a lock, and   
+        // we must clear it and stop the execution
+        else
+        {
+            delete this.syncLocks[data][callingForm];
+            delete this.syncLocks[data][destForm];
+            return true;
+        }
+    },
+
+    /**
+     * Retrieves the {turn on} / {turn off} multi cc switch
+     */
+    _getSwitch()
+    {
+        return $(this.paymentMethodCode + "_switch_use_two_cards");
+    },
+
+    /**
+     * Retrieves the {go to second card form} button
+     */
+    _getGoToCard2FormButton()
+    {
+        return $(this.paymentMethodCode + "_button_go_to_card_two_form");
+    },
+
+    /**
+     * Activate multi card funcionality
+     */
+    _enableMultiCc: function()
+    {
+        for(var formId in this.forms) { this.forms[formId].enable(); };
+        this.forms["cc1"].setCardData("total", 0);
+        this.forms["cc1"].openEditMode();
+
+        // TO DO !!! transiction button still manual, must be 
+        // something automated
+        this._getGoToCard2FormButton().show();
+    },
+
+    /**
+     * Deactivate multi card functionality
+     */
+    _disableMultiCc: function()
+    {
+        for(var formId in this.forms) { this.forms[formId].disable(); };
+        this.forms["cc1"].openEditMode();
+        this.forms["cc1"].hideTotal();
+        this.forms["cc1"].setCardData("total", this.params.grandTotal);
+        
+        // TO DO !!! transiction button still manual, must be 
+        // something automated
+        this._getGoToCard2FormButton().hide();
+    },
+
+    /**
+     * Synthesize {go to card 1 form} actions
+     */
+    _goToCard: function(index)
+    {
+        for(var formId in this.forms) { this.forms[formId].closeEditMode(); };   
+        this.forms[index].openEditMode();
+
+        // TO DO !!! transiction button still manual, must be 
+        // something automated
+        if(index == "cc1")
+        {
+            this._getGoToCard2FormButton().show();
+        }
+        else
+        {
+            this._getGoToCard2FormButton().hide();
+        }
+    }
+});
+
+RMPagSeguro_Multicc_CardForm = Class.create
+({
+    initialize: function(params)
+    {
+        this.paymentMethodCode = params.paymentMethodCode;
+        this.cardIndex = params.cardIndex;
+        this.grandTotal = params.grandTotal;
+        this.config = Object.assign((params.config ? params.config : {}), RMPagSeguroObj.config);
+        
+        this.cardData = 
+        {
+            total       : "",
+            number      : "",
+            brand       : "",
+            cvv         : "",
+            expMonth    : "",
+            expYear     : "",
+            owner       : "",
+            installments: "",
+            token       : ""
+        };
+        this.cardMetadata = {};
+        this.requestLocks = 
+        {
+            brand       : false,
+            token       : false,
+            installments: false
+        };
+        this.eventListeners = [];
+        this.cardDataBinds = [];
+
+        this._addFieldObservers();
+        this._searchHTMLCardDataBinds();
+        
+        // all forms are initialized disabled
+        this.state = "";
+        this.disable();
+    },
+
+    /**
+     * Add event listener and data binds to form fields
+     */
+    _addFieldObservers: function()
+    {
+        // these functions can be converted in only one observing the
+        // card fields, but before we need to understand what are the 
+        // default transformations and appropriate events
+        this._addFieldEventListener("total",            "change", function(field){this.setCardData("total", (field.getValue() ? parseFloat(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0));});
+        this._addFieldEventListener("number",           "change", function(field){this.setCardData("number", field.getValue().replace(/^\s+|\s+$/g,''));});
+        this._addFieldEventListener("cid",              "change", function(field){this.setCardData("cvv", field.getValue().replace(/^\s+|\s+$/g,''));});
+        this._addFieldEventListener("expiration_mth",   "change", function(field){this.setCardData("expMonth", field.getValue());});
+        this._addFieldEventListener("expiration_yr",    "change", function(field){this.setCardData("expYear", field.getValue());});
+        this._addFieldEventListener("installments",     "change", function(field){this.setCardData("installments", field.getValue());});
+
+        // 'masks'
+        this._addFieldEventListener("total",            "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("number",           "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("cid",              "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("dob_day",          "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("dob_month",        "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("dob_year",         "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("owner_document",   "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("total",            "keyup", this._formatCurrencyInput);
+        
+        // custom listeners
+        this._addFieldEventListener("total",        "keyup",  this._instantReflectTotalInProgressBar);
+        this._addFieldEventListener("number",       "keyup",  this._consultCardBrandOnPagSeguro);
+        this._addFieldEventListener("installments", "change", this._updateInstallmentsMetadata);
+        
+        // logic data binds
+        this.addCardDataBind("total",       this._consultInstallmentsOnPagSeguro);
+        this.addCardDataBind("total",       this._updateTotalHTMLOnSetValue);
+        this.addCardDataBind("number",      this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("number",      this._updateFormmatedNumberMetadata);
+        this.addCardDataBind("brand",       this._updateBrandOnHTML);
+        this.addCardDataBind("brand",       this._consultInstallmentsOnPagSeguro);
+        this.addCardDataBind("cvv",         this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("expMonth",    this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("expYear",     this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("token",       this._updateTokenOnHTML);
+
+        // validate fields on blur
+        this._getHTMLFormInputsAndSelects().each(function(element)
+        {
+            element.observe("blur", function(){ Validation.validate(element); });
+        })
+    },
+
+    /**
+     * Search for elements inside a li width a declared card index
+     * that has card data binds
+     */
+    _searchHTMLCardDataBinds: function()
+    {
+        // raw data
+        var fieldSelector = 
+            "#payment_form_" + this.paymentMethodCode + " " +
+                "li[data-card-index=" + this.cardIndex + "] " +
+                    "[data-bind=card-data]";
+        
+        $$(fieldSelector).each((function(element)
+        {
+            var cardData = $(element).getAttribute("data-card-field");
+
+            if(cardData)
+            {
+                this.addCardDataBind(cardData, function(newValue)
+                {
+                    $(element).update(newValue);
+                });
+            }
+
+        }).bind(this));
+
+        // metada data
+        var fieldSelector = 
+            "#payment_form_" + this.paymentMethodCode + " " +
+                "li[data-card-index=" + this.cardIndex + "] " +
+                    "[data-bind=card-metadata]";
+        
+        $$(fieldSelector).each((function(element)
+        {
+            var cardMetadata = $(element).getAttribute("data-card-field");
+
+            if(cardMetadata)
+            {
+                this.addCardDataBind("metadata_" + cardMetadata, function(newValue)
+                {
+                    $(element).update(newValue);
+                });
+            }
+
+        }).bind(this));
+    },
+
+    /**
+     * Observes card number field to consult card brand on PagSeguro web service
+     * @param  field 
+     */
+    _consultCardBrandOnPagSeguro: function(field)
+    {
+        var fieldValue = field.getValue().replace(/^\s+|\s+$/g,'');
+        
+        // update only if there are at least 6 digits and
+        if(fieldValue.length >= 6 && !this.getCardData("brand") && !this.requestLocks.brand)
+        {
+            // TO DO: add expiring time to this lock before using it, 
+            // because of the PagSeguro lib instability
+            //this.requestLocks.brand = true;
+
+            PagSeguroDirectPayment.getBrand
+            ({
+                cardBin: fieldValue.substring(0, 6),
+                success: (function(response)
+                {
+                    if(response && response.brand)
+                    {
+                        this.setCardData("brand", response.brand.name);
+                    }
+
+                    if(response && response.cvvSize)
+                    {
+                        this.setCardMetadata("cvv_size", response.cvvSize);
+                    }
+
+                }).bind(this),
+                error: (function()
+                {
+                    this.setCardData("brand", "");
+                    this.setCardMetadata("cvv_size");
+
+                }).bind(this),
+                complete: (function()
+                {
+                    //this.requestLocks.brand = false;
+
+                }).bind(this)
+            });
+        }
+        // clear brand if the card data became smaller than 6 digits
+        else if(fieldValue.length < 6)
+        {
+            this.setCardData("brand", "");
+        }
+    },
+
+    /**
+     * Observes card brand data to consult installments on 
+     * PagSeguro web service (could update grand total before)
+     */
+    _consultInstallmentsOnPagSeguro: function()
+    {
+        if(!this.getCardData("total"))
+        {
+            var selectbox = this._clearInstallmentsOptions();
+            selectbox.options[0].text = "Informe o valor a ser pago neste cartão para calcular as parcelas.";
+            return;
+        }
+
+        // update only if there are at least 6 digits and
+        if(this.getCardData("brand"))
+        {
+            PagSeguroDirectPayment.getInstallments
+            ({
+                brand: this.getCardData("brand"),
+                amount: this.getCardData("total"),
+                success: this._populateInstallments.bind(this),
+                error: this._populateSafeInstallments.bind(this)
+            });
+        }
+    },
+
+    /**
+     * Observes card number field to consult card token on PagSeguro web service
+     * @param  field 
+     */
+    _createCardTokenOnPagSeguro: function()
+    {
+        // update only if there are at least 6 digits and
+        if( this.getCardData("number").length >= 12 && !this.requestLocks.token && 
+            this.getCardData("brand") && this.getCardData("cvv") && 
+            this.getCardData("expMonth") && this.getCardData("expYear") )
+        {
+            // TO DO: add expiring time to this lock before using it, 
+            // because of the PagSeguro lib instability
+            //this.requestLocks.token = true;
+
+            PagSeguroDirectPayment.createCardToken
+            ({
+                cardNumber      : this.getCardData("number"),
+                brand           : this.getCardData("brand"),
+                cvv             : this.getCardData("cvv"),
+                expirationMonth : this.getCardData("expMonth"),
+                expirationYear  : this.getCardData("expYear"),
+                success: (function(response)
+                {
+                    if(response && response.card && response.card.token)
+                    {
+                        this.setCardData("token", response.card.token);
+                    }
+
+                }).bind(this),
+                error: (function()
+                {
+                    this.setCardData("token", "");
+
+                }).bind(this),
+                complete: (function()
+                {
+                    //this.requestLocks.token = false;
+
+                }).bind(this)
+            });
+        }
+        // if its not good enought to create a card token,
+        // checks if its possible to consult the card brand 
+        else if(this.getCardData("number").length >= 6)
+        {
+            this._consultCardBrandOnPagSeguro(this._getFieldElement("number"));
+        }
+        // if the card number was cleared, clear the brand too
+        else if(this.getCardData("number").length < 6)
+        {
+            this.setCardData("brand", "");
+        }
+    },
+
+    /**
+     * Callback function that populates installments
+     * select box with returned options 
+     * @param XMLHttpRequest response 
+     */
+    _populateInstallments: function(response)
+    {
+        var remoteInstallments = Object.values(response.installments)[0];
+        var selectbox = this._clearInstallmentsOptions();
+
+        if(this.config.force_installments_selection)
+        {
+            $(selectbox.options[0]).update("Selecione a quantidade de parcelas");
+        }
+        else
+        {
+            selectbox.remove(0);
+        }
+
+        var maxInstallments = this.config.installment_limit;
+
+        for(var x = 0; x < remoteInstallments.length; x++)
+        {
+            if(maxInstallments && maxInstallments <= x)
+            {
+                break;
+            }
+
+            var qty = remoteInstallments[x].quantity;
+            var value =  remoteInstallments[x].installmentAmount;
+            var formmatedValue = value.toFixed(2).replace('.',',');
+            var text = qty + "x de R$" + formmatedValue;
+            
+            text += remoteInstallments[x].interestFree
+                        ? " sem juros"
+                        : " com juros";
+            
+            text += this.config.show_total
+                        ? " (total R$" + (value * qty).toFixed(2).replace('.',',') + ")"
+                        : "";
+            
+            var option = new Element('option', {"value": qty + "|" + value});
+            option.update(text);
+
+            selectbox.add(option);
+        }
+    },
+
+    /**
+     * Callback function that populates installments 
+     * select box when there isn't a response from server
+     * @param XMLHttpRequest response 
+     */
+    _populateSafeInstallments: function(response)
+    {
+        var selectbox = this._clearInstallmentsOptions();
+        selectbox.options[0].text = "Falha ao obter demais parcelas junto ao pagseguro";
+
+        var option = document.createElement('option');
+        option.text = "1x de R$" + this.grandTotal.toFixed(2).toString().replace('.',',') + " sem juros";
+        option.selected = true;
+        option.value = "1|" + this.grandTotal.toFixed(2);
+        selectbox.add(option);
+
+        console.error('Somente uma parcela será exibida. Erro ao obter parcelas junto ao PagSeguro:');
+        console.error(response);
+    },
+
+    /**
+     * Remove all options from installments select box,
+     * except the one with empty value
+     */
+    _clearInstallmentsOptions()
+    {
+        var field = this._getFieldElement("installments");
+
+        for(var i = 0; i < field.length; i++)
+        {
+            if(field.options[i].value != "")
+            {
+                field.remove(i);
+                i--;
+            }
+        }
+
+        return field;
+    },
+
+    /**
+     * Capture digits inserted in the total field to update
+     * progress bar
+     * @param DomElement field Total field element
+     */
+    _instantReflectTotalInProgressBar: function(field)
+    {
+        var value = field.getValue() ? field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'') : 0;
+        this._recalcProgressBarFulfillment(value);
+    },
+
+    /**
+     * Visual adjustment of the progress bar based on total value
+     * @param float value
+     */
+    _recalcProgressBarFulfillment: function(value)
+    {
+        var percent = value * 100 / this.grandTotal;
+        var remainingValue = (this.grandTotal > value)
+                                ? ((value > 0) ? this.grandTotal - value : this.grandTotal)
+                                : 0;
+
+        this.setCardMetadata("remaining_total", "R$" + remainingValue.toFixed(2).replace(".", ","));
+        this.updateProgressBar(percent);
+    },
+
+    updateProgressBar: function(percent)
+    {
+        if(percent > 100) percent = 100;
+        
+        var progress = this._getFieldElement("progress_bar")
+                        .select("[data-role=progress]")
+                        .first();
+
+        $(progress).setStyle({width: percent.toFixed(2) + "%"});
+    },
+
+    /**
+     * Getter and setter for card data
+     */
+    getCardData: function(data = false)
+    {
+        if(data === false)
+        {
+            return this.cardData;
+        }
+
+        if(this.cardData[data])
+        {
+            return this.cardData[data];
+        }
+
+        return false;
+    },
+    setCardData: function(data, newValue)
+    {
+        if(typeof this.cardData[data] !== "undefined")
+        {
+            var previousValue = this.cardData[data];
+            this.cardData[data] = newValue;
+            
+            if(this.cardDataBinds[data])
+            {
+                this.cardDataBinds[data].each((function(callback)
+                {
+                    callback.bind(this)(newValue, previousValue);
+
+                }).bind(this));
+            }
+        }
+
+        return this;
+    },
+
+    /**
+     * Getter and setter for card metadata
+     */
+    getCardMetadata: function(data = false)
+    {
+        if(data === false)
+        {
+            return this.cardMetadata;
+        }
+
+        if(this.cardMetadata[data])
+        {
+            return this.cardMetadata[data];
+        }
+
+        return false;
+    },
+    setCardMetadata: function(data, newValue)
+    {
+        this.cardMetadata[data] = newValue;
+        
+        if(this.cardDataBinds["metadata_" + data])
+        {
+            var previousValue = "";
+            
+            if(typeof this.cardMetadata[data] !== "undefined")
+            {
+                previousValue = this.cardMetadata[data];
+            }
+
+            this.cardDataBinds["metadata_" + data].each((function(callback)
+            {
+                callback.bind(this)(newValue, previousValue);
+
+            }).bind(this));
+        }
+
+        return this;
+    },
+
+    /**
+     * Add callback listener to setCardData 
+     * @param string data 
+     * @param function callback 
+     */
+    addCardDataBind: function(data, callback)
+    {
+        if(!this.cardDataBinds[data])
+        {
+            this.cardDataBinds[data] = [];
+        }
+
+        this.cardDataBinds[data].push(callback);
+    },
+
+    /**
+     * Update the brand image flag on HTML form
+     * @param string newBrand 
+     */
+    _updateBrandOnHTML(newBrand)
+    {
+        // update HTML
+        if(newBrand)
+        {
+            var image = new Element("img", 
+            {
+                src: "https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/" + newBrand + ".png",
+                alt: newBrand, 
+                alt: newBrand
+            });
+            this._getFieldElement("card_brand").update().appendChild(image);
+        }
+        else
+        {
+            this._getFieldElement("card_brand").update();
+        }
+    },
+
+    /**
+     * Update the brand image flag on HTML form
+     * @param string newValue 
+     */
+    _updateTotalHTMLOnSetValue(newValue)
+    {
+        var field = this._getFieldElement("total");
+        
+        if(newValue != field.getValue())
+        {
+            field.setValue(newValue.toFixed(2).replace(".", ","));
+        }
+
+        this._recalcProgressBarFulfillment(newValue);
+    },
+
+    /**
+     * Update the token on HTML form hidden input
+     * @param string newToken 
+     */
+    _updateTokenOnHTML(newToken)
+    {
+        // update HTML
+        this._getFieldElement("token").setValue(newToken);
+    },
+
+    /**
+     * Generate installments metadata
+     * @param DOMElement field 
+     */
+    _updateInstallmentsMetadata(field)
+    {
+        this.setCardMetadata("installments_description", field.options[field.selectedIndex].text);
+    },
+
+    /**
+     * Generate formmated number metadata
+     * @param DOMElement field 
+     */
+    _updateFormmatedNumberMetadata(newValue)
+    {
+        var formmatedNumber = "";
+
+        if(newValue.length >= 4) { formmatedNumber += newValue.substring(0, 4); }
+        if(newValue.length >= 8) { formmatedNumber += "*".repeat(4); }
+        if(newValue.length >= 12) { formmatedNumber += "*".repeat(4) + newValue.substring(12); }
+        
+        this.setCardMetadata("formmated_number", formmatedNumber);
+    },
+
+    /**
+     * Returns a DOM element of an input or select
+     * present in the form
+     */
+    _getFieldElement: function(fieldRef)
+    {
+        var fieldId = 
+            this.paymentMethodCode + 
+            "_cc" + this.cardIndex + 
+            "_" + fieldRef;
+        
+        return $(fieldId);
+    },
+
+    /**
+     * Add and event listener to a form field element
+     */
+    _addFieldEventListener: function(fieldRef, eventName, callback)
+    {
+        var field = fieldRef;
+
+        if(typeof fieldRef === 'string')
+        {
+            field = this._getFieldElement(fieldRef);
+        }
+
+        if(field && field.id)
+        {
+            if(!this.eventListeners[field.id])
+            {
+                this.eventListeners[field.id] = [];
+            }
+
+            if(!this.eventListeners[field.id][eventName])
+            {
+                this.eventListeners[field.id][eventName] = [];
+            }
+
+            var callbackRef = callback.bind(this, field);
+            field.observe(eventName, callbackRef);
+
+            this.eventListeners[field.id][eventName].push(callbackRef);
+        }
+    },
+
+    /**
+     * Show / hide card payment fields in the form
+     */
+    _getCommongFields: function()
+    {
+        var fieldSelector = 
+            "#payment_form_" + this.paymentMethodCode + " " +
+                "li" + 
+                "[data-field-profile=default]" +
+                "[data-card-index=" + this.cardIndex + "]";
+        
+        return $$(fieldSelector);
+    },
+    showCommonFields: function()
+    {
+        this._getCommongFields().each(Element.show);
+    },
+    hideCommonFields: function()
+    {
+        this._getCommongFields().each(Element.hide);
+    },
+
+    /**
+     * Show / hide summary
+     */
+    _getSummaryLine: function()
+    {
+        var fieldId = 
+            this.paymentMethodCode + 
+            "_cc" + this.cardIndex + 
+            "_summary_line";
+        
+        return $(fieldId);
+    },
+    showSummary()
+    {
+        if(typeof this.config._summary == "undefined" || this.config._summary !== false)
+        {
+            this._getSummaryLine().show();
+        }
+    },
+    hideSummary()
+    {
+        this._getSummaryLine().hide();
+    },
+
+    /**
+     * Show / hide summary
+     */
+    _getTotalLine: function()
+    {
+        var fieldId = 
+            this.paymentMethodCode + 
+            "_cc" + this.cardIndex + 
+            "_total_line";
+        
+        return $(fieldId);
+    },
+    showTotal()
+    {
+        this._getTotalLine().show();
+    },
+    hideTotal()
+    {
+        this._getTotalLine().hide();
+    },
+
+    /**
+     * Show form, so that user can edit 
+     * its fields
+     */
+    openEditMode: function()
+    {
+        this.hideSummary();
+        this.showTotal();
+        this.showCommonFields();
+    },
+
+    /**
+     * Close form edition, showing just its summary
+     */
+    closeEditMode: function()
+    {
+        this.hideCommonFields();
+        this.hideTotal();
+        this.showSummary();
+    },
+    
+    /**
+     * Turn on form functionalities on interface
+     */
+    enable: function()
+    {
+        if(this.state == "disabled")
+        {
+            this.closeEditMode();
+            this.state = "enabled";
+        }
+    },
+
+    /**
+     * Turn off form functionalities on interface
+     */
+    disable: function()
+    {
+        this.hideCommonFields();
+        this.hideTotal();
+        this.hideSummary();
+
+        this.state = "disabled";
+    },
+
+
+    /**
+     * Get the summary box
+     */
+    getSummaryBox: function()
+    {
+        var fieldId = 
+            this.paymentMethodCode + 
+            "_cc" + this.cardIndex + 
+            "_summary_box";
+        
+        return $(fieldId);
+    },
+
+    /**
+     * Validate HTML form fields
+     */
+    validate: function()
+    {
+        var valid = true;
+
+        this._getHTMLFormInputsAndSelects().each(function(element)
+        {
+            if($(element).readAttribute("name"))
+            {
+                valid &= Validation.validate(element);
+            }
+
+        });
+
+        return valid;
+    },
+
+    /**
+     * Retrieve all the HTML form fields
+     */
+    _getHTMLFormInputsAndSelects()
+    {
+        return $$
+        (
+            "li[data-card-index=" + this.cardIndex + "] input[type=text]",
+            "li[data-card-index=" + this.cardIndex + "] input[type=number]",
+            "li[data-card-index=" + this.cardIndex + "] input[type=tel]",
+            "li[data-card-index=" + this.cardIndex + "] input[type=email]",
+            "li[data-card-index=" + this.cardIndex + "] select"
+        );
+    },
+
+    /**
+     * Avoid not number chars
+     * @param DOMElement field 
+     * @param Event event 
+     */
+    _disallowNotNumbers(field, event)
+    {
+        if (!/[0-9\/]+/.test(event.key) && event.key.length === 1)
+        {
+            event.preventDefault();
+        }
+    },
+
+    /**
+     * Money format for value inputs
+     * @param DOMElement field 
+     */
+    _formatCurrencyInput: function(field)
+    {
+        var formattedValue = field.getValue().replace(/\D/g,'');
+            
+        while(formattedValue.length > 0 && formattedValue.substring(0, 1) == 0)
+        {
+            formattedValue = formattedValue.substring(1);
+        }
+
+        if(formattedValue.length == 1)
+        {
+            formattedValue = "0,0" + formattedValue;
+        }
+        else if(formattedValue.length == 2)
+        {
+            formattedValue = "0," + formattedValue;
+        }
+        else if(formattedValue.length > 2)
+        {
+            formattedValue = formattedValue.substring(0, formattedValue.length - 2) + 
+                             "," + 
+                             formattedValue.substring(formattedValue.length - 2);
+        }
+        
+        field.setValue(formattedValue);
     }
 });

@@ -1,20 +1,37 @@
-/* The switch - the box around the slider */
-.switch {
+/* multi credit card switch */
+.rm-pagseguro-payment-form  .multi-cc-switch-box
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 280px;
+    max-width: 100%;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+.rm-pagseguro-payment-form  .multi-cc-switch-box:before,
+.rm-pagseguro-payment-form  .multi-cc-switch-box:after
+{
+    display: none;
+}
+.rm-pagseguro-payment-form  .multi-cc-switch-box .switch
+{
     position: relative;
     display: inline-block;
     width: 33px;
     height: 15px;
 }
-
-/* Hide default HTML checkbox */
-.switch input {
+.rm-pagseguro-payment-form  .multi-cc-switch-box .switch input
+{
     opacity: 0;
     width: 0;
     height: 0;
 }
-
-/* The slider */
-.slider {
+.rm-pagseguro-payment-form  .multi-cc-switch-box .slider
+{
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -22,11 +39,11 @@
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
+    -webkit-transition: .1s;
+    transition: .1s;
 }
-
-.slider:before {
+.rm-pagseguro-payment-form  .multi-cc-switch-box .slider:before
+{
     position: absolute;
     content: "";
     height: 9px;
@@ -34,29 +51,91 @@
     left: 5px;
     bottom: 3px;
     background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
+    -webkit-transition: .1s;
+    transition: .1s;
 }
-
-input:checked + .slider {
+.rm-pagseguro-payment-form  .multi-cc-switch-box input:checked + .slider
+{
     background-color: #89c75d;
 }
-
-input:focus + .slider {
+.rm-pagseguro-payment-form  .multi-cc-switch-box input:focus + .slider
+{
     box-shadow: 0 0 1px #89C75D;
 }
-
-input:checked + .slider:before {
+.rm-pagseguro-payment-form  .multi-cc-switch-box input:checked + .slider:before
+{
     -webkit-transform: translateX(14px);
     -ms-transform: translateX(14px);
     transform: translateX(14px);
 }
-
-/* Rounded sliders */
-.slider.round {
+.rm-pagseguro-payment-form  .multi-cc-switch-box .slider.round
+{
     border-radius: 33px;
 }
-
-.slider.round:before {
+.rm-pagseguro-payment-form  .multi-cc-switch-box .slider.round:before
+{
     border-radius: 50%;
+}
+
+/* multi credit card progress bar */
+.rm-pagseguro-payment-form .cc-total-progress-bar
+{
+    width: 280px;
+    max-width: 100%;
+    padding-bottom: 20px;
+    margin-top: 10px;
+    margin-bottom: 25px;
+    position: relative;
+}
+.rm-pagseguro-payment-form .cc-total-progress-bar:before,
+.rm-pagseguro-payment-form .cc-total-progress-bar .progress
+{
+    display: block;
+    content: " ";
+    height: 3px;
+    position: absolute;
+    top: 27px;
+    left: 0;
+    border-radius: 2px;
+}
+.rm-pagseguro-payment-form .cc-total-progress-bar:before
+{
+    width: 100%;
+    background-color: #d1d1d1;
+    z-index: 1;
+}
+.rm-pagseguro-payment-form .cc-total-progress-bar .progress
+{
+    width: 0;
+    background-color: #67d23d;
+    z-index: 2;
+    -webkit-transition: .3s;
+    transition: .3s;
+    max-width: 100%;
+}
+
+/* multi credit summary info */
+.rm-pagseguro-payment-form .summary-info
+{
+    display: flex;
+    width: 100%;
+    max-width: 375px;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid #eee;
+    padding: 7px;
+    cursor: pointer;
+}
+.rm-pagseguro-payment-form .summary-info .info > span
+{
+    font-size: 12px;
+    display: block;
+}
+.rm-pagseguro-payment-form .summary-info .edit-link
+{
+    font-size: 14px;
+    text-decoration: underline;
+    font-weight: bold;
+    color: #666;
+    margin-right: 5px;
 }
