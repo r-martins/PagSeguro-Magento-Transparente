@@ -7,11 +7,11 @@ $_iwdEnabled = $_helper->isIwdEnabled();
 
 <ul class="form-list rm-pagseguro-payment-form" id="payment_form_<?php echo $_code ?>" style="<?php echo (!$_iwdEnabled) ? 'display:none;' : ''; ?>">
     <li class="multi-cc-switch-box">
-        <label for="<?php echo $_code ?>-switch-use-two-cards"><?php echo __('Pay with 2 cards')?></label>
         <label class="switch">
             <input type="checkbox" name="payment[use_two_cards]" id="<?php echo $_code; ?>_switch_use_two_cards" />
             <span class="slider round"></span>
         </label>
+        <label for="<?php echo $_code; ?>_switch_use_two_cards"><?php echo __('Pay with 2 cards')?></label>
     </li>
 
     <!-- first card form -->

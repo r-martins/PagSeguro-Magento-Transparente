@@ -14,6 +14,7 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             class="input-text required-entry" 
             title="<?php echo $this->__('How much do You want to pay with this card?') ?>" 
             placeholder="0,00"
+            autocomplete="off"
             />
     </div>
     <div class="cc-total-progress-bar" id="<?php echo $this->getElementId("progress_bar") ?>">
@@ -29,10 +30,11 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             id="<?php echo $this->getElementId("number") ?>" 
             name="<?php echo $this->getFieldName("number") ?>"
             value="" 
-            class="input-text validate-cc-number validate-cc-type required-entry" 
+            class="input-text validate-cc-number validate-cc-type required-entry embedded-flag" 
             title="<?php echo $this->__('Credit Card Number') ?>" 
             maxlength="16"
             placeholder="**** **** **** ****"
+            autocomplete="off"
             />
         <span id="<?php echo $this->getElementId("card_brand") ?>" class="card-brand"></span>
         <input type="hidden" id="<?php echo $this->getElementId("token") ?>" name="<?php echo $this->getFieldName("token") ?>" />
@@ -82,6 +84,7 @@ $_helper = $this->helper('ricardomartins_pagseguro');
                 title="<?php echo $this->__('Card Verification Number') ?>" 
                 maxlength="4"
                 placeholder="***"
+                autocomplete="off"
                 />
         </div>
         <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>
@@ -97,6 +100,7 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             value=""
             class="input-text required-entry" 
             title="<?php echo $this->__('Credit Card Owner\'s Name') ?>" 
+            autocomplete="off"
             />
     </div>
 </li>
@@ -114,10 +118,11 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             id="<?php echo $this->getElementId("owner_document") ?>" 
             name="<?php echo $this->getFieldName("owner_document") ?>"
             value="" 
-            class="input-text required-entry validate-digits" 
+            class="input-text required-entry validate-rm-pagseguro-customer-document" 
             title="<?php echo $this->__('Credit Card Owner\'s CPF') ?>" 
-            maxlength="11"
+            maxlength="14"
             placeholder="___.___.___-__"
+            autocomplete="off"
             />
     </div>
 </li>
@@ -141,7 +146,7 @@ $_helper = $this->helper('ricardomartins_pagseguro');
 <li id="<?php echo $this->getElementId("summary_line") ?>" data-card-index="<?php echo $this->getCardIndex() ?>" style="display: none;">
     <div id="<?php echo $this->getElementId("summary_box") ?>" class="summary-info">
         <div class="info">
-            <span><strong>card <?php echo $this->getCardIndex() ?></strong> | <span data-bind="card-metadata" data-card-field="formmated_number"></span></span>
+            <span><strong><?php echo $this->__("card %s", $this->getCardIndex()) ?> </strong> | <span data-bind="card-metadata" data-card-field="formmated_number"></span></span>
             <span data-bind="card-metadata" data-card-field="installments_description"></span>
         </div>
         <span class="edit-link" href="#"><?php echo $this->__('edit') ?></span>

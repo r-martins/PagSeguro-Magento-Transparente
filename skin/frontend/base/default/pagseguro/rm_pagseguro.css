@@ -1,11 +1,18 @@
+/* card number input with embedded flag */
+.rm-pagseguro-payment-form .embedded-flag
+{
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: calc(100% - 5px) center;
+}
+
 /* multi credit card switch */
 .rm-pagseguro-payment-form  .multi-cc-switch-box
 {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 280px;
-    max-width: 100%;
+    justify-content: flex-start;
+    width: 100%;
     padding: 10px 0;
     border-bottom: 1px solid #eee;
     border-top: 1px solid #eee;
@@ -23,6 +30,7 @@
     display: inline-block;
     width: 33px;
     height: 15px;
+    margin-right: 10px;
 }
 .rm-pagseguro-payment-form  .multi-cc-switch-box .switch input
 {
@@ -80,8 +88,7 @@
 /* multi credit card progress bar */
 .rm-pagseguro-payment-form .cc-total-progress-bar
 {
-    width: 280px;
-    max-width: 100%;
+    width: 100%;
     padding-bottom: 20px;
     margin-top: 10px;
     margin-bottom: 25px;

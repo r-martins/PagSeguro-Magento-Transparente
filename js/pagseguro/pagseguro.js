@@ -50,6 +50,36 @@ RMPagSeguro = Class.create({
                 RMPagSeguroObj.updatePaymentHashes();
                 return true;
         });
+
+        Validation.add('validate-rm-pagseguro-customer-document', 'Por favor, insira um número de CPF válido.', function(value, el)
+        {
+            if (value.length != 14) return false;
+            
+            var repeatedDigits = true;
+            value = value.replace(/\D/g,"");
+            
+            for(var i = 0; i < 10; i++)
+            {
+                if(value.charAt(i) != value.charAt(i + 1)) { repeatedDigits = false; break; }
+            }
+            
+            if (repeatedDigits) { return false; }
+            var sum = 0;
+            for (i=0; i < 9; i ++) { sum += parseInt(value.charAt(i)) * (10 - i); }
+            
+            var rev = 11 - (sum % 11);
+            if (rev == 10 || rev == 11) rev = 0;
+            if (rev != parseInt(value.charAt(9))) return false;
+            
+            sum = 0;
+            for (i = 0; i < 10; i ++) { sum += parseInt(value.charAt(i)) * (11 - i); }
+            rev = 11 - (sum % 11);
+
+            if (rev == 10 || rev == 11) rev = 0;
+            if (rev != parseInt(value.charAt(10))) return false;
+            
+            return true;
+        });
     },
     updateSenderHash: function(response) {
         if(typeof response === 'undefined'){
@@ -406,12 +436,13 @@ RMPagSeguro_Multicc_Control = Class.create
     initialize: function(paymentMethodCode, params)
     {
         this.paymentMethodCode = paymentMethodCode;
-        this.params = params;
+        this.grandTotal = params.grandTotal;
         this.forms = {};
         this.syncLocks = {};
 
         this._initForms();
         this._initObservers();
+        this._startAjaxListeners();
     },
 
     /**
@@ -420,8 +451,8 @@ RMPagSeguro_Multicc_Control = Class.create
      */
     _initForms: function()
     {
-        this.forms["cc1"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 1, paymentMethodCode: this.paymentMethodCode, grandTotal: this.params.grandTotal });
-        this.forms["cc2"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 2, paymentMethodCode: this.paymentMethodCode, grandTotal: this.params.grandTotal, config: {_summary: false} });
+        this.forms["cc1"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 1, paymentMethodCode: this.paymentMethodCode, grandTotal: this.grandTotal });
+        this.forms["cc2"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 2, paymentMethodCode: this.paymentMethodCode, grandTotal: this.grandTotal, config: {_summary: false} });
 
         this._disableMultiCc();
     },
@@ -456,7 +487,7 @@ RMPagSeguro_Multicc_Control = Class.create
         this.forms["cc1"].getSummaryBox().observe('click', this._goToCard.bind(this, "cc1"));
 
         // sync totals between forms
-        var updateOtherTotalFunc = (function(newValue) { return this.params.grandTotal - newValue; }).bind(this);
+        var updateOtherTotalFunc = (function(newValue) { return this.grandTotal - newValue; }).bind(this);
         this._syncData("total", "cc1", "cc2", updateOtherTotalFunc);
         this._syncData("total", "cc2", "cc1", updateOtherTotalFunc);
     },
@@ -558,7 +589,7 @@ RMPagSeguro_Multicc_Control = Class.create
         for(var formId in this.forms) { this.forms[formId].disable(); };
         this.forms["cc1"].openEditMode();
         this.forms["cc1"].hideTotal();
-        this.forms["cc1"].setCardData("total", this.params.grandTotal);
+        this.forms["cc1"].setCardData("total", this.grandTotal);
         
         // TO DO !!! transiction button still manual, must be 
         // something automated
@@ -583,6 +614,136 @@ RMPagSeguro_Multicc_Control = Class.create
         {
             this._getGoToCard2FormButton().hide();
         }
+    },
+
+    /**
+     * Start system that monitors ajax requests on checkout
+     */
+    _startAjaxListeners: function()
+    {
+        var self = this;
+
+        // override browser ajax requests object
+        var oldXHR = window.XMLHttpRequest;
+        function newXHR()
+        {
+            var realXHR = new oldXHR();
+    
+            realXHR.addEventListener("readystatechange", function()
+            {
+                if(this.readyState === realXHR.DONE && this.status === 200)
+                {
+                    self._processAjaxListeners(this.responseURL, this);
+                }
+            }, false);
+    
+            return realXHR;
+        }
+        window.XMLHttpRequest = newXHR;
+
+        /*
+
+        // ProtoypeJS version
+        Ajax.Responders.register
+        ({
+            onCreate: function()
+            {
+                alert('a request has been initialized!');
+            }, 
+            onComplete: function()
+            {
+                alert('a request completed');
+            }
+        });
+        */
+
+        // register urls
+        this.ajaxListeners = [];
+        this._registerAjaxListener({url: "onestepcheckout/ajax/saveAddress",         callback: this._ajaxListener__tryToCaptureGrandTotal});
+        this._registerAjaxListener({url: "onestepcheckout/ajax/saveFormValues",      callback: this._ajaxListener__tryToCaptureGrandTotal});
+        this._registerAjaxListener({url: "onestepcheckout/ajax/saveShippingMethod",  callback: this._ajaxListener__tryToCaptureGrandTotal});
+        this._registerAjaxListener({url: "onestepcheckout/ajax/applyCoupon",         callback: this._ajaxListener__tryToCaptureGrandTotal});
+    },
+
+    /**
+     * Add URL to ajax listeners
+     * @param Object listener 
+     */
+    _registerAjaxListener: function(listener)
+    {
+        if(typeof listener.url == "string")
+        {
+            listener.url = new RegExp(listener.url);
+        }
+
+        this.ajaxListeners.push(listener);
+    },
+
+    /**
+     * Verify if the URL is monitored and run callback function
+     * @param string candidateUrl 
+     */
+    _processAjaxListeners: function(candidateUrl, XMLHttpRequestObj)
+    {
+        this.ajaxListeners.each((function(listener)
+        {
+            if(listener.url.test(candidateUrl))
+            {
+                listener.callback(XMLHttpRequestObj);
+            }
+
+        }).bind(this));
+    },
+
+    /**
+     * Default ajax listener to observe grand total change on OSC
+     * @param XMLHttpRequest XMLHttpRequestObj 
+     */
+    _ajaxListener__tryToCaptureGrandTotal: function(XMLHttpRequestObj)
+    {
+        if(!XMLHttpRequestObj)
+        {
+            return;
+        }
+
+        var responseJson = JSON.parse(XMLHttpRequestObj.response);
+
+        if( responseJson && 
+            responseJson.grand_total && 
+            this.grandTotal != responseJson.grand_total )
+        {
+            console.warn("Total do pedido alterado.");
+
+            this.grandTotal = responseJson.grand_total;
+
+            for(var formId in this.forms)
+            {
+                this.forms[formId].updateGrandTotal(this.grandTotal);
+            };
+        }
+    },
+
+    /**
+     * Request grand total value on server and update local forms
+     */
+    requestUpdateGrandTotal: function()
+    {
+        new Ajax.Request(RMPagSeguroSiteBaseURL + 'pseguro/ajax/getGrandTotal',
+        {
+            onSuccess: (function(response)
+            {
+                if(this.grandTotal != response.responseJSON.total)
+                {
+                    this.grandTotal =  response.responseJSON.total;
+
+                    for(var formId in this.forms)
+                    {
+                        this.forms[formId].updateGrandTotal(this.grandTotal);
+                    };
+                }
+
+            }).bind(this)
+        });
     }
 });
 
@@ -642,18 +803,20 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
         // 'masks'
         this._addFieldEventListener("total",            "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("total",            "keyup",   this._formatCurrencyInput);
         this._addFieldEventListener("number",           "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("cid",              "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("dob_day",          "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("dob_month",        "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("dob_year",         "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("owner_document",   "keydown", this._disallowNotNumbers);
-        this._addFieldEventListener("total",            "keyup", this._formatCurrencyInput);
+        this._addFieldEventListener("owner_document",   "keyup",   this._formatDocumentInput);
+        this._addFieldEventListener("owner_document",   "blur",    this._formatDocumentInput);
         
         // custom listeners
-        this._addFieldEventListener("total",        "keyup",  this._instantReflectTotalInProgressBar);
-        this._addFieldEventListener("number",       "keyup",  this._consultCardBrandOnPagSeguro);
-        this._addFieldEventListener("installments", "change", this._updateInstallmentsMetadata);
+        this._addFieldEventListener("total",            "keyup",  this._instantReflectTotalInProgressBar);
+        this._addFieldEventListener("number",           "keyup",  this._consultCardBrandOnPagSeguro);
+        this._addFieldEventListener("installments",     "change", this._updateInstallmentsMetadata);
         
         // logic data binds
         this.addCardDataBind("total",       this._consultInstallmentsOnPagSeguro);
@@ -671,7 +834,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this._getHTMLFormInputsAndSelects().each(function(element)
         {
             element.observe("blur", function(){ Validation.validate(element); });
-        })
+        });
     },
 
     /**
@@ -953,7 +1116,8 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Visual adjustment of the progress bar based on total value
+     * Visual adjustment of the progress bar and remaining value
+     * based on total value
      * @param float value
      */
     _recalcProgressBarFulfillment: function(value)
@@ -964,10 +1128,14 @@ RMPagSeguro_Multicc_CardForm = Class.create
                                 : 0;
 
         this.setCardMetadata("remaining_total", "R$" + remainingValue.toFixed(2).replace(".", ","));
-        this.updateProgressBar(percent);
+        this._updateProgressBar(percent);
     },
 
-    updateProgressBar: function(percent)
+    /**
+     * Visual adjustment of the progress bar based on percentual value
+     * @param float percent
+     */
+    _updateProgressBar: function(percent)
     {
         if(percent > 100) percent = 100;
         
@@ -976,6 +1144,21 @@ RMPagSeguro_Multicc_CardForm = Class.create
                         .first();
 
         $(progress).setStyle({width: percent.toFixed(2) + "%"});
+    },
+
+    /**
+     * Verify if the grand total changed 
+     * @param float|string newValue 
+     */
+    updateGrandTotal: function(newValue)
+    {
+        if(newValue != this.grandTotal)
+        {
+            this.grandTotal = newValue;
+
+            this._recalcProgressBarFulfillment(this.getCardData("total"));
+            this._consultInstallmentsOnPagSeguro();
+        }
     },
 
     /**
@@ -1076,6 +1259,17 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _updateBrandOnHTML(newBrand)
     {
+        if(newBrand)
+        {
+            var imageUrl = "https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/" + newBrand + ".png";
+            this._getFieldElement("number").setStyle({ "background-image": "url('" + imageUrl + "')" });
+        }
+        else
+        {
+            this._getFieldElement("number").setStyle({ "background-image": "none" });
+        }
+
+        /*
         // update HTML
         if(newBrand)
         {
@@ -1091,6 +1285,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         {
             this._getFieldElement("card_brand").update();
         }
+        */
     },
 
     /**
@@ -1388,6 +1583,32 @@ RMPagSeguro_Multicc_CardForm = Class.create
                              "," + 
                              formattedValue.substring(formattedValue.length - 2);
         }
+        
+        field.setValue(formattedValue);
+    },
+
+    /**
+     * CPF format for value inputs
+     * @param DOMElement field 
+     */
+    _formatDocumentInput: function(field)
+    {
+        var digits = field.getValue().replace(/\D/g,'');
+        var formattedValue = "";
+        var lastIndex = 0;
+        
+        if(digits.length <= 3)
+        {
+            return digits;
+        }
+        
+        formattedValue += digits.substring(0, 3) + ".";
+        lastIndex = 3;
+
+        if(digits.length > 6) { formattedValue += digits.substring(3, 6) + "."; lastIndex = 6; }
+        if(digits.length > 9) { formattedValue += digits.substring(6, 9) + "-"; lastIndex = 9; }
+        
+        formattedValue += digits.substring(lastIndex);
         
         field.setValue(formattedValue);
     }
