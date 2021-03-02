@@ -1057,7 +1057,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                         ? " (total R$" + (value * qty).toFixed(2).replace('.',',') + ")"
                         : "";
             
-            var option = new Element('option', {"value": qty + "|" + value});
+            var option = new Element('option', {"value": qty + "|" + value.toFixed(2)});
             option.update(text);
 
             selectbox.add(option);
@@ -1263,10 +1263,12 @@ RMPagSeguro_Multicc_CardForm = Class.create
         {
             var imageUrl = "https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/" + newBrand + ".png";
             this._getFieldElement("number").setStyle({ "background-image": "url('" + imageUrl + "')" });
+            this._getFieldElement("brand").setValue(newBrand);
         }
         else
         {
             this._getFieldElement("number").setStyle({ "background-image": "none" });
+            this._getFieldElement("brand").setValue("");
         }
 
         /*
