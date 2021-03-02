@@ -37,6 +37,7 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             autocomplete="off"
             />
         <span id="<?php echo $this->getElementId("card_brand") ?>" class="card-brand"></span>
+        <input type="hidden" id="<?php echo $this->getElementId("brand") ?>" name="<?php echo $this->getFieldName("brand") ?>" />
         <input type="hidden" id="<?php echo $this->getElementId("token") ?>" name="<?php echo $this->getFieldName("token") ?>" />
     </div>
 </li>

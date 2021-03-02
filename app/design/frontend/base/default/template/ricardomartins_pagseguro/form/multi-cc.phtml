@@ -28,6 +28,10 @@ $_iwdEnabled = $_helper->isIwdEnabled();
 
     <!-- payment form footer -->
     <?php echo $this->getChildHtml() ?>
+
+    <!-- sender hash -->
+    <input type="hidden" name="payment[ps_multicc_sender_hash]" id="rm_pagseguro_multicc_sender_hash" value="" />
+
     <li>
         <?php /* O selo do PagSeguro deve ser exibido obrigatoriamente. Você pode escolher outra imagem disponivel na pasta 'selo' */ ?>
         <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>

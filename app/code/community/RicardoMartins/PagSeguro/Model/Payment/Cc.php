@@ -67,13 +67,44 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $info = $this->getInfoInstance();
 
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
+        $helper = Mage::helper('ricardomartins_pagseguro');
         $pHelper = Mage::helper('ricardomartins_pagseguro/params');
 
-        $info->setAdditionalInformation('sender_hash', $pHelper->getPaymentHash('sender_hash'))
-            ->setAdditionalInformation('credit_card_token', $pHelper->getPaymentHash('credit_card_token'))
-            ->setAdditionalInformation('credit_card_owner', $data->getPsCcOwner())
-            ->setCcType($pHelper->getPaymentHash('cc_type'))
-            ->setCcLast4(substr($data->getPsCcNumber(), -4));
+        $info->setAdditionalInformation('sender_hash', $pHelper->getPaymentHash('sender_hash'));
+
+        // treat multi credit card data before, 
+        // if funcionality is enabled
+        if($helper->isMultiCcEnabled())
+        {
+            $info->setAdditionalInformation("cc1", $this->_extractMultiCcDataFromForm($info, $data, 1, $pHelper));
+            $info->setAdditionalInformation("cc2", $this->_extractMultiCcDataFromForm($info, $data, 2, $pHelper));
+            $info->setAdditionalInformation("use_two_cards", ($data->getData("use_two_cards") ? 1 : 0)); 
+            
+            if($data->getData("use_two_cards"))
+            {
+                return;
+            }
+
+            $cc1Data = $info->getAdditionalInformation("cc1");
+
+            $info->setAdditionalInformation('credit_card_token', $cc1Data["token"]);
+            $info->setCcType($cc1Data["brand"]);
+            $info->setCcLast4($cc1Data["last4"]);
+            $data->setPsCcOwner($cc1Data["owner"]);
+            $data->setPsCcOwnerBirthdayDay(str_pad($data->getData("ps_multicc1_dob_day"), 2, "0", STR_PAD_LEFT));
+            $data->setPsCcOwnerBirthdayMonth(str_pad($data->getData("ps_multicc1_dob_month"), 2, "0", STR_PAD_LEFT));
+            $data->setPsCcOwnerBirthdayYear($data->getData("ps_multicc1_dob_year"));
+            $data->setPsCcInstallments($data->getData("ps_multicc1_installments"));
+            $data->setData($this->getCode() . "_cpf", $cc1Data["owner_doc"]);
+        }
+        else
+        {
+            $info->setAdditionalInformation('credit_card_token', $pHelper->getPaymentHash('credit_card_token'))
+                 ->setCcType($pHelper->getPaymentHash('cc_type'))
+                 ->setCcLast4(substr($data->getPsCcNumber(), -4));
+        }
+        
+        $info->setAdditionalInformation('credit_card_owner', $data->getPsCcOwner());
 
         //cpf
         if (Mage::helper('ricardomartins_pagseguro')->isCpfVisible()) {
@@ -110,6 +141,54 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     }
 
     /**
+     * Assign multi credit card form data to payment info object
+     *
+     * @param Mage_Payment_Model_Info $paymentInfo
+     * @param mixed $formData
+     */
+    public function _extractMultiCcDataFromForm($paymentInfo, $formData, $cardIndex, $pHelper)
+    {
+        $installments = explode("|", $formData->getData("ps_multicc{$cardIndex}_installments"));
+
+        if($installments !== false && count($installments) == 2)
+        {
+            $installmentsQty = $installments[0];
+            $installmentsValue = $installments[1];
+        }
+        else
+        {
+            $installmentsQty = "";
+            $installmentsValue = "";
+        }
+
+        $total =  str_replace(".", "", $formData->getData("ps_multicc{$cardIndex}_total"));
+        $total = floatval(str_replace(",", ".", $total));
+
+        $cardData = array
+        (
+            "last4"     => substr($pHelper->removeNonNumbericChars($formData->getData("ps_multicc{$cardIndex}_number")), - 4),
+            "token"     => $formData->getData("ps_multicc{$cardIndex}_token"),
+            "total"     => $total,
+            "brand"     => $formData->getData("ps_multicc{$cardIndex}_brand"),
+            "owner"     => $formData->getData("ps_multicc{$cardIndex}_owner"),
+            "owner_doc" => $pHelper->removeNonNumbericChars($formData->getData("ps_multicc{$cardIndex}_owner_document")),
+            "installments_qty" => $installmentsQty,
+            "installments_value" => $installmentsValue,
+        );
+
+        if (empty(Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute')))
+        {
+            $dob = str_pad($formData->getData("ps_multicc{$cardIndex}_dob_day"), 2, "0", STR_PAD_LEFT) . "/" . 
+                   str_pad($formData->getData("ps_multicc{$cardIndex}_dob_month"), 2, "0", STR_PAD_LEFT) . "/" .
+                   $formData->getData("ps_multicc{$cardIndex}_dob_year");
+                
+            $cardData["dob"] = $dob;
+        }
+
+        return $cardData;
+    }
+
+    /**
      * Validate payment method information object
      *
      * @return Mage_Payment_Model_Abstract
@@ -124,6 +203,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
         $pHelper = Mage::helper('ricardomartins_pagseguro/params');
 
+        $paymentInfo = $this->getInfoInstance();
         $shippingMethod = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingMethod();
 
         // verifica se não há método de envio selecionado antes de exibir o erro de falha no cartão de crédito - Weber
@@ -132,7 +212,31 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
 
         $senderHash = $pHelper->getPaymentHash('sender_hash');
-        $creditCardToken = $pHelper->getPaymentHash('credit_card_token');
+        $helper->isMultiCcEnabled();
+
+        if($helper->isMultiCcEnabled() && $paymentInfo->getAdditionalInformation("use_two_cards"))
+        {
+            $cc1 = $paymentInfo->getAdditionalInformation("cc1");
+            $this->_validateCardAndSenderHashes($cc1["token"], $senderHash, " 1");
+            
+            $cc2 = $paymentInfo->getAdditionalInformation("cc2");
+            $this->_validateCardAndSenderHashes($cc2["token"], $senderHash, " 2");
+        }
+        else
+        {
+            $creditCardToken = $helper->isMultiCcEnabled()
+                                    ? $paymentInfo->getAdditionalInformation("credit_card_token")
+                                    : $pHelper->getPaymentHash("credit_card_token");
+
+            $this->_validateCardAndSenderHashes($creditCardToken, $senderHash);
+        }
+
+        return $this;
+    }
+
+    private function _validateCardAndSenderHashes($creditCardToken, $senderHash, $cardSuffix = "")
+    {
+        $helper = Mage::helper('ricardomartins_pagseguro');
 
         //mapeia a request URL atual
         $controller = Mage::app()->getRequest()->getControllerName();
@@ -146,8 +250,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         //Valida token e hash se a request atual se encontra na lista de
         //exceções do admin ou se a requisição vem de placeOrder
-        if ((!$creditCardToken || !$senderHash) && !in_array($pathRequest, $configPaths)) {
-            $missingInfo = sprintf('Token do cartão: %s', var_export($creditCardToken, true));
+        if ((!$creditCardToken || !$senderHash) && !in_array($pathRequest, $configPaths))
+        {
+            $missingInfo = sprintf('Token do cartão%s: %s', $cardSuffix, var_export($creditCardToken, true));
             $missingInfo .= sprintf('/ Sender_hash: %s', var_export($senderHash, true));
             $missingInfo .= '/ URL desta requisição: ' . $pathRequest;
             $helper->writeLog(
@@ -157,18 +262,19 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                     a url de exceção.
                     $missingInfo"
             );
-            if (!$helper->isRetryActive()) {
+            if (!$helper->isRetryActive())
+            {
                 Mage::throwException(
                     'Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.'
                 );
-            } else {
+            }
+            else
+            {
                 $helper->writeLog(
                     'Apesar da transação ter falhado, o pedido poderá continuar pois a retentativa está ativa.'
                 );
             }
         }
-
-        return $this;
     }
 
     /**
@@ -181,8 +287,52 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     public function order(Varien_Object $payment, $amount)
     {
-        /** @var Mage_Sales_Model_Order $order */
+        $helper = Mage::helper('ricardomartins_pagseguro');
+
+        if($helper->isMulticcEnabled() && $payment->getAdditionalInformation("use_two_cards"))
+        {
+            try
+            {
+                $transaction1 = $this->_createTransaction($payment, $amount, 1);
+                $transaction2 = $this->_createTransaction($payment, $amount, 2);
+            }
+            catch(Exception $e)
+            {
+                if(isset($transaction1))
+                {
+                    // TO DO: cancel transaction 1
+                }
+                
+                if(isset($transaction2))
+                {
+                    // TO DO: cancel transaction 2
+                }
+                
+                throw $e;
+            }
+        }
+        else
+        {
+            $this->_createTransaction($payment, $amount);
+        }
+
+        return $this;
+    }
+
+    private function _createTransaction($payment, $amount, $ccIdx = null)
+    {
         $order = $payment->getOrder();
+
+        if($ccIdx)
+        {
+            $carData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            $payment->setData("_current_card_index", $ccIdx);
+            $payment->setData("_current_card_total_multiplier", ($carData["total"] / $amount));
+        }
+        else
+        {
+            $carData = false;
+        }
 
         //will grab data to be send via POST to API inside $params
         $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
@@ -199,6 +349,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 && !$payment->getAdditionalInformation(
                     'retried_installments'
                 )) {
+                    // !!! TO DO: adapt this logic for multi cc
                 return $this->recalculateInstallmentsAndPlaceOrder($payment, $amount);
             }
 
@@ -216,20 +367,60 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             }
         }
 
+        // avoid Magento transaction automatic creation  to use our 
+        // own logic
         $payment->setSkipOrderProcessing(true);
+        $pagSeguroTransactionId = $returnXml->code;
 
-        if (isset($returnXml->code)) {
+        if (isset($returnXml->code))
+        {
+            // legacy code: store transaction ID on additional information
             $additional = array('transaction_id'=>(string)$returnXml->code);
-            if ($existing = $payment->getAdditionalInformation()) {
+            if ($existing = $payment->getAdditionalInformation()){
                 if (is_array($existing)) {
                     $additional = array_merge($additional, $existing);
                 }
             }
 
             $payment->setAdditionalInformation($additional);
+
+            // new approach: use transaction from pagseguro to 
+            // generate a magento transaction
+            $payment->setTransactionId((string) $returnXml->code);
+            $transaction = $payment->addTransaction(Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
+            
+            if($carData && isset($carData["total"]))
+            {
+                $transaction->setAdditionalInformation("frontend_value", $carData["total"]);
+            }
+
+            $transactionDetails = array
+            (
+                "reference"       => isset($returnXml->reference) ? (string) $returnXml->reference : "",
+                "status"          => isset($returnXml->status) ? (string) $returnXml->status : "",
+                "last_event_date" => isset($returnXml->lastEventDate) ? (string) $returnXml->lastEventDate : "",
+                "remote_value"    => isset($returnXml->grossAmount) ? (string) $returnXml->grossAmount : "",
+            );
+            
+            if(isset($returnXml->gatewaySystem))
+            {
+                if(isset($returnXml->gatewaySystem->authorizationCode)) $transactionDetails["authorization_code"] = (string) $returnXml->gatewaySystem->authorizationCode;
+                if(isset($returnXml->gatewaySystem->nsu)) $transactionDetails["nsu"] = (string) $returnXml->gatewaySystem->nsu;
+                if(isset($returnXml->gatewaySystem->tid)) $transactionDetails["tid"] = (string) $returnXml->gatewaySystem->tid;
+            }
+
+            $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transactionDetails);
+        }
+        else
+        {
+            $xmlStr = is_object($returnXml) && method_exists($returnXml, "asXML")
+                        ? $returnXml->asXML()
+                        : strval($returnXml);
+            $helper->writeLog("Could not determine the transaction ID of the WS returned XML: " . $xmlStr);
+            Mage::throwException("Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.");
         }
 
-        return $this;
+        return $transaction;
     }
 
     /**

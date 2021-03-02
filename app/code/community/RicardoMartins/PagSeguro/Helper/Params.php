@@ -25,6 +25,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function getItemsParams(Mage_Sales_Model_Order $order)
     {
+        $payment = $order->getPayment();
+        $ccIdx = $payment->getData("_current_card_index");
+        $totalMultiplier = $ccIdx
+                            ? $payment->getData("_current_card_total_multiplier")
+                            : 1;
+
         $return = array();
         $items = $order->getAllVisibleItems();
         if ($items) {
@@ -34,7 +40,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 $qtyOrdered = $items[$y]->getQtyOrdered();
                 $return['itemId'.$x] = $items[$y]->getId();
                 $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100);
-                $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
+                $return['itemAmount'.$x] = number_format($itemPrice * $totalMultiplier, 2, '.', '');
                 $return['itemQuantity'.$x] = (int)$qtyOrdered;
 
                 if ($items[$y]->getIsQtyDecimal()) {
@@ -42,7 +48,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                     $return['itemDescription'.$x] = substr($items[$y]->getName(), 0, 100-strlen($txtUnDesc));
                     $return['itemDescription'.$x] .= $txtUnDesc;
                     $itemPrice = $items[$y]->getRowTotalInclTax();
-                    $return['itemAmount'.$x] = number_format($itemPrice, 2, '.', '');
+                    $return['itemAmount'.$x] = number_format($itemPrice * $totalMultiplier, 2, '.', '');
                     $return['itemQuantity'.$x] = 1;
                 }
 
@@ -115,8 +121,16 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($order->getCustomer(), $payment);
         $phone = $this->_extractPhone($order->getBillingAddress()->getData($this->_getTelephoneAttribute()));
 
+        if($ccIdx = $payment->getData("_current_card_index"))
+        {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            $holderName = $cardData["owner"];
+        }
+        else
+        {
+            $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
+        }
 
-        $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
         $return = array(
             'creditCardHolderName'      => $holderName,
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
@@ -136,20 +150,40 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      */
     public function getCreditCardInstallmentsParams(Mage_Sales_Model_Order $order, $payment)
     {
-        if ($payment->getAdditionalInformation('installment_quantity')
-            && $payment->getAdditionalInformation('installment_value')) {
-            $return = array(
-                'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity'),
-                'installmentValue'      => number_format(
-                    $payment->getAdditionalInformation('installment_value'), 2, '.', ''
-                ),
-            );
-        } else {
-            $return = array(
-                'installmentQuantity'   => '1',
-                'installmentValue'      => number_format($order->getGrandTotal(), 2, '.', ''),
-            );
+        if($ccIdx = $payment->getData("_current_card_index"))
+        {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            
+            if( is_array($cardData) && 
+                isset($cardData["installments_qty"]) && 
+                isset($cardData["installments_value"]) )
+            {
+                return array
+                (
+                    'installmentQuantity' => $cardData["installments_qty"],
+                    'installmentValue'    => $cardData["installments_value"],
+                );
+            }
         }
+        else
+        {
+            if ($payment->getAdditionalInformation('installment_quantity')
+                && $payment->getAdditionalInformation('installment_value')) {
+                return array
+                (
+                    'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity'),
+                    'installmentValue'      => number_format(
+                        $payment->getAdditionalInformation('installment_value'), 2, '.', ''
+                    ),
+                );
+            }
+        }
+
+        return array
+        (
+            'installmentQuantity'   => '1',
+            'installmentValue'      => number_format($order->getGrandTotal(), 2, '.', ''),
+        );
 
         return $return;
     }
@@ -196,9 +230,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         );
 
         //shipping specific
-        if ($type == 'shipping') {
+        if ($type == 'shipping')
+        {
+            $costMultiplier = $order->getPayment()->getData("_current_card_total_multiplier") ?: 1;
+
             $shippingType = $this->_getShippingType($order);
-            $shippingCost = $order->getShippingAmount();
+            $shippingCost = $order->getShippingAmount() * $costMultiplier;
             $return['shippingType'] = $shippingType;
             if ($shippingCost > 0) {
                 if ($this->_shouldSplit($order)) {
@@ -311,7 +348,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Calculates the "Exta" value that corresponds to Tax values minus Discount given
+     * Calculates the "Extra" value that corresponds to Tax values minus Discount given
      * It makes the correct discount to be shown correctly on PagSeguro
      * @param Mage_Sales_Model_Order $order
      *
@@ -349,6 +386,33 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Calculates the difference of the value generated due to float pointing
+     * rounding on items ammount
+     * @param Mage_Sales_Model_Order $order
+     *
+     * @return float
+     */
+    public function getMultiCcRoundedAmountError($order)
+    {
+        $ccIdx = $order->getPayment()->getData("_current_card_index");
+
+        if(!$ccIdx)
+        {
+            return 0;
+        }
+        
+        $multiplier = $order->getPayment()->getData("_current_card_total_multiplier");
+        $itemsTotal = 0;
+
+        foreach ($order->getAllVisibleItems() as $item)
+        {
+            $itemsTotal += round($item->getPrice() * $multiplier, 2) * $item->getQtyOrdered() ;
+        }
+
+        return round(($order->getSubtotal() * $multiplier) - $itemsTotal, 2);
+    }
+
+    /**
      * Remove duplicated spaces from string
      * @param $string
      * @return string
@@ -358,6 +422,17 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $string = self::normalizeChars($string);
 
         return preg_replace('/\s+/', ' ', trim($string));
+    }
+
+    /**
+     * Remove non numeric (digits) chars from string
+     * @param $string
+     * @return string
+     */
+    public function removeNonNumbericChars($string)
+    {
+        return (new Zend_Filter_Digits())->filter($string);
+        //return preg_replace("/[^0-9]/", "", $string);
     }
 
     /**
@@ -462,9 +537,21 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $ccDobAttribute = Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute');
 
-        if (empty($ccDobAttribute)) { //when asked with payment data
-            if (isset($payment['additional_information']['credit_card_owner_birthdate'])) {
-                return $payment['additional_information']['credit_card_owner_birthdate'];
+        if (empty($ccDobAttribute)) //when asked with payment data
+        {
+            if($ccIdx = $payment->getData("_current_card_index"))
+            {
+                $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+                if (is_array($cardData) && isset($cardData["owner_dob"]))
+                {
+                    return $cardData["owner_dob"];
+                }
+            }
+            else
+            {
+                if (isset($payment['additional_information']['credit_card_owner_birthdate'])) {
+                    return $payment['additional_information']['credit_card_owner_birthdate'];
+                }
             }
         }
 
@@ -496,9 +583,21 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
 
-        if (empty($customerCpfAttribute)) { //Asked with payment data
-            if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
-                return $payment['additional_information'][$payment->getMethod() . '_cpf'];
+        if (empty($customerCpfAttribute)) //Asked with payment data
+        {
+            if($ccIdx = $payment->getData("_current_card_index"))
+            {
+                $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+                if (is_array($cardData) && isset($cardData["owner_doc"]))
+                {
+                    return $cardData["owner_doc"];
+                }
+            }
+            else
+            {
+                if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
+                    return $payment['additional_information'][$payment->getMethod() . '_cpf'];
+                }
             }
         }
 
