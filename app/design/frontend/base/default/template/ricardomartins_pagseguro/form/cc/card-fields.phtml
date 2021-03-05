@@ -137,7 +137,7 @@ $_helper = $this->helper('ricardomartins_pagseguro');
                 name="<?php echo $this->getFieldName("installments") ?>"
                 class="required-entry">
                 
-                <option value="1|<?php echo $this->getGrandTotal() ?>">1x de <?php echo $this->formatCurrency($this->getGrandTotal()) ?> sem juros</option>
+                <option value="1|<?php echo number_format($this->getGrandTotal(), 2, ".", "") ?>">1x de <?php echo $this->formatCurrency($this->getGrandTotal()) ?> sem juros</option>
                 <option value="">Informe os dados do cartão para calcular as demais parcelas</option>
 
             </select>

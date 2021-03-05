@@ -32,7 +32,76 @@ class RicardoMartins_PagSeguro_Block_Form_Info_Cc extends Mage_Payment_Block_Inf
     protected function _construct()
     {
         parent::_construct();
-        $this->setTemplate('ricardomartins_pagseguro/form/info/cc.phtml');
+        
+        if($this->helper("ricardomartins_pagseguro")->isMultiCcEnabled())
+        {
+            $this->setTemplate('ricardomartins_pagseguro/form/info/multi-cc.phtml');
+        }
+        else
+        {
+            $this->setTemplate('ricardomartins_pagseguro/form/info/cc.phtml');
+        }
     }
 
+    public function isSandbox()
+    {
+        $order = $this->getInfo()->getOrder();
+        return (!$order || !$order->getId() || strpos($order->getCustomerEmail(), '@sandbox.pagseguro') === false) ? false : true;
+    }
+
+    public function isMultiCcPayment()
+    {
+        return $this->helper("ricardomartins_pagseguro")->isMultiCcEnabled() && 
+               $this->getInfo()->getAdditionalInformation("use_two_cards");
+    }
+
+    public function getCc1Data()
+    {
+        $cc1 = $this->getInfo()->getAdditionalInformation("cc1");
+
+        if($cc1)
+        {
+            return new Varien_Object($cc1);
+        }
+
+        return false;
+    }
+
+    public function getCc2Data()
+    {
+        $cc2 = $this->getInfo()->getAdditionalInformation("cc2");
+
+        if($cc2 && $this->getInfo()->getAdditionalInformation("use_two_cards"))
+        {
+            return new Varien_Object($cc2);
+        }
+
+        return false;
+    }
+
+    public function formatTransactionId($transactionId)
+    {
+        return $this->isSandbox() ? str_replace('-', '', $transactionId) : $transactionId;
+    }
+
+    public function getTransactionUrlOnPagSeguro($transactionId)
+    {
+        if($this->isSandbox())
+        {
+            return "https://sandbox.pagseguro.uol.com.br/aplicacao/transacoes.html";
+        }
+        
+        return "https://pagseguro.uol.com.br/transaction/details.jhtml?code=" . $this->escapeHtml($transactionId);
+    }
+
+    public function isForceUpdateEnabled()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/pagseguro_update');
+    }
+
+    public function getForceUpdateUrl()
+    {
+        // Mage::helper('adminhtml')->getUrl('adminhtml/updatePayment/index', array('id'=>$info->getId()))
+        return "";
+    }
 }

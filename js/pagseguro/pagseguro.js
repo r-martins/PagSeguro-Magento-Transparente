@@ -1552,7 +1552,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _disallowNotNumbers(field, event)
     {
-        if (!/[0-9\/]+/.test(event.key) && event.key.length === 1)
+        if (event.key && !/[0-9\/]+/.test(event.key) && event.key.length === 1)
         {
             event.preventDefault();
         }

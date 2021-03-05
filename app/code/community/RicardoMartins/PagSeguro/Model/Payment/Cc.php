@@ -293,19 +293,51 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         {
             try
             {
-                $transaction1 = $this->_createTransaction($payment, $amount, 1);
-                $transaction2 = $this->_createTransaction($payment, $amount, 2);
+                $transaction1 = $this->_createOrderTransaction($payment, $amount, 1);
+                $transaction2 = $this->_createOrderTransaction($payment, $amount, 2);
+
+                // update references to transactions on card data
+                $cc1 = $payment->getAdditionalInformation("cc1");
+                $cc2 = $payment->getAdditionalInformation("cc2");
+
+                $cc1["transaction_id"] = $transaction1->getTxnId();
+                $cc2["transaction_id"] = $transaction2->getTxnId();
+
+                $payment->setAdditionalInformation("cc1", $cc1);
+                $payment->setAdditionalInformation("cc2", $cc2);
             }
             catch(Exception $e)
             {
-                if(isset($transaction1))
+                // collect the successfully registered transactions
+                // and refund them
+                foreach($payment->getOrder()->getRelatedObjects() as $object)
                 {
-                    // TO DO: cancel transaction 1
-                }
-                
-                if(isset($transaction2))
-                {
-                    // TO DO: cancel transaction 2
+                    if( $object instanceof Mage_Sales_Model_Order_Payment_Transaction && 
+                        $object->getTxnType() == Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER )
+                    {
+                        if(in_array($object->getAdditionalInformation("status"), array("1", "2")))
+                        {
+                            $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
+                        }
+                        else if(in_array($object->getAdditionalInformation("status"), array("3", "4", "5")))
+                        {
+                            $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            $this->_createRefundTransaction($payment, $amount, $object->getTxnId(), $transactionType);
+                        }
+                        catch(Exception $e)
+                        {
+                            $helper->writeLog("Transaction could not be automatic refunded: " . $object->getTxnId());
+                            Mage::logException($e);
+                        }
+                    }
                 }
                 
                 throw $e;
@@ -313,13 +345,27 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
         else
         {
-            $this->_createTransaction($payment, $amount);
+            $transaction = $this->_createOrderTransaction($payment, $amount);
+
+            // update reference to transaction on card data
+            $cc1 = $payment->getAdditionalInformation("cc1");
+            $cc1["transaction_id"] = $transaction->getTxnId();
+            $payment->setAdditionalInformation("cc1", $cc1);
         }
 
         return $this;
     }
 
-    private function _createTransaction($payment, $amount, $ccIdx = null)
+    /**
+     * Comunicate with PagSeguro web service and create a Magento 
+     * order transacation object
+     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param float $amount
+     * @param integer $ccIdx
+     * 
+     * @return Mage_Sales_Model_Order_Payment_Transaction
+     */
+    private function _createOrderTransaction($payment, $amount, $ccIdx = null)
     {
         $order = $payment->getOrder();
 
@@ -337,23 +383,28 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         //will grab data to be send via POST to API inside $params
         $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
         $rmHelper = Mage::helper('ricardomartins_pagseguro');
-
+        
         //call API
         $returnXml = $this->callApi($params, $payment);
 
-        try {
+        try
+        {
             $this->proccessNotificatonResult($returnXml);
-        } catch (Mage_Core_Exception $e) {
+        }
+        catch (Mage_Core_Exception $e)
+        {
             //retry if error is related to installment value
             if ($this->getIsInvalidInstallmentValueError()
                 && !$payment->getAdditionalInformation(
                     'retried_installments'
-                )) {
+                ))
+            {
                     // !!! TO DO: adapt this logic for multi cc
                 return $this->recalculateInstallmentsAndPlaceOrder($payment, $amount);
             }
 
-            if ($rmHelper->canRetryOrder($order)) {
+            if ($rmHelper->canRetryOrder($order))
+            {
                 $order->addStatusHistoryComment(
                     'A retentativa de pedido está ativa. O pedido foi concluído mesmo com o seguite erro: '
                     . $e->getMessage()
@@ -362,7 +413,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
             //only throws exception if payment retry is disabled
             //read more at https://bit.ly/3b2onpo
-            if (!$rmHelper->isRetryActive()) {
+            if (!$rmHelper->isRetryActive())
+            {
                 Mage::throwException($e->getMessage());
             }
         }
@@ -401,6 +453,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 "last_event_date" => isset($returnXml->lastEventDate) ? (string) $returnXml->lastEventDate : "",
                 "remote_value"    => isset($returnXml->grossAmount) ? (string) $returnXml->grossAmount : "",
             );
+
+            $transaction->setAdditionalInformation("status", $transactionDetails["status"]);
+            $transaction->setAdditionalInformation("last_event_date", $transactionDetails["last_event_date"]);
             
             if(isset($returnXml->gatewaySystem))
             {
@@ -416,7 +471,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $xmlStr = is_object($returnXml) && method_exists($returnXml, "asXML")
                         ? $returnXml->asXML()
                         : strval($returnXml);
-            $helper->writeLog("Could not determine the transaction ID of the WS returned XML: " . $xmlStr);
+            $rmHelper->writeLog("Could not determine the transaction ID of the WS returned XML: " . $xmlStr);
             Mage::throwException("Falha ao processar seu pagamento. Por favor, entre em contato com nossa equipe.");
         }
 

@@ -418,7 +418,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             )
         );
         $params = $paramsObj->getParams();
-        if (strpos($params['senderEmail'], '@sandbox.pagseguro') !== false && !$helper->isSandbox())
+        if (isset($params['senderEmail']) && strpos($params['senderEmail'], '@sandbox.pagseguro') !== false && !$helper->isSandbox())
         {
             Mage::throwException('E-mail @sandbox.pagseguro não deve ser usado em produção');
         }
@@ -597,9 +597,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             && (Mage::app()->getStore()->roundPrice($quote->getGrandTotal()) > 0 || $quote->isNominal());
     }
 
-
     /**
-     * Order payment
+     * Refund payment
      *
      * @param Varien_Object $payment
      * @param float $amount
@@ -608,32 +607,97 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      */
     public function refund(Varien_Object $payment, $amount)
     {
-        //will grab data to be send via POST to API inside $params
-        $rmHelper   = Mage::helper('ricardomartins_pagseguro');
+        // Get the order transactions for the payment
+        $transactions = Mage::getModel('sales/order_payment_transaction')->getCollection()
+                            ->setOrderFilter($payment->getOrder())
+                            ->addPaymentIdFilter($payment->getId())
+                            ->addTxnTypeFilter(Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER)
+                            ->setOrder('created_at', Varien_Data_Collection::SORT_ORDER_DESC)
+                            ->setOrder('transaction_id', Varien_Data_Collection::SORT_ORDER_DESC);
+        
+        if($transactions && count($transactions) > 0)
+        {
+            foreach($transactions as $transaction)
+            {
+                if(in_array($transaction->getAdditionalInformation("status"), array("1", "2")))
+                {
+                    $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
+                }
+                else if(in_array($transaction->getAdditionalInformation("status"), array("3", "4", "5")))
+                {
+                    $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND;
+                }
+                else
+                {
+                    // the transaction status doest not permit refund
+                    // Mage::throwException("Transaction %s could not be refunded, due to its status: %s", $transaction->getTxnId(), $transaction->getAdditionalInformation("status"));
+                    continue;
+                }
+                
+                $this->_createRefundTransaction($payment, $amount, $transaction->getTxnId(), $transactionType);
+            }
+        }
+        else if($payment->getAdditionalInformation("transaction_id"))
+        {
+            $this->_createRefundTransaction($payment, $amount, $payment->getAdditionalInformation("transaction_id"));
+        }
 
-        // recupera a informação adicional do PagSeguro
-        $info           = $this->getInfoInstance();
-        $transactionId = $info->getAdditionalInformation('transaction_id');
+        return $this;
+    }
 
-        $params = array(
-            'transactionCode'   => $transactionId,
-            'refundValue'       => number_format($amount, 2, '.', ''),
-        );
+    /**
+     * Comunicate with PagSeguro web service and create a Magento 
+     * refund transacation object
+     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param string $parentTransactionId
+     * @param string $transactionType
+     * 
+     * @return Mage_Sales_Model_Order_Payment_Transaction
+     */
+    protected function _createRefundTransaction($payment, $amount, $parentTransactionId, $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND)
+    {
+        $rmHelper = Mage::helper('ricardomartins_pagseguro');
+        $params = array('transactionCode' => $parentTransactionId);
 
-        if ($rmHelper->getLicenseType() != 'app') {
+        if ($rmHelper->getLicenseType() != 'app')
+        {
             $params['token'] = $rmHelper->getToken();
             $params['email'] = $rmHelper->getMerchantEmail();
         }
+        
+        // cancel action on pagseguro
+        if($transactionType == Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID)
+        {
+            $uri = 'transactions/cancels';
+        }
+        // refund action on pagseguro
+        else if($transactionType == Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND)
+        {
+            $params['refundValue'] = number_format($amount, 2, '.', '');
+            $uri = 'transactions/refunds';
+        }
+        else
+        {
+            Mage::throwException("Unrecognized refund transaction type : %s", $transactionType);
+        }
 
         // call API - refund
-        $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
+        $returnXml  = $this->callApi($params, $payment, $uri);
 
-        if ($returnXml === null) {
+        if ($returnXml === null)
+        {
             $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
             Mage::throwException($errorMsg);
         }
-        return $this;
+
+        $payment->setTransactionId($parentTransactionId . "-" . $transactionType);
+        $payment->setParentTransactionId($parentTransactionId);
+        $payment->setShouldCloseParentTransaction(true);
+        
+        return $payment->addTransaction($transactionType);
     }
+
+
 
     /**
      * Convert array values to utf-8
