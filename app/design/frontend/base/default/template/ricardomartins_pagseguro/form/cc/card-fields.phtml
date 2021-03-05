@@ -11,11 +11,12 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             id="<?php echo $this->getElementId("total") ?>" 
             name="<?php echo $this->getFieldName("total") ?>"
             value="" 
-            class="input-text required-entry" 
+            class="input-text validate-custom" 
             title="<?php echo $this->__('How much do You want to pay with this card?') ?>" 
             placeholder="0,00"
             autocomplete="off"
             />
+        <div class="validation-advice" style="display:none;"></div>
     </div>
     <div class="cc-total-progress-bar" id="<?php echo $this->getElementId("progress_bar") ?>">
         <label><?php echo $this->__('Remaining value of the payment:') ?> <span data-bind="card-metadata" data-card-field="remaining_total"></span></label>
@@ -30,9 +31,9 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             id="<?php echo $this->getElementId("number") ?>" 
             name="<?php echo $this->getFieldName("number") ?>"
             value="" 
-            class="input-text validate-cc-number validate-cc-type required-entry embedded-flag" 
+            class="input-text validate-cc-number required-entry embedded-flag" 
             title="<?php echo $this->__('Credit Card Number') ?>" 
-            maxlength="16"
+            maxlength="19"
             placeholder="**** **** **** ****"
             autocomplete="off"
             />

@@ -67,7 +67,7 @@ class RicardoMartins_PagSeguro_Block_Form_Cc_CardFields extends Mage_Core_Block_
                 ->createBlock('ricardomartins_pagseguro/form_cc_dob')
                 ->setTemplate('ricardomartins_pagseguro/form/cc/dob.phtml')
                 ->setCardIndex($this->getCardIndex())
-                ->setFieldIdFormat('rm_pagseguro_input_cc' . $this->getCardIndex() . '_dob_%s')
+                ->setFieldIdFormat('rm_pagseguro_cc_cc' . $this->getCardIndex() . '_dob_%s')
                 ->setFieldNameFormat("payment[ps_multicc" . $this->getCardIndex() . "_dob_%s]")
                 ->setParentFormBlock($this)
                 ->toHtml();

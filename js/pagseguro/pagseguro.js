@@ -190,11 +190,11 @@ RMPagSeguro = Class.create({
 
     },
     updateCreditCardToken: function(){
-        var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/^\s+|\s+$/g,'');
+        var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/\D/g,'');
         // var ccNumElm = $$('input[name="payment[ps_cc_number]"]').first();
-        var ccExpMo = $$('select[name="payment[ps_cc_exp_month]"]').first().value.replace(/^\s+|\s+$/g,'');
-        var ccExpYr = $$('select[name="payment[ps_cc_exp_year]"]').first().value.replace(/^\s+|\s+$/g,'');
-        var ccCvv = $$('input[name="payment[ps_cc_cid]"]').first().value.replace(/^\s+|\s+$/g,'');
+        var ccExpMo = $$('select[name="payment[ps_cc_exp_month]"]').first().value.replace(/\D/g,'');
+        var ccExpYr = $$('select[name="payment[ps_cc_exp_year]"]').first().value.replace(/\D/g,'');
+        var ccCvv = $$('input[name="payment[ps_cc_cid]"]').first().value.replace(/\D/g,'');
 
         var brandName = '';
         if(typeof RMPagSeguroObj.lastCcNum != "undefined" || ccNum != RMPagSeguroObj.lastCcNum){
@@ -267,7 +267,7 @@ RMPagSeguro = Class.create({
         }
     },
     updateBrand: function(){
-        var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/^\s+|\s+$/g,'');
+        var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/\D/g,'');
         var currentBin = ccNum.substring(0, 6);
         var flag = RMPagSeguroObj.config.flag; //tamanho da bandeira
 
@@ -437,12 +437,35 @@ RMPagSeguro_Multicc_Control = Class.create
     {
         this.paymentMethodCode = paymentMethodCode;
         this.grandTotal = params.grandTotal;
+        this.isMultiCcPreEnabled = false;
         this.forms = {};
         this.syncLocks = {};
+        this.importedFormData = {};
 
+        this._setupUniqueObject();
         this._initForms();
         this._initObservers();
-        this._startAjaxListeners();
+        //this._startAjaxListeners();
+    },
+
+    /**
+     * Ensures that only one instance of the class exists in 
+     * the page, destroying the existing one before itself
+     */
+     _setupUniqueObject: function()
+    {
+        if(typeof window.rm_pagseguro_multicc_control != "undefined")
+        {
+            // before destroying its ancestor, copy its data
+            this.importedFormData = window.rm_pagseguro_multicc_control.exportFormData();
+            this.isMultiCcPreEnabled = this.importedFormData.isMultiCcEnabled;
+
+            // goodbye, old friend
+            window.rm_pagseguro_multicc_control.destroy();
+            delete window.rm_pagseguro_multicc_control;
+        }
+
+        window.rm_pagseguro_multicc_control = this;
     },
 
     /**
@@ -451,10 +474,36 @@ RMPagSeguro_Multicc_Control = Class.create
      */
     _initForms: function()
     {
-        this.forms["cc1"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 1, paymentMethodCode: this.paymentMethodCode, grandTotal: this.grandTotal });
-        this.forms["cc2"] = new RMPagSeguro_Multicc_CardForm({cardIndex: 2, paymentMethodCode: this.paymentMethodCode, grandTotal: this.grandTotal, config: {_summary: false} });
+        this.forms["cc1"] = new RMPagSeguro_Multicc_CardForm
+        ({
+            cardIndex         : 1, 
+            paymentMethodCode : this.paymentMethodCode, 
+            grandTotal        : this.grandTotal,
+            oldGrandTotal     : this.importedFormData ? this.importedFormData.grandTotal : false,
+            importedData      : (typeof this.importedFormData["cc1"] != "undefined")
+                                    ? this.importedFormData["cc1"]
+                                    : false
+        });
+        
+        this.forms["cc2"] = new RMPagSeguro_Multicc_CardForm
+        ({
+            cardIndex         : 2, 
+            paymentMethodCode : this.paymentMethodCode, 
+            grandTotal        : this.grandTotal, 
+            config            : { _summary: false },
+            importedData      : (typeof this.importedFormData["cc2"] != "undefined")
+                                    ? this.importedFormData["cc2"]
+                                    : false
+        });
 
-        this._disableMultiCc();
+        if(this.isMultiCcPreEnabled)
+        {
+            this._enableMultiCc();
+        }
+        else
+        {
+            this._disableMultiCc();
+        }
     },
 
     /**
@@ -573,8 +622,17 @@ RMPagSeguro_Multicc_Control = Class.create
     _enableMultiCc: function()
     {
         for(var formId in this.forms) { this.forms[formId].enable(); };
-        this.forms["cc1"].setCardData("total", 0);
         this.forms["cc1"].openEditMode();
+        
+        if(!this.isMultiCcPreEnabled)
+        {
+            this.forms["cc1"].setCardData("total", 0);
+        }
+        else
+        {
+            // disables the flag for next interactions
+            this.isMultiCcPreEnabled = false;
+        }
 
         // TO DO !!! transiction button still manual, must be 
         // something automated
@@ -613,6 +671,35 @@ RMPagSeguro_Multicc_Control = Class.create
         else
         {
             this._getGoToCard2FormButton().hide();
+        }
+    },
+
+    /**
+     * Collects data from its forms and return it
+     */
+     exportFormData: function(index)
+    {
+        var formData = {};
+        
+        for(var formId in this.forms)
+        {
+            formData[formId] = this.forms[formId].exportData();
+        }
+        
+        formData.isMultiCcEnabled = this._getSwitch().checked;
+        formData.grandTotal = this.grandTotal;
+
+        return formData;
+    },
+
+    /**
+     * Triggers the destroy method on forms
+     */
+     destroy: function()
+    {
+        for(var formId in this.forms)
+        {
+            this.forms[formId].destroy();
         }
     },
 
@@ -758,15 +845,19 @@ RMPagSeguro_Multicc_CardForm = Class.create
         
         this.cardData = 
         {
+            brand       : "",
+            token       : "",
             total       : "",
             number      : "",
-            brand       : "",
-            cvv         : "",
+            cid         : "",
             expMonth    : "",
             expYear     : "",
             owner       : "",
-            installments: "",
-            token       : ""
+            owner_doc   : "",
+            dob_day     : "",
+            dob_month   : "",
+            dob_year    : "",
+            installments: ""
         };
         this.cardMetadata = {};
         this.requestLocks = 
@@ -775,11 +866,17 @@ RMPagSeguro_Multicc_CardForm = Class.create
             token       : false,
             installments: false
         };
-        this.eventListeners = [];
-        this.cardDataBinds = [];
+        this.eventListeners = {};
+        this.cardDataBinds = {};
+
+        if(params.importedData && params.oldGrandTotal)
+        {
+            params.importedData.oldGrandTotal = params.oldGrandTotal;
+        }
 
         this._addFieldObservers();
-        this._searchHTMLCardDataBinds();
+        this._addHTMLCardDataBinds();
+        this._importData(params.importedData);
         
         // all forms are initialized disabled
         this.state = "";
@@ -795,16 +892,22 @@ RMPagSeguro_Multicc_CardForm = Class.create
         // card fields, but before we need to understand what are the 
         // default transformations and appropriate events
         this._addFieldEventListener("total",            "change", function(field){this.setCardData("total", (field.getValue() ? parseFloat(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0));});
-        this._addFieldEventListener("number",           "change", function(field){this.setCardData("number", field.getValue().replace(/^\s+|\s+$/g,''));});
-        this._addFieldEventListener("cid",              "change", function(field){this.setCardData("cvv", field.getValue().replace(/^\s+|\s+$/g,''));});
+        this._addFieldEventListener("number",           "change", function(field){this.setCardData("number", field.getValue().replace(/\D/g,''));});
+        this._addFieldEventListener("cid",              "change", function(field){this.setCardData("cid", field.getValue().replace(/\D/g,''));});
         this._addFieldEventListener("expiration_mth",   "change", function(field){this.setCardData("expMonth", field.getValue());});
         this._addFieldEventListener("expiration_yr",    "change", function(field){this.setCardData("expYear", field.getValue());});
-        this._addFieldEventListener("installments",     "change", function(field){this.setCardData("installments", field.getValue());});
+        this._addFieldEventListener("owner",            "change", function(field){this.setCardData("owner", field.getValue());});
+        this._addFieldEventListener("owner_document",   "change", function(field){this.setCardData("owner_doc", field.getValue());});
+        this._addFieldEventListener("dob_day",          "change", function(field){this.setCardData("dob_day", field.getValue());});
+        this._addFieldEventListener("dob_month",        "change", function(field){this.setCardData("dob_month", field.getValue());});
+        this._addFieldEventListener("dob_year",         "change", function(field){this.setCardData("dob_year", field.getValue());});
 
         // 'masks'
         this._addFieldEventListener("total",            "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("total",            "keyup",   this._formatCurrencyInput);
         this._addFieldEventListener("number",           "keydown", this._disallowNotNumbers);
+        this._addFieldEventListener("number",           "keyup",   this._formatCardNumber);
+        this._addFieldEventListener("number",           "change",  this._formatCardNumber);
         this._addFieldEventListener("cid",              "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("dob_day",          "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("dob_month",        "keydown", this._disallowNotNumbers);
@@ -816,19 +919,49 @@ RMPagSeguro_Multicc_CardForm = Class.create
         // custom listeners
         this._addFieldEventListener("total",            "keyup",  this._instantReflectTotalInProgressBar);
         this._addFieldEventListener("number",           "keyup",  this._consultCardBrandOnPagSeguro);
-        this._addFieldEventListener("installments",     "change", this._updateInstallmentsMetadata);
+        this._addFieldEventListener("installments",     "change", this._updateInstallmentsdata);
         
         // logic data binds
-        this.addCardDataBind("total",       this._consultInstallmentsOnPagSeguro);
-        this.addCardDataBind("total",       this._updateTotalHTMLOnSetValue);
-        this.addCardDataBind("number",      this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("number",      this._updateFormmatedNumberMetadata);
-        this.addCardDataBind("brand",       this._updateBrandOnHTML);
-        this.addCardDataBind("brand",       this._consultInstallmentsOnPagSeguro);
-        this.addCardDataBind("cvv",         this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("expMonth",    this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("expYear",     this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("token",       this._updateTokenOnHTML);
+        this.addCardDataBind("total",           this._consultInstallmentsOnPagSeguro);
+        this.addCardDataBind("total",           this._updateTotalHTMLOnSetValue);
+        this.addCardDataBind("number",          this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("number",          this._updateFormmatedNumberMetadata);
+        this.addCardDataBind("brand",           this._updateBrandOnHTML);
+        this.addCardDataBind("brand",           this._consultInstallmentsOnPagSeguro);
+        this.addCardDataBind("cid",             this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("expMonth",        this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("expYear",         this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("installments",    this._updateInstallmentsMetadata);
+        this.addCardDataBind("token",           this._updateTokenOnHTML);
+
+        // custom validation for total
+        var totalField = this._getFieldElement("total");
+        var advice = totalField.next(".validation-advice");
+
+        totalField.validate = function()
+        {
+            var value = (totalField.getValue() != "")
+                            ? parseInt(totalField.getValue().replace(",", ".").replace(/^\s+|\s+$/g,''))
+                            : 0;
+
+            if(value <= 0)
+            {
+                advice.update("Valor pago neste cartão deve ser maior do que 0.");
+                advice.show();
+                return false;
+            }
+
+            if(value >= this.grandTotal)
+            {
+                advice.update("Valor pago neste cartão deve ser menor do que o total do pedido.");
+                advice.show();
+                return false;
+            }
+
+            advice.hide();
+            return true;
+
+        }.bind(this);
 
         // validate fields on blur
         this._getHTMLFormInputsAndSelects().each(function(element)
@@ -841,7 +974,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
      * Search for elements inside a li width a declared card index
      * that has card data binds
      */
-    _searchHTMLCardDataBinds: function()
+    _addHTMLCardDataBinds: function()
     {
         // raw data
         var fieldSelector = 
@@ -886,11 +1019,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
     /**
      * Observes card number field to consult card brand on PagSeguro web service
-     * @param  field 
+     * @param DOMElement field 
      */
     _consultCardBrandOnPagSeguro: function(field)
     {
-        var fieldValue = field.getValue().replace(/^\s+|\s+$/g,'');
+        var fieldValue = field.getValue().replace(/\D/g,'');
         
         // update only if there are at least 6 digits and
         if(fieldValue.length >= 6 && !this.getCardData("brand") && !this.requestLocks.brand)
@@ -911,14 +1044,14 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
                     if(response && response.cvvSize)
                     {
-                        this.setCardMetadata("cvv_size", response.cvvSize);
+                        this.setCardMetadata("cid_size", response.cvvSize);
                     }
 
                 }).bind(this),
                 error: (function()
                 {
                     this.setCardData("brand", "");
-                    this.setCardMetadata("cvv_size");
+                    this.setCardMetadata("cid_size", "");
 
                 }).bind(this),
                 complete: (function()
@@ -963,13 +1096,15 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
     /**
      * Observes card number field to consult card token on PagSeguro web service
-     * @param  field 
      */
     _createCardTokenOnPagSeguro: function()
     {
+        var ccNumberField = this._getFieldElement("number");
+        var ccNumValidation = Validation.get("validate-cc-number");
+        
         // update only if there are at least 6 digits and
-        if( this.getCardData("number").length >= 12 && !this.requestLocks.token && 
-            this.getCardData("brand") && this.getCardData("cvv") && 
+        if( ccNumValidation.test($F(ccNumberField), ccNumberField) && !this.requestLocks.token && 
+            this.getCardData("brand") && this.getCardData("cid") && 
             this.getCardData("expMonth") && this.getCardData("expYear") )
         {
             // TO DO: add expiring time to this lock before using it, 
@@ -980,7 +1115,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
             ({
                 cardNumber      : this.getCardData("number"),
                 brand           : this.getCardData("brand"),
-                cvv             : this.getCardData("cvv"),
+                cvv             : this.getCardData("cid"),
                 expirationMonth : this.getCardData("expMonth"),
                 expirationYear  : this.getCardData("expYear"),
                 success: (function(response)
@@ -1007,7 +1142,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         // checks if its possible to consult the card brand 
         else if(this.getCardData("number").length >= 6)
         {
-            this._consultCardBrandOnPagSeguro(this._getFieldElement("number"));
+            this._consultCardBrandOnPagSeguro(ccNumberField);
         }
         // if the card number was cleared, clear the brand too
         else if(this.getCardData("number").length < 6)
@@ -1060,7 +1195,18 @@ RMPagSeguro_Multicc_CardForm = Class.create
             var option = new Element('option', {"value": qty + "|" + value.toFixed(2)});
             option.update(text);
 
+            if(this.getCardData("installments") == qty)
+            {
+                option.setAttribute("selected", true);
+            }
+
             selectbox.add(option);
+        }
+
+        // forces data binds to run
+        if(this.getCardData("installments"))
+        {
+            this._updateInstallmentsMetadata(); 
         }
     },
 
@@ -1111,7 +1257,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _instantReflectTotalInProgressBar: function(field)
     {
-        var value = field.getValue() ? field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'') : 0;
+        var value = field.getValue() ? parseInt(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0;
         this._recalcProgressBarFulfillment(value);
     },
 
@@ -1317,11 +1463,21 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Generate installments metadata
+     * Split installments value and update card data
      * @param DOMElement field 
      */
-    _updateInstallmentsMetadata(field)
+    _updateInstallmentsdata(field)
     {
+        var splitedValue = field.getValue().split("|");
+        this.setCardData("installments", splitedValue[0]);
+    },
+
+    /**
+     * Generate installments metadata
+     */
+    _updateInstallmentsMetadata()
+    {
+        var field = this._getFieldElement("installments");
         this.setCardMetadata("installments_description", field.options[field.selectedIndex].text);
     },
 
@@ -1370,7 +1526,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         {
             if(!this.eventListeners[field.id])
             {
-                this.eventListeners[field.id] = [];
+                this.eventListeners[field.id] = {};
             }
 
             if(!this.eventListeners[field.id][eventName])
@@ -1483,6 +1639,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
             this.closeEditMode();
             this.state = "enabled";
         }
+
+        if(!this.getCardData("total"))
+        {
+            this.setCardData("total", 0);
+        }
     },
 
     /**
@@ -1533,7 +1694,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     /**
      * Retrieve all the HTML form fields
      */
-    _getHTMLFormInputsAndSelects()
+    _getHTMLFormInputsAndSelects: function()
     {
         return $$
         (
@@ -1550,7 +1711,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
      * @param DOMElement field 
      * @param Event event 
      */
-    _disallowNotNumbers(field, event)
+    _disallowNotNumbers: function(field, event)
     {
         if (event.key && !/[0-9\/]+/.test(event.key) && event.key.length === 1)
         {
@@ -1590,6 +1751,33 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
+     * Formats card number
+     * @param DOMElement field 
+     */
+     _formatCardNumber: function(field)
+    {
+        var digits = field.getValue().replace(/\D/g,'');
+        var formattedValue = "";
+        var lastIndex = 0;
+        
+        if(digits.length <= 4)
+        {
+            field.setValue(digits);
+            return;
+        }
+        
+        formattedValue += digits.substring(0, 4) + " ";
+        lastIndex = 4;
+
+        if(digits.length > 8) { formattedValue += digits.substring(4, 8) + " "; lastIndex = 8; }
+        if(digits.length > 12) { formattedValue += digits.substring(8, 12) + " "; lastIndex = 12; }
+        
+        formattedValue += digits.substring(lastIndex, 16);
+        
+        field.setValue(formattedValue);
+    },
+
+    /**
      * CPF format for value inputs
      * @param DOMElement field 
      */
@@ -1613,5 +1801,79 @@ RMPagSeguro_Multicc_CardForm = Class.create
         formattedValue += digits.substring(lastIndex);
         
         field.setValue(formattedValue);
+    },
+
+    /**
+     * 
+     * @param Object importedData 
+     */
+     _importData: function(importedData)
+    {
+        if(!importedData)
+        {
+            return;
+        }
+
+        // fulfills the HTML form
+        this._getFieldElement("number").setValue(importedData.cardData.number);
+        this._getFieldElement("total").setValue(importedData.cardData.total);
+        this._getFieldElement("cid").setValue(importedData.cardData.cid);
+        this._getFieldElement("expiration_mth").setValue(importedData.cardData.expMonth);
+        this._getFieldElement("expiration_yr").setValue(importedData.cardData.expYear);
+        this._getFieldElement("owner").setValue(importedData.cardData.owner);
+        this._getFieldElement("owner_document").setValue(importedData.cardData.owner_doc);
+        this._getFieldElement("dob_day").setValue(importedData.cardData.dob_day);
+        this._getFieldElement("dob_month").setValue(importedData.cardData.dob_month);
+        this._getFieldElement("dob_year").setValue(importedData.cardData.dob_year);
+
+        // format card number
+        this._formatCardNumber(this._getFieldElement("number"));
+        this._formatCurrencyInput(this._getFieldElement("total"));
+        
+        // copy data and metadata
+        for(var dataIdx in importedData.cardData)
+        {
+            this.setCardData(dataIdx, importedData.cardData[dataIdx]);
+        }
+
+        for(var dataIdx in importedData.cardMetadata)
+        {
+            this.setCardMetadata(dataIdx, importedData.cardMetadata[dataIdx]);
+        }
+
+        if( importedData.cardData.installments != "" && 
+            importedData.oldGrandTotal && 
+            importedData.oldGrandTotal != this.grandTotal )
+        {
+            alert("Atenção! O valor total do seu pedido foi alterado, por favor confira os valores das suas parcelas.");
+        }
+    },
+
+    /**
+     * Exports object data for persistency
+     * @return Object
+     */
+     exportData: function()
+    {
+        return {
+            "cardData"     : this.cardData,
+            "cardMetadata" : this.cardMetadata
+        };
+    },
+    
+    /**
+     * Prepare object to be deleted
+     */
+    destroy: function()
+    {
+        for(var fieldId in this.eventListeners)
+        {
+            for(var eventName in this.eventListeners[fieldId])
+            {
+                var callback = this.eventListeners[fieldId][eventName];
+
+                $(fieldId).stopObserving(eventName, callback);
+            }
+        }
     }
 });
