@@ -926,6 +926,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this.addCardDataBind("total",           this._updateTotalHTMLOnSetValue);
         this.addCardDataBind("number",          this._createCardTokenOnPagSeguro);
         this.addCardDataBind("number",          this._updateFormmatedNumberMetadata);
+        //this.addCardDataBind("number",          this._consultInstallmentsOnPagSeguro); TO DO: validate if its really needed
         this.addCardDataBind("brand",           this._updateBrandOnHTML);
         this.addCardDataBind("brand",           this._consultInstallmentsOnPagSeguro);
         this.addCardDataBind("cid",             this._createCardTokenOnPagSeguro);

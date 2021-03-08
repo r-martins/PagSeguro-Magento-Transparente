@@ -293,64 +293,19 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         {
             try
             {
-                $transaction1 = $this->_createOrderTransaction($payment, $amount, 1);
-                $transaction2 = $this->_createOrderTransaction($payment, $amount, 2);
-
-                // update references to transactions on card data
-                $cc1 = $payment->getAdditionalInformation("cc1");
-                $cc2 = $payment->getAdditionalInformation("cc2");
-
-                $cc1["transaction_id"] = $transaction1->getTxnId();
-                $cc2["transaction_id"] = $transaction2->getTxnId();
-
-                $payment->setAdditionalInformation("cc1", $cc1);
-                $payment->setAdditionalInformation("cc2", $cc2);
+                $this->_order($payment, $amount, 1);
+                $this->_order($payment, $amount, 2);
             }
             catch(Exception $e)
             {
-                // collect the successfully registered transactions
-                // and refund them
-                foreach($payment->getOrder()->getRelatedObjects() as $object)
-                {
-                    if( $object instanceof Mage_Sales_Model_Order_Payment_Transaction && 
-                        $object->getTxnType() == Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER )
-                    {
-                        if(in_array($object->getAdditionalInformation("status"), array("1", "2")))
-                        {
-                            $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
-                        }
-                        else if(in_array($object->getAdditionalInformation("status"), array("3", "4", "5")))
-                        {
-                            $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-
-                        try
-                        {
-                            $this->_createRefundTransaction($payment, $amount, $object->getTxnId(), $transactionType);
-                        }
-                        catch(Exception $e)
-                        {
-                            $helper->writeLog("Transaction could not be automatic refunded: " . $object->getTxnId());
-                            Mage::logException($e);
-                        }
-                    }
-                }
+                $this->_refundNotPersistedTransactions($payment, $amount);
                 
                 throw $e;
             }
         }
         else
         {
-            $transaction = $this->_createOrderTransaction($payment, $amount);
-
-            // update reference to transaction on card data
-            $cc1 = $payment->getAdditionalInformation("cc1");
-            $cc1["transaction_id"] = $transaction->getTxnId();
-            $payment->setAdditionalInformation("cc1", $cc1);
+            $transaction = $this->_order($payment, $amount);
         }
 
         return $this;
@@ -365,7 +320,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      * 
      * @return Mage_Sales_Model_Order_Payment_Transaction
      */
-    private function _createOrderTransaction($payment, $amount, $ccIdx = null)
+    private function _order($payment, $amount, $ccIdx = null)
     {
         $order = $payment->getOrder();
 
@@ -383,9 +338,26 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         //will grab data to be send via POST to API inside $params
         $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
         $rmHelper = Mage::helper('ricardomartins_pagseguro');
-        
+
         //call API
         $returnXml = $this->callApi($params, $payment);
+
+        // creates Magento transactions
+        $transaction = $this->_createOrderTransaction($payment, $returnXml);
+
+        // update references to transactions on card data
+        if($ccIdx)
+        {
+            $ccCard = $payment->getAdditionalInformation("cc" . $ccIdx);
+            $ccCard["transaction_id"] = $transaction->getTxnId();
+            $payment->setAdditionalInformation("cc" . $ccIdx, $ccCard);
+        }
+        else
+        {
+            $cc1 = $payment->getAdditionalInformation("cc1");
+            $cc1["transaction_id"] = $transaction ? $transaction->getTxnId() : "";
+            $payment->setAdditionalInformation("cc1", $cc1);
+        }
 
         try
         {
@@ -419,12 +391,17 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             }
         }
 
+        return $transaction;
+    }
+
+
+    protected function _createOrderTransaction($payment, $returnXml)
+    {
         // avoid Magento transaction automatic creation  to use our 
         // own logic
         $payment->setSkipOrderProcessing(true);
-        $pagSeguroTransactionId = $returnXml->code;
-
-        if (isset($returnXml->code))
+        
+        if(isset($returnXml->code))
         {
             // legacy code: store transaction ID on additional information
             $additional = array('transaction_id'=>(string)$returnXml->code);
@@ -441,6 +418,13 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $payment->setTransactionId((string) $returnXml->code);
             $transaction = $payment->addTransaction(Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
             
+            $transaction->setIsClosed(false);
+            $transactionStatus = (string) $returnXml->status;
+            if($transactionStatus == "3" || $transactionStatus == "4")
+            {
+                $transaction->setIsClosed(true);
+            }
+
             if($carData && isset($carData["total"]))
             {
                 $transaction->setAdditionalInformation("frontend_value", $carData["total"]);
@@ -476,6 +460,41 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
 
         return $transaction;
+    }
+
+    private function _refundNotPersistedTransactions($payment, $amount)
+    {
+        // collect the successfully registered transactions
+        // and refund them
+        foreach($payment->getOrder()->getRelatedObjects() as $object)
+        {
+            if( $object instanceof Mage_Sales_Model_Order_Payment_Transaction && 
+                $object->getTxnType() == Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER )
+            {
+                if(in_array($object->getAdditionalInformation("status"), array("1", "2")))
+                {
+                    $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
+                }
+                else if(in_array($object->getAdditionalInformation("status"), array("3", "4", "5")))
+                {
+                    $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND;
+                }
+                else
+                {
+                    continue;
+                }
+
+                try
+                {
+                    $this->_createRefundTransaction($payment, $amount, $object->getTxnId(), $transactionType);
+                }
+                catch(Exception $e)
+                {
+                    $helper->writeLog("Transaction could not be automatic refunded: " . $object->getTxnId());
+                    Mage::logException($e);
+                }
+            }
+        }
     }
 
     /**
