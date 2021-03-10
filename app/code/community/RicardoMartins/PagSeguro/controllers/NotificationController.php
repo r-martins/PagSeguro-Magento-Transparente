@@ -41,7 +41,7 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
             return;
         }
         */
-
+        
         Mage::app()->getCache()->save('in_progress', $notificationCode, array('pagseguro_notification'), 60);
 
         /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
@@ -56,18 +56,24 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
             Mage::throwException('Falha ao processar retorno XML do PagSeguro.');
         }
 
-        $processedResult = $model->proccessNotificatonResult($response);
-        if (false === $processedResult) {
-            $this->getResponse()->setBody(
-                'Falha ao processar notificação do PagSeguro. Consulte os logs para mais detalhes.'
-            );
+        try
+        {
+            $paymentNotification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $response));
+            $methodInstance = $paymentNotification->getOrder()->getPayment()->getMethodInstance();
+
+            $processedResult = $methodInstance->proccessNotificatonResult($response);
+
+            if (false === $processedResult)
+            {
+                throw new Exception("Falha ao processar notificação do PagSeguro. Consulte os logs para mais detalhes.");
+            }
+
+            $this->getResponse()->setBody('Notificação recebida para o pedido ' . $paymentNotification->getReference());
+        }
+        catch(Exception $e)
+        {
+            $this->getResponse()->setBody($e->getMessage());
             $this->getResponse()->setHttpResponseCode(500);
-            return;
         }
-
-        if (isset($response->reference)) {
-            $this->getResponse()->setBody('Notificação recebida para o pedido ' . (string)$response->reference);
-        }
-
     }
 }

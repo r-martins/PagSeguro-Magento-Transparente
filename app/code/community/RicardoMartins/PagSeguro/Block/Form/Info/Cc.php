@@ -99,9 +99,12 @@ class RicardoMartins_PagSeguro_Block_Form_Info_Cc extends Mage_Payment_Block_Inf
         return Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/pagseguro_update');
     }
 
-    public function getForceUpdateUrl()
+    public function getForceUpdateUrl($transactionId)
     {
-        // Mage::helper('adminhtml')->getUrl('adminhtml/updatePayment/index', array('id'=>$info->getId()))
-        return "";
+        return Mage::helper('adminhtml')->getUrl('adminhtml/updatePayment/transaction', array
+        (
+            "order_id"       => $this->getInfo()->getOrder()->getId(),
+            "transaction_id" => $transactionId,
+        ));
     }
 }

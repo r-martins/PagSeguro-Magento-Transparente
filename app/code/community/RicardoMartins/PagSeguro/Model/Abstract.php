@@ -11,6 +11,15 @@
  */
 class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_Abstract
 {
+    const PS_TRANSACTION_STATUS_PENDING_PAYMENT = 1;
+    const PS_TRANSACTION_STATUS_REVIEW = 2;
+    const PS_TRANSACTION_STATUS_PAID = 3;
+    const PS_TRANSACTION_STATUS_AVAILABLE = 4;
+    const PS_TRANSACTION_STATUS_CONTESTED = 5;
+    const PS_TRANSACTION_STATUS_REFUNDED = 6;
+    const PS_TRANSACTION_STATUS_CANCELED = 7;
+    const PS_TRANSACTION_STATUS_DEBITED = 8;
+    const PS_TRANSACTION_STATUS_TEMPORARY_RETENTION = 9;
 
     /** @var Mage_Sales_Model_Order $_order */
     protected $_order;
@@ -20,16 +29,14 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      *
      * @see https://pagseguro.uol.com.br/v2/guia-de-integracao/api-de-notificacoes.html#v2-item-servico-de-notificacoes
      *
-     * @param SimpleXMLElement $resultXML
+     * @param SimpleXMLElement $xmlDocument
      *
      * @return $this
      * @throws Mage_Core_Exception
      * @throws Varien_Exception
      */
-    public function proccessNotificatonResult(SimpleXMLElement $resultXML)
+    public function proccessNotificatonResult(SimpleXMLElement $xmlDocument)
     {
-        $helper = Mage::helper('ricardomartins_pagseguro');
-        
         // prevent this event from firing twice
         if (Mage::registry('sales_order_invoice_save_after_event_triggered'))
         {
@@ -38,243 +45,105 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         Mage::register('sales_order_invoice_save_after_event_triggered', true);
 
-        // tries to identify an error reported by pagseguro
-        // and throws an exception if there are problems
-        if (isset($resultXML->errors) || isset($resultXML->error))
+        $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $xmlDocument));
+
+        if($notification->hasErrors())
+		{
+			//$this->setIsInvalidInstallmentValueError($notification->hasInstallmentsError()); !!! TO DO: uncomment this code before publish
+            $this->setIsInvalidInstallmentValueError(false);
+            Mage::throwException($notification->getErrorsDescription());
+		}
+
+        if(!$notification->getReference())
         {
-            $errMsg = array();
-
-            // version multiple errors
-            if(isset($resultXML->errors))
-            {
-                foreach ($resultXML->errors as $error)
-                {
-                    $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
-
-                    //installment value invalid value
-                    if ($error->code == '53041') 
-                    {
-                        $this->setIsInvalidInstallmentValueError(true);
-                    }
-                }
-            }
-            // version single errors
-            if (isset($resultXML->error))
-            {
-                $error = $resultXML->error;
-                $errMsg[] = $this->_getHelper()->__((string)$error->message) . ' (' . $error->code . ')';
-
-                //installment value invalid value
-                if ($error->code == '53041') 
-                {
-                    $this->setIsInvalidInstallmentValueError(true);
-                }
-            }
-
-            Mage::throwException('Um ou mais erros ocorreram no seu pagamento.' . PHP_EOL . implode(PHP_EOL, $errMsg));
-        }
-
-        // process transaction return, but set reference as
-        // mandatory param
-        if (isset($resultXML->reference))
-        {
-            try
-            {
-                $transactionId = isset($resultXML->code) ? (string) $resultXML->code : "";
-                $transactionReference = (string) $resultXML->reference;
-                $transactionStatus = (int) $resultXML->status;
-
-                // kiosk mode: payment link
-                if (strstr($transactionReference, 'kiosk_') !== false)
-                {
-                    $kioskNotification = new Varien_Object();
-                    $kioskNotification->setOrderNo($transactionReference);
-                    $kioskNotification->setNotificationXml($resultXML);
-                    Mage::dispatchEvent(
-                        'ricardomartins_pagseguro_kioskorder_notification_received',
-                        array('kiosk_notification' => $kioskNotification)
-                    );
-                    $transactionReference = $kioskNotification->getOrderNo();
-                }
-
-                /** @var Mage_Sales_Model_Order $order */
-                $order = $this->_getOrderByPagSeguroReference($transactionReference);
-                $payment = $order->getPayment();
-
-                $this->_order = $order;
-                $this->_code = $payment->getMethod();
-
-                // updates order local reference, if didnt exists
-                if( !$payment->getAdditionalInformation('transaction_id') && 
-                    $transactionId
-                ) {
-                    $payment->setAdditionalInformation('transaction_id', $transactionId);
-                }
-
-                // TO DO: review this function later
-                $processedState = $this->processStatus($transactionStatus);
-                $message = $processedState->getMessage();
-
-                // refunded status on pagseguro
-                if( $transactionStatus == "6" ||
-                    $transactionStatus == "8"
-                ) {
-                    if ($order->canUnhold())
-                    {
-                        $order->unhold();
-                    }
-
-                    // TO DO: certify that multi cc spread the cancelation 
-                    // through its transactions
-                    if ($order->canCancel())
-                    {
-                        $order->cancel();
-                        $order->save();
-                    }
-                    else
-                    {
-                        $payment->registerRefundNotification(floatval($resultXML->grossAmount));
-                        $order->addStatusHistoryComment(
-                            'Devolvido: o valor foi devolvido ao comprador.'
-                        )->save();
-                    }
-                }
-
-                // cancelled status on pagseguro
-                if( $transactionStatus == "7" && 
-                    isset($resultXML->cancellationSource)
-                ) {
-                    // registers the cancellation source
-                    switch((string)$resultXML->cancellationSource)
-                    {
-                        case 'INTERNAL':
-                            $message .= ' O próprio PagSeguro negou ou cancelou a transação.';
-                            break;
-                        case 'EXTERNAL':
-                            $message .= ' A transação foi negada ou cancelada pela instituição bancária.';
-                            break;
-                    }
-
-                    $orderCancellation = new Varien_Object();
-                    $orderCancellation->setData(array
-                    (
-                        'should_cancel'       => true,
-                        'cancellation_source' => (string) $resultXML->cancellationSource,
-                        'order'               => $order,
-                    ));
-
-                    Mage::dispatchEvent('ricardomartins_pagseguro_before_cancel_order', array
-                    (
-                        'order_cancellation' => $orderCancellation
-                    ));
-
-                    if ($orderCancellation->getShouldCancel())
-                    {
-                        $order->cancel();
-                    }
-                }
-
-                if ($processedState->getStateChanged())
-                {
-                    // changes order state if status is refunded
-                    if ((int)$resultXML->status != 6)
-                    {
-                        $order->setState
-                        (
-                            $processedState->getState(),
-                            true,
-                            $message,
-                            $processedState->getIsCustomerNotified()
-                        )->save();
-                    }
-    
-                }
-                else
-                {
-                    $order->addStatusHistoryComment($message);
-                }
-
-                // paid status on pagseguro
-                if( $transactionStatus == "3" ||
-                    $transactionStatus == "4"
-                ) {
-                    // use transaction from pagseguro to 
-                    // generate a magento transaction
-                    $orderTransaction = $payment->lookupTransaction($transactionId, Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
-
-                    if($orderTransaction)
-                    {
-                        $transactionDetails = $orderTransaction->getAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS);
-                        $transactionDetails["closed_on"] = Zend_Date::now()->toString("YYYY-MM-DD HH:mm:ss");
-                        $orderTransaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transactionDetails);
-                        $orderTransaction->setIsClosed(true);
-                        $orderTransaction->save();
-                    }
-
-                    // creates invoice and sends an email (if its configured to do so)
-                    // $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
-                    if(!$order->hasInvoices() && $this->_methodAllowsOrderInvoice($payment))
-                    {
-                        $invoice = $order->prepareInvoice();
-                        $invoice->register()->pay();
-                        $invoice->sendEmail
-                        (
-                            Mage::getStoreConfigFlag('payment/rm_pagseguro/send_invoice_email'),
-                            'Pagamento recebido com sucesso.'
-                        );
-    
-                        // create the orders transactions (review)
-                        $msg = sprintf('Pagamento capturado. Identificador da Transação: %s', $transactionId);
-                        $invoice->addComment($msg);
-
-                        if ($transactionId)
-                        {
-                            $invoice->setTransactionId($transactionId)->save();
-                        }
-    
-                        // create transaction on Magento
-                        Mage::getModel('core/resource_transaction')
-                            ->addObject($invoice)
-                            ->addObject($invoice->getOrder())
-                            ->save();
-
-                        $order->addStatusHistoryComment
-                        (
-                            sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId())
-                        );
-                    }
-                }
-    
-                // registers fee and net amount
-                if (isset($resultXML->feeAmount) && isset($resultXML->netAmount))
-                {
-                    $payment
-                        ->setAdditionalInformation('fee_amount', floatval($resultXML->feeAmount))
-                        ->setAdditionalInformation('net_amount', floatval($resultXML->netAmount));
-                }
-    
-                $payment->save();
-                $order->save();
-
-                Mage::dispatchEvent
-                (
-                    'pagseguro_proccess_notification_after',
-                    array
-                    (
-                        'order' => $order,
-                        'payment'=> $payment,
-                        'result_xml' => $resultXML,
-                    )
-                );
-            }
-            catch(Exception $e)
-            {
-                $helper->writeLog($e->getMessage());
-                return false;
-            }
-        } else {
             Mage::throwException('Retorno inválido. Referência do pedido não encontrada.');
         }
+
+        // triggers kiosk notification to possibly update
+        // the transaction reference
+        $this->_triggerKioskNotification($notification);
+
+        /** @var Mage_Sales_Model_Order $order */
+        $order = $notification->getOrder();
+        $payment = $order->getPayment();
+
+        // legacy flags and variable updates
+        $this->_order = $order;
+        $this->_code = $payment->getMethod();
+        if( !$payment->getAdditionalInformation('transaction_id') && 
+            $notification->getTransactionId()
+        ) {
+            $payment->setAdditionalInformation('transaction_id', $notification->getTransactionId());
+        }
+
+        // process order based on returned status
+        switch($notification->getStatus())
+        {
+        	//case self::PS_TRANSACTION_STATUS_PENDING_PAYMENT:
+        	//case self::PS_TRANSACTION_STATUS_REVIEW:
+
+        	case self::PS_TRANSACTION_STATUS_PAID:
+        	case self::PS_TRANSACTION_STATUS_AVAILABLE:
+        		$this->_confirmPayment($payment, $notification);
+        		break;
+
+        	case self::PS_TRANSACTION_STATUS_REFUNDED:
+        	case self::PS_TRANSACTION_STATUS_DEBITED:
+        		$this->_refundOrder($payment, $notification);
+        		break;
+
+        	case self::PS_TRANSACTION_STATUS_CANCELED:
+        		$this->_cancelOrder($payment, $notification);
+        		break;
+
+        	case self::PS_TRANSACTION_STATUS_CONTESTED:
+        	case self::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION:
+        		$this->_holdOrder();
+        		break;
+        }
+
+        // determines if the order must have its state changed
+        $processedState = $this->processStatus($notification->getStatus(), $notification);
+        $message = $processedState->getMessage() . $notification->getCancellationSourceDescription();
+
+        if ($processedState->getStateChanged())
+        {
+            $order->setState
+            (
+                $processedState->getState(),
+                true,
+                $message,
+                $processedState->getIsCustomerNotified()
+            );
+        }
+        else
+        {
+            $order->addStatusHistoryComment($message);
+        }
+
+        // registers fee and net amount
+        if($notification->getFeeAmount() && $notification->getNetAmount())
+        {
+            $payment
+                ->setAdditionalInformation('fee_amount', $notification->getFeeAmount())
+                ->setAdditionalInformation('net_amount', $notification->getNetAmount());
+        }
+
+        $payment->save();
+        $order->save();
+
+        Mage::dispatchEvent
+        (
+            'pagseguro_proccess_notification_after',
+            array
+            (
+                'order'      => $order,
+                'payment'    => $payment,
+                'result_xml' => $notification->getDocument(),
+            )
+        );
+
+        return $this;
     }
 
     /**
@@ -347,11 +216,12 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      * Processes order status and return information about order status and state
      * Doesn' change anything to the order. Just returns an object showing what to do.
      *
-     * @param $statusCode
+     * @param String|Integer $statusCode
+     * @param RicardoMartins_PagSeguro_Model_Payment_Notification $notification
      * @return Varien_Object
      * @throws Varien_Exception
      */
-    public function processStatus($statusCode)
+    public function processStatus($statusCode, $notification = null)
     {
         $return = new Varien_Object();
         $return->setStateChanged(true);
@@ -359,7 +229,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         switch($statusCode)
         {
-            case '1':
+            case self::PS_TRANSACTION_STATUS_PENDING_PAYMENT:
                 $return->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
                 $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
                 if ($this->getCode()=='rm_pagseguro_cc') {
@@ -371,7 +241,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 mas até o momento o PagSeguro não recebeu nenhuma informação sobre o pagamento.'
                 );
                 break;
-            case '2':
+            case self::PS_TRANSACTION_STATUS_REVIEW:
                 $return->setState(Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW);
                 $return->setIsCustomerNotified(true);
                 $return->setMessage(
@@ -379,7 +249,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     o PagSeguro está analisando o risco da transação.'
                 );
                 break;
-            case '3':
+            case self::PS_TRANSACTION_STATUS_PAID:
                 $return->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
                 $return->setIsCustomerNotified(true);
                 $return->setMessage(
@@ -388,7 +258,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 );
                 $return->setIsTransactionPending(false);
                 break;
-            case '4':
+            case self::PS_TRANSACTION_STATUS_AVAILABLE:
                 $return->setMessage(
                     'Disponível: a transação foi paga e chegou ao final de seu prazo de liberação sem
                     ter sido retornada e sem que haja nenhuma disputa aberta.'
@@ -397,7 +267,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $return->setStateChanged(false);
                 $return->setIsTransactionPending(false);
                 break;
-            case '5':
+            case self::PS_TRANSACTION_STATUS_CONTESTED:
                 $return->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
@@ -406,13 +276,14 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     abriu uma disputa.'
                 );
                 break;
-            case '6':
-                $return->setData('state', Mage_Sales_Model_Order::STATE_CLOSED);
+            case self::PS_TRANSACTION_STATUS_REFUNDED:
+                $return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
+                $return->setStateChanged(false);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
                 $return->setMessage('Devolvida: o valor da transação foi devolvido para o comprador.');
                 break;
-            case '7':
+            case self::PS_TRANSACTION_STATUS_CANCELED:
                 $return->setState(Mage_Sales_Model_Order::STATE_CANCELED);
                 $return->setIsCustomerNotified(true);
                 $return->setMessage('Cancelada: a transação foi cancelada sem ter sido finalizada.');
@@ -426,13 +297,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     );
                 }
                 break;
-            case '8':
+            case self::PS_TRANSACTION_STATUS_DEBITED:
                 $return->setState(Mage_Sales_Model_Order::STATE_CANCELED);
                 $return->setIsCustomerNotified(false);
                 $return->setMessage('Debitado: o valor da transação foi devolvida ao comprador após processo'
                     . ' de disputa.');
                 break;
-            case '9':
+            case self::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION:
                 $return->setState(Mage_Sales_Model_Order::STATE_HOLDED);
                 $return->setIsCustomerNotified(false);
                 $return->setMessage('Retenção Temporária: O comprador abriu uma solicitação de chargeback junto à'
@@ -670,152 +541,238 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
      */
     public function refund(Varien_Object $payment, $amount)
     {
-        // Get the order transactions for the payment
-        $transactions = Mage::getModel('sales/order_payment_transaction')->getCollection()
-                            ->setOrderFilter($payment->getOrder())
-                            ->addPaymentIdFilter($payment->getId())
-                            ->addTxnTypeFilter(Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER)
-                            ->setOrder('created_at', Varien_Data_Collection::SORT_ORDER_DESC)
-                            ->setOrder('transaction_id', Varien_Data_Collection::SORT_ORDER_DESC);
-        
-        if($transactions && count($transactions) > 0)
-        {
-            foreach($transactions as $transaction)
-            {
-                if(in_array($transaction->getAdditionalInformation("status"), array("1", "2")))
-                {
-                    $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
-                }
-                else if(in_array($transaction->getAdditionalInformation("status"), array("3", "4", "5")))
-                {
-                    $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND;
-                }
-                else
-                {
-                    // the transaction status doest not permit refund
-                    // Mage::throwException("Transaction %s could not be refunded, due to its status: %s", $transaction->getTxnId(), $transaction->getAdditionalInformation("status"));
-                    continue;
-                }
-                
-                $this->_createRefundTransaction($payment, $amount, $transaction->getTxnId(), $transactionType);
-            }
-        }
-        else if($payment->getAdditionalInformation("transaction_id"))
-        {
-            $this->_createRefundTransaction($payment, $amount, $payment->getAdditionalInformation("transaction_id"));
+        //will grab data to be send via POST to API inside $params
+        $rmHelper   = Mage::helper('ricardomartins_pagseguro');
+
+        // recupera a informação adicional do PagSeguro
+        $info           = $this->getInfoInstance();
+        $transactionId = $info->getAdditionalInformation('transaction_id');
+
+        $params = array(
+            'transactionCode'   => $transactionId,
+            'refundValue'       => number_format($amount, 2, '.', ''),
+        );
+
+        if ($rmHelper->getLicenseType() != 'app') {
+            $params['token'] = $rmHelper->getToken();
+            $params['email'] = $rmHelper->getMerchantEmail();
         }
 
+        // call API - refund
+        $returnXml  = $this->callApi($params, $payment, 'transactions/refunds');
+
+        if ($returnXml === null) {
+            $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
+            Mage::throwException($errorMsg);
+        }
         return $this;
     }
 
     /**
-     * Comunicate with PagSeguro web service and create a Magento 
-     * refund transacation object
+     * Checks if order can be invoiced
      * @param Mage_Sales_Model_Order_Payment $payment
-     * @param string $parentTransactionId
-     * @param string $transactionType
      * 
-     * @return Mage_Sales_Model_Order_Payment_Transaction
-     */
-    protected function _createRefundTransaction($payment, $amount, $parentTransactionId, $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND)
-    {
-        $rmHelper = Mage::helper('ricardomartins_pagseguro');
-        $params = array('transactionCode' => $parentTransactionId);
-
-        if ($rmHelper->getLicenseType() != 'app')
-        {
-            $params['token'] = $rmHelper->getToken();
-            $params['email'] = $rmHelper->getMerchantEmail();
-        }
-        
-        // cancel action on pagseguro
-        if($transactionType == Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID)
-        {
-            $uri = 'transactions/cancels';
-        }
-        // refund action on pagseguro
-        else if($transactionType == Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND)
-        {
-            $params['refundValue'] = number_format($amount, 2, '.', '');
-            $uri = 'transactions/refunds';
-        }
-        else
-        {
-            Mage::throwException("Unrecognized refund transaction type : %s", $transactionType);
-        }
-
-        // call API - refund
-        $returnXml  = $this->callApi($params, $payment, $uri);
-
-        if ($returnXml === null)
-        {
-            $errorMsg = $this->_getHelper()->__('Erro ao solicitar o reembolso.\n');
-            Mage::throwException($errorMsg);
-        }
-
-        $payment->setTransactionId($parentTransactionId . "-" . $transactionType);
-        $payment->setParentTransactionId($parentTransactionId);
-        $payment->setShouldCloseParentTransaction(true);
-        
-        return $payment->addTransaction($transactionType);
-    }
-
-    /**
-     * Checks if order can be invoiced, verifying its transactions
+     * @return Boolean
      */
     protected function _methodAllowsOrderInvoice($payment)
     {
-        if($this->_code != "rm_pagseguro_cc")
-        {
-            return true;
-        }
-
-        $orderTransactions = Mage::getModel('sales/order_payment_transaction')->getCollection()
-                                ->addPaymentIdFilter($payment->getId())
-                                ->addTxnTypeFilter(Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER)
-                                ->setOrder('created_at', Varien_Data_Collection::SORT_ORDER_DESC);
-
-        foreach($orderTransactions as $transaction)
-        {
-            if(!$transaction->getIsClosed())
-            {
-                return false;
-            }
-        }
-
         return true;
     }
 
     /**
-     * 
+     * Closes transactions and create invoice to order
+     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param RicardoMartins_PagSeguro_Model_Payment_Notification $notification
      */
-    protected function _getOrderByPagSeguroReference($transactionReference)
+    protected function _confirmPayment($payment, $notification)
     {
-        $referenceSuffix = strlen($transactionReference) > 4
-                            ? substr($transactionReference, strlen($transactionReference) - 4)
-                            : "";
+        $order = $payment->getOrder();
+        $transactionId = $notification->getTransactionId();
 
-        if($referenceSuffix == "-cc1" || $referenceSuffix == "-cc2")
-        {
-            $incrementId = substr($transactionReference, 0, strlen($transactionReference) - 4);
-        }
-        else
-        {
-            $incrementId = $transactionReference;
-        }
-        
-        $order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
+        // checks if order state permits payment confirmation
+        $notAllowedStates = array
+        (
+            Mage_Sales_Model_Order::STATE_CLOSED,
+            Mage_Sales_Model_Order::STATE_CANCELED,
+        );
 
-        if(!$order || !$order->getId())
+        if(in_array($order->getState(), $notAllowedStates))
         {
-            throw new Exception(sprintf
+            Mage::throwException(sprintf("Could not confirm payment of the order #%s.", $order->getIncrementId()));
+        }
+
+        // creates invoice and sends an email (if its configured to do so)
+        // $payment->registerCaptureNotification(floatval($resultXML->grossAmount));
+        if(!$order->hasInvoices() && $this->_methodAllowsOrderInvoice($payment))
+        {
+            $invoice = $order->prepareInvoice();
+            $invoice->register()->pay();
+            $invoice->sendEmail
             (
-                'Pedido %s não encontrado no sistema. Impossível processar retorno. ' .
-                'Uma nova tentativa será feita em breve pelo PagSeguro ou pelo módulo.', $transactionReference
-            ));
+                Mage::getStoreConfigFlag('payment/rm_pagseguro/send_invoice_email'),
+                'Pagamento recebido com sucesso.'
+            );
+
+            // create the orders transactions (review)
+            $msg = sprintf('Pagamento capturado. Identificador da Transação: %s', $transactionId);
+            $invoice->addComment($msg);
+
+            if ($transactionId)
+            {
+                $invoice->setTransactionId($transactionId)->save();
+            }
+
+            // create transaction on Magento
+            Mage::getModel('core/resource_transaction')
+                ->addObject($invoice)
+                ->addObject($invoice->getOrder())
+                ->save();
+
+            $order->addStatusHistoryComment
+            (
+                sprintf('Fatura #%s criada com sucesso.', $invoice->getIncrementId())
+            );
+        }
+    }
+
+    /**
+     * Refund Magento orders that can be invoiced
+     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param RicardoMartins_PagSeguro_Model_Payment_Notification $notification
+     */
+    protected function _refundOrder($payment, $notification)
+    {
+        $order = $payment->getOrder();
+        $remoteAmount = $notification->getGrossAmount();
+
+        if($order->canUnhold())
+        {
+            $order->unhold();
         }
 
-        return $order;
+        $orderEffectivellyRefunded = false;
+
+        // in cases that there arent invoices and the order
+        // can be canceled
+        if($order->canCancel())
+        {
+            $order->cancel();
+
+            $orderEffectivellyRefunded = true;
+        }
+        // in cases that there are invoices and the order
+        // must be refunded !!! TO DO: verify if its ok to other payment methods
+        else if($order->canCreditmemo())
+        {
+            foreach($order->getInvoiceCollection() as $invoice)
+            {
+                $service = Mage::getModel('sales/service_order', $order);
+
+                $creditmemo = $service->prepareInvoiceCreditmemo($invoice);
+                $creditmemo->setRefundRequested(true)
+                        ->setOfflineRequested(false)
+                        ->register();
+
+                Mage::getModel('core/resource_transaction')
+                    ->addObject($creditmemo)
+                    ->addObject($creditmemo->getOrder())
+                    ->addObject($creditmemo->getInvoice())
+                    ->save();
+            }
+
+            $orderEffectivellyRefunded = true;
+        }
+
+        if(!$orderEffectivellyRefunded)
+        {
+            $payment->registerRefundNotification($remoteAmount);
+            $order->addStatusHistoryComment('Devolvido: o valor foi devolvido ao comprador.');
+        }
+    }
+
+    /**
+     * Cancel Magento orders that must not be invoiced
+     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param RicardoMartins_PagSeguro_Model_Payment_Notification $notification
+     */
+    protected function _cancelOrder($payment, $notification)
+    {
+        $order = $payment->getOrder();
+        $cancellationSource = $notification->getCancellationSource();
+        $message = "";
+
+        $orderCancellation = new Varien_Object();
+        $orderCancellation->setData(array
+        (
+            'should_cancel'       => true,
+            'cancellation_source' => $cancellationSource,
+            'order'               => $order,
+        ));
+
+        Mage::dispatchEvent('ricardomartins_pagseguro_before_cancel_order', array
+        (
+            'order_cancellation' => $orderCancellation
+        ));
+
+        if($orderCancellation->getShouldCancel())
+        {
+            $order->cancel();
+        }
+    }
+
+    /**
+     * Hold Magento order
+     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param RicardoMartins_PagSeguro_Model_Payment_Notification $notification
+     */
+    protected function _holdOrder($payment, $notification)
+    {
+        $order = $payment->getOrder();
+        
+        if($order->canHold())
+        {
+            $order->hold();
+        }
+
+        $message = "";
+
+        switch($notification->getStatus())
+        {
+            case self::PS_TRANSACTION_STATUS_CONTESTED:
+                $message = sprintf("O cliente abriu uma disputa no PagSeguro para a transação %s", $notification->getTransactionId());
+                break;
+
+            case self::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION:
+                $message = sprintf("O cliente abriu uma solicitação de chargeback no PagSeguro para a transação %s", $notification->getTransactionId());
+                break;
+        }
+
+        if($message)
+        {
+            $order->addStatusHistoryComment($message);
+        }
+    }
+
+    /**
+     * @param SimpleXMLElement $document
+     */
+    protected function _triggerKioskNotification($notification)
+    {
+        // kiosk mode: payment link
+        if(strstr($notification->getReference(), 'kiosk_') !== false)
+        {
+            $kioskNotification = new Varien_Object();
+            $kioskNotification->setOrderNo($notification->getReference());
+            $kioskNotification->setNotificationXml($notification->getDocument());
+            Mage::dispatchEvent
+            (
+                'ricardomartins_pagseguro_kioskorder_notification_received',
+                array('kiosk_notification' => $kioskNotification)
+            );
+
+            // updates notification reference
+            $notification->setReference($kioskNotification->getOrderNo());
+        }
     }
 
     /**

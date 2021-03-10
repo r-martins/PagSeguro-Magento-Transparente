@@ -133,4 +133,27 @@ class RicardoMartins_PagSeguro_Model_Observer
         $observer->getObject()->setOrderInfo(array_merge($observer->getObject()->getOrderInfo(), $data));
         $observer->getObject()->setCustomerId($customerId);
     }
+
+    /**
+     * Observes order cancelation to void open transactions
+     */
+    public function voidOrderTransactions($observer)
+    {
+        $order = $observer->getOrder();
+
+        if(!$order)
+        {
+            return;
+        }
+
+        $methodInstance = $order->getPayment()->getMethodInstance();
+
+        // forces void action of the payment method, because its
+        // payment action is order, but it could have open transactions
+        if( $methodInstance &&
+            $methodInstance->getCode() == "rm_pagseguro_cc"
+        ) {
+            $methodInstance->void($order->getPayment());
+        }
+    }
 }

@@ -58,4 +58,60 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
         Mage::getSingleton('adminhtml/session')->addSuccess('Pedido atualizado com sucesso. Veja o último comentário para mais detalhes.');
         return $this->_redirectReferer();
     }
+
+    public function transactionAction()
+    {
+        try
+        {
+            $transactionId = $this->getRequest()->getParam('transaction_id');
+            $orderId = $this->getRequest()->getParam('order_id');
+            
+            // verifies if its a credit card payment
+            $order = Mage::getModel('sales/order')->load($orderId);
+
+            if($order->getPayment()->getMethod() != "rm_pagseguro_cc")
+            {
+                Mage::throwException('Somente transações via cartão de crédito devem utilizar este método.');
+            }
+
+            // loads transaction
+            $transaction = $order->getPayment()->lookupTransaction($transactionId);
+
+            if(!$transaction)
+            {
+                Mage::throwException('Não foi possível carregar a transação para atualizá-la.');
+            }
+
+            // consults PagSeguro web services
+            $helper = Mage::helper("ricardomartins_pagseguro");
+            $response = $helper->getOrderStatusXML($transaction->getTxnId(), $helper->isSandbox());
+            $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => simplexml_load_string($response)));
+
+            if(!$notification->getStatus())
+            {
+                $helper->writeLog("Retorno inesperado para atualização manual de pedido. Retorno: " . var_export($notification->getDocument(), true));
+                Mage::throwException("Retorno inesperado do PagSeguro. Tente novamente mais tarde ou veja os logs para mais detalhes.");
+            }
+
+            // verifies if status changed
+            if($notification->getStatus() == $transaction->getAdditionalInformation("status"))
+            {
+                Mage::throwException("A situação do pedido permanece a mesma. Nenhuma alteração foi realizada.");
+            }
+
+            // proccess returned data
+            Mage::unregister('sales_order_invoice_save_after_event_triggered');
+            Mage::register('is_pagseguro_updater_session', true);
+            $order->getPayment()->getMethodInstance()->proccessNotificatonResult($notification->getDocument());
+            Mage::unregister('is_pagseguro_updater_session');
+
+            Mage::getSingleton('adminhtml/session')->addSuccess('Pedido atualizado com sucesso. Veja o último comentário para mais detalhes.');
+        }
+        catch(Exception $e)
+        {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+        }
+
+        return $this->_redirectReferer();
+    }
 }

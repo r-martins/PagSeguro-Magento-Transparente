@@ -14,6 +14,19 @@
         Parcelas: <?php echo $this->escapeHtml($cc1->getInstallmentsQty());?>x <?php echo $coreHelper->formatCurrency($cc1->getInstallmentsValue()); ?><br/>
     <?php endif; ?>
 
+    <?php if($this->isForceUpdateEnabled() && $cc1->getTransactionId()): ?>
+        <br />
+        <button
+            class="scalable psupdate" 
+            title="Forçar atualização" 
+            onclick="if(confirm('Você tem certeza?'))setLocation('<?php echo $this->getForceUpdateUrl($cc1->getTransactionId()) ?>')" >
+            <span>
+                <span>Forçar atualização</span>
+            </span>
+        </button>
+        <br />
+    <?php endif;?>
+
     <?php if($cc2 = $this->getCc2Data()): ?>
         <?php echo $this->isMultiCcPayment() ? "<br /><strong>Cartão 2:</strong><br />" : ""; ?>
         Código da Transação: <?php echo $this->escapeHtml($this->formatTransactionId($cc2->getTransactionId()));?>
@@ -23,11 +36,18 @@
         Bandeira: <?php echo $this->escapeHtml(ucfirst($cc2->getBrand())); ?><br/>
         Últimos 4 dígitos: <?php echo $this->escapeHtml($cc2->getLast4()); ?><br/>
         Parcelas: <?php echo $this->escapeHtml($cc2->getInstallmentsQty());?>x <?php echo $coreHelper->formatCurrency($cc2->getInstallmentsValue()); ?><br/>
-    <?php endif; ?>
 
-    <?php if($this->isForceUpdateEnabled() && $cc1->getTransactionId()): ?>
-        <br />
-        <button class="scalable psupdate" title="Forçar atualização" onclick="if(confirm('Você tem certeza?'))setLocation('<?php echo $this->getForceUpdateUrl() ?>')"><span><span>Forçar atualização</span></span></button>
-    <?php endif;?>
+        <?php if($this->isForceUpdateEnabled() && $cc1->getTransactionId()): ?>
+            <br />
+            <button
+                class="scalable psupdate" 
+                title="Forçar atualização" 
+                onclick="if(confirm('Você tem certeza?'))setLocation('<?php echo $this->getForceUpdateUrl($cc2->getTransactionId()) ?>')" >
+                <span>
+                    <span>Forçar atualização</span>
+                </span>
+            </button>
+        <?php endif;?>
+    <?php endif; ?>
 
 <?php endif; ?>
