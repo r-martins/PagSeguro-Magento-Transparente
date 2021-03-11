@@ -309,4 +309,17 @@ class RicardoMartins_PagSeguro_Model_Payment_Notification
 
         return $this->_order;
     }
+
+    /**
+     * Retrieves the XML document as a string
+     */
+    public function returnXMLasString()
+    {
+        if(is_object($this->_xmlDocument) && method_exists($this->_xmlDocument, "asXML"))
+        {
+            return $this->_xmlDocument->asXML();
+        }
+        
+        return strval($this->_xmlDocument);
+    }
 }

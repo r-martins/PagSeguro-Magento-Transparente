@@ -9,6 +9,9 @@
         <?php if($cc1->getTransactionId()): ?>
             <a href="<?php echo $this->getTransactionUrlOnPagSeguro($cc1->getTransactionId()) ?>" target="_blank">Ver no PagSeguro</a>
         <?php endif; ?><br/>
+        <?php if($cc1->getTransactionId()): ?>
+            Status da transação: <strong><?php echo $this->getTransactionStatus($cc1->getTransactionId()); ?></strong><br/>
+        <?php endif; ?>
         Bandeira: <?php echo $this->escapeHtml(ucfirst($cc1->getBrand())); ?><br/>
         Últimos 4 dígitos: <?php echo $this->escapeHtml($cc1->getLast4()); ?><br/>
         Parcelas: <?php echo $this->escapeHtml($cc1->getInstallmentsQty());?>x <?php echo $coreHelper->formatCurrency($cc1->getInstallmentsValue()); ?><br/>
@@ -33,6 +36,9 @@
         <?php if($cc2->getTransactionId()): ?>
             <a href="<?php echo $this->getTransactionUrlOnPagSeguro($cc2->getTransactionId()) ?>" target="_blank">Ver no PagSeguro</a>
         <?php endif; ?><br/>
+        <?php if($cc2->getTransactionId()): ?>
+            Status da transação: <strong><?php echo $this->getTransactionStatus($cc2->getTransactionId()); ?></strong><br/>
+        <?php endif; ?>
         Bandeira: <?php echo $this->escapeHtml(ucfirst($cc2->getBrand())); ?><br/>
         Últimos 4 dígitos: <?php echo $this->escapeHtml($cc2->getLast4()); ?><br/>
         Parcelas: <?php echo $this->escapeHtml($cc2->getInstallmentsQty());?>x <?php echo $coreHelper->formatCurrency($cc2->getInstallmentsValue()); ?><br/>

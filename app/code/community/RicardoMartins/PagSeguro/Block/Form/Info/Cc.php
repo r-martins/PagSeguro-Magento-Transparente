@@ -94,6 +94,45 @@ class RicardoMartins_PagSeguro_Block_Form_Info_Cc extends Mage_Payment_Block_Inf
         return "https://pagseguro.uol.com.br/transaction/details.jhtml?code=" . $this->escapeHtml($transactionId);
     }
 
+    public function getTransactionStatus($transactionId)
+    {
+        $transaction = $this->getInfo()->lookupTransaction($transactionId);
+
+        if($transaction && $transaction->getAdditionalInformation("status"))
+        {
+            return $this->getTransactionStatusDescription($transaction->getAdditionalInformation("status"));
+        }
+
+        return "";
+    }
+
+    public function getTransactionStatusDescription($status)
+    {
+        switch($status)
+        {
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PENDING_PAYMENT:
+                return "Aguardando pagamento";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_REVIEW:
+                return "Em análise";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PAID:
+                return "Paga";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_AVAILABLE:
+                return "Disponível";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_CONTESTED:
+                return "Em disputa";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_REFUNDED:
+                return "Devolvida";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_CANCELED:
+                return "Cancelada";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_DEBITED:
+                return "Debitado";
+            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION:
+                return "Retenção temporária";
+        }
+
+        return "";
+    }
+
     public function isForceUpdateEnabled()
     {
         return Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/pagseguro_update');

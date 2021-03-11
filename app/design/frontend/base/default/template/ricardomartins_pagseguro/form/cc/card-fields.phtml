@@ -11,12 +11,12 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             id="<?php echo $this->getElementId("total") ?>" 
             name="<?php echo $this->getFieldName("total") ?>"
             value="" 
-            class="input-text validate-custom" 
+            class="input-text validate-rm-pagseguro-cc-total" 
             title="<?php echo $this->__('How much do You want to pay with this card?') ?>" 
             placeholder="0,00"
             autocomplete="off"
+            data-card-index="<?php echo $this->getCardIndex() ?>"
             />
-        <div class="validation-advice" style="display:none;"></div>
     </div>
     <div class="cc-total-progress-bar" id="<?php echo $this->getElementId("progress_bar") ?>">
         <label><?php echo $this->__('Remaining value of the payment:') ?> <span data-bind="card-metadata" data-card-field="remaining_total"></span></label>
@@ -31,11 +31,12 @@ $_helper = $this->helper('ricardomartins_pagseguro');
             id="<?php echo $this->getElementId("number") ?>" 
             name="<?php echo $this->getFieldName("number") ?>"
             value="" 
-            class="input-text validate-cc-number required-entry embedded-flag" 
+            class="input-text validate-rm-pagseguro-cc-number embedded-flag" 
             title="<?php echo $this->__('Credit Card Number') ?>" 
-            maxlength="19"
+            maxlength="20"
             placeholder="**** **** **** ****"
             autocomplete="off"
+            data-card-index="<?php echo $this->getCardIndex() ?>"
             />
         <span id="<?php echo $this->getElementId("card_brand") ?>" class="card-brand"></span>
         <input type="hidden" id="<?php echo $this->getElementId("brand") ?>" name="<?php echo $this->getFieldName("brand") ?>" />

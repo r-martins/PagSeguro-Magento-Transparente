@@ -50,36 +50,6 @@ RMPagSeguro = Class.create({
                 RMPagSeguroObj.updatePaymentHashes();
                 return true;
         });
-
-        Validation.add('validate-rm-pagseguro-customer-document', 'Por favor, insira um número de CPF válido.', function(value, el)
-        {
-            if (value.length != 14) return false;
-            
-            var repeatedDigits = true;
-            value = value.replace(/\D/g,"");
-            
-            for(var i = 0; i < 10; i++)
-            {
-                if(value.charAt(i) != value.charAt(i + 1)) { repeatedDigits = false; break; }
-            }
-            
-            if (repeatedDigits) { return false; }
-            var sum = 0;
-            for (i=0; i < 9; i ++) { sum += parseInt(value.charAt(i)) * (10 - i); }
-            
-            var rev = 11 - (sum % 11);
-            if (rev == 10 || rev == 11) rev = 0;
-            if (rev != parseInt(value.charAt(9))) return false;
-            
-            sum = 0;
-            for (i = 0; i < 10; i ++) { sum += parseInt(value.charAt(i)) * (11 - i); }
-            rev = 11 - (sum % 11);
-
-            if (rev == 10 || rev == 11) rev = 0;
-            if (rev != parseInt(value.charAt(10))) return false;
-            
-            return true;
-        });
     },
     updateSenderHash: function(response) {
         if(typeof response === 'undefined'){
@@ -441,6 +411,7 @@ RMPagSeguro_Multicc_Control = Class.create
         this.forms = {};
         this.syncLocks = {};
         this.importedFormData = {};
+        this.sequentialNumber = null;
 
         this._setupUniqueObject();
         this._initForms();
@@ -454,11 +425,14 @@ RMPagSeguro_Multicc_Control = Class.create
      */
      _setupUniqueObject: function()
     {
+        this.sequentialNumber = 1;
+
         if(typeof window.rm_pagseguro_multicc_control != "undefined")
         {
             // before destroying its ancestor, copy its data
             this.importedFormData = window.rm_pagseguro_multicc_control.exportFormData();
             this.isMultiCcPreEnabled = this.importedFormData.isMultiCcEnabled;
+            this.sequentialNumber += window.rm_pagseguro_multicc_control.sequentialNumber;
 
             // goodbye, old friend
             window.rm_pagseguro_multicc_control.destroy();
@@ -504,6 +478,14 @@ RMPagSeguro_Multicc_Control = Class.create
         {
             this._disableMultiCc();
         }
+
+        // hook due to OSC bug (wrong grand total by not considering default shipping method value):
+        // if its the first object of the page, we request a grand total update
+        if(this.sequentialNumber == 1)
+        {
+            this.requestUpdateGrandTotal();
+            this._declareValidators();
+        }
     },
 
     /**
@@ -512,7 +494,8 @@ RMPagSeguro_Multicc_Control = Class.create
     _initObservers: function()
     {
         // multi cc switch
-        this._getSwitch().observe('change', (function(event)
+        var multiCcSwitch = this._getSwitch();
+        multiCcSwitch.observe('change', (function(event)
         {
             var checkbox = event.currentTarget;
             checkbox.checked 
@@ -539,6 +522,46 @@ RMPagSeguro_Multicc_Control = Class.create
         var updateOtherTotalFunc = (function(newValue) { return this.grandTotal - newValue; }).bind(this);
         this._syncData("total", "cc1", "cc2", updateOtherTotalFunc);
         this._syncData("total", "cc2", "cc1", updateOtherTotalFunc);
+    },
+
+    /**
+     * 
+     */
+    _validateMultiCcForms: function()
+    {
+        var field = this._getSwitch();
+        
+        if( field.checked &&
+            this._validateForm(1) && 
+            !this._validateForm(2)
+        ) {
+            return false;
+        }
+        
+        return true;
+    },
+
+    _validateForm: function(cardIndex)
+    {
+        var valid = true;
+
+        this.forms["cc" + cardIndex].getHTMLFormInputsAndSelects().each(function(elm)
+        {
+            if(elm.id == (this.paymentMethodCode + "_cc" + cardIndex + "_total"))
+            {
+                return;
+            }
+
+            var classes = $w(elm.className);
+
+            for(var idx in classes)
+            {
+                var validation = Validation.get(classes[idx]);
+                valid &= validation.test($F(elm), elm);
+            }
+        });
+
+        return valid;
     },
     
     /**
@@ -831,6 +854,58 @@ RMPagSeguro_Multicc_Control = Class.create
 
             }).bind(this)
         });
+    },
+
+    _declareValidators: function()
+    {
+        var self = this;
+
+        Validation.add('validate-rm-pagseguro-cc-number', 'Por favor, insira um número de cartão de crédito válido.', function(value, elm)
+        {
+            var cardIndex = $(elm).getAttribute("data-card-index");
+            return self.forms["cc" + cardIndex]._validateCcNumber(value, elm);
+        });
+
+        Validation.add('validate-rm-pagseguro-cc-total', 'O valor a ser pago no cartão deve ser maior que zero e menor do que o total do pedido.', function(value, elm)
+        {
+            var cardIndex = $(elm).getAttribute("data-card-index");
+            return self.forms["cc" + cardIndex]._validateTotal(value, elm);
+        });
+
+        Validation.add('validate-rm-pagseguro-multi-cc-enabled', 'Por favor, preencha os dados dos dois cartões antes de concluir o pedido.', function(value, elm)
+        {
+            return self._validateMultiCcForms();
+        });
+
+        Validation.add('validate-rm-pagseguro-customer-document', 'Por favor, insira um número de CPF válido.', function(value)
+        {
+            if (value.length != 14) return false;
+            
+            var repeatedDigits = true;
+            value = value.replace(/\D/g,"");
+            
+            for(var i = 0; i < 10; i++)
+            {
+                if(value.charAt(i) != value.charAt(i + 1)) { repeatedDigits = false; break; }
+            }
+            
+            if (repeatedDigits) { return false; }
+            var sum = 0;
+            for (i=0; i < 9; i ++) { sum += parseInt(value.charAt(i)) * (10 - i); }
+            
+            var rev = 11 - (sum % 11);
+            if (rev == 10 || rev == 11) rev = 0;
+            if (rev != parseInt(value.charAt(9))) return false;
+            
+            sum = 0;
+            for (i = 0; i < 10; i ++) { sum += parseInt(value.charAt(i)) * (11 - i); }
+            rev = 11 - (sum % 11);
+
+            if (rev == 10 || rev == 11) rev = 0;
+            if (rev != parseInt(value.charAt(10))) return false;
+            
+            return true;
+        });
     }
 });
 
@@ -841,6 +916,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this.paymentMethodCode = params.paymentMethodCode;
         this.cardIndex = params.cardIndex;
         this.grandTotal = params.grandTotal;
+        this.multiccValidation = params.multiccValidation;
         this.config = Object.assign((params.config ? params.config : {}), RMPagSeguroObj.config);
         
         this.cardData = 
@@ -935,44 +1011,15 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this.addCardDataBind("installments",    this._updateInstallmentsMetadata);
         this.addCardDataBind("token",           this._updateTokenOnHTML);
 
-        // custom validation for total
-        var totalField = this._getFieldElement("total");
-        var advice = totalField.next(".validation-advice");
-
-        totalField.validate = function()
-        {
-            var value = (totalField.getValue() != "")
-                            ? parseInt(totalField.getValue().replace(",", ".").replace(/^\s+|\s+$/g,''))
-                            : 0;
-
-            if(value <= 0)
-            {
-                advice.update("Valor pago neste cartão deve ser maior do que 0.");
-                advice.show();
-                return false;
-            }
-
-            if(value >= this.grandTotal)
-            {
-                advice.update("Valor pago neste cartão deve ser menor do que o total do pedido.");
-                advice.show();
-                return false;
-            }
-
-            advice.hide();
-            return true;
-
-        }.bind(this);
-
         // validate fields on blur
-        this._getHTMLFormInputsAndSelects().each(function(element)
+        this.getHTMLFormInputsAndSelects().each(function(element)
         {
             element.observe("blur", function(){ Validation.validate(element); });
         });
     },
 
     /**
-     * Search for elements inside a li width a declared card index
+     * Searches for elements inside a li width a declared card index
      * that has card data binds
      */
     _addHTMLCardDataBinds: function()
@@ -1026,12 +1073,12 @@ RMPagSeguro_Multicc_CardForm = Class.create
     {
         var fieldValue = field.getValue().replace(/\D/g,'');
         
-        // update only if there are at least 6 digits and
-        if(fieldValue.length >= 6 && !this.getCardData("brand") && !this.requestLocks.brand)
+        // updates only if there are at least 6 digits and
+        if(fieldValue.length >= 6 && !this.getCardData("brand") /* && !this.requestLocks.brand */)
         {
             // TO DO: add expiring time to this lock before using it, 
             // because of the PagSeguro lib instability
-            //this.requestLocks.brand = true;
+            this.requestLocks.brand = true;
 
             PagSeguroDirectPayment.getBrand
             ({
@@ -1041,23 +1088,35 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     if(response && response.brand)
                     {
                         this.setCardData("brand", response.brand.name);
+                        this.setCardMetadata("cid_size", response.brand.cvvSize);
+                        this.setCardMetadata("validation_algorithm", response.brand.validationAlgorithm);
+                    }
+                    else
+                    {
+                        this.setCardData("brand", "");
+                        this.setCardMetadata("cid_size", "");
+                        this.setCardMetadata("validation_algorithm", "");
                     }
 
-                    if(response && response.cvvSize)
-                    {
-                        this.setCardMetadata("cid_size", response.cvvSize);
-                    }
+                    // this validation must be here, to ensure that its going to run after 
+                    // the set data (not happenned when code present on complete callback)
+                    field.validate();
 
                 }).bind(this),
                 error: (function()
                 {
                     this.setCardData("brand", "");
                     this.setCardMetadata("cid_size", "");
+                    this.setCardMetadata("validation_algorithm", "");
+
+                    // this validation must be here, to ensure that its going to run after 
+                    // the set data (not happenned when code present on complete callback)
+                    field.validate();
 
                 }).bind(this),
                 complete: (function()
                 {
-                    //this.requestLocks.brand = false;
+                    this.requestLocks.brand = false;
 
                 }).bind(this)
             });
@@ -1077,22 +1136,24 @@ RMPagSeguro_Multicc_CardForm = Class.create
     {
         if(!this.getCardData("total"))
         {
-            var selectbox = this._clearInstallmentsOptions();
-            selectbox.options[0].text = "Informe o valor a ser pago neste cartão para calcular as parcelas.";
+            this._clearInstallmentsOptions("Informe o valor a ser pago neste cartão para calcular as parcelas.");
             return;
         }
 
-        // update only if there are at least 6 digits and
-        if(this.getCardData("brand"))
+        if(!this.getCardData("brand"))
         {
-            PagSeguroDirectPayment.getInstallments
-            ({
-                brand: this.getCardData("brand"),
-                amount: this.getCardData("total"),
-                success: this._populateInstallments.bind(this),
-                error: this._populateSafeInstallments.bind(this)
-            });
+            this._clearInstallmentsOptions("Preencha os dados do cartão para calcular as parcelas.");
+            this._insert1xInstallmentsOption();
+            return;
         }
+
+        PagSeguroDirectPayment.getInstallments
+        ({
+            brand: this.getCardData("brand"),
+            amount: this.getCardData("total"),
+            success: this._populateInstallments.bind(this),
+            error: this._populateSafeInstallments.bind(this)
+        });
     },
 
     /**
@@ -1101,10 +1162,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
     _createCardTokenOnPagSeguro: function()
     {
         var ccNumberField = this._getFieldElement("number");
-        var ccNumValidation = Validation.get("validate-cc-number");
+        //var ccNumValidation = Validation.get("validate-cc-number");
         
         // update only if there are at least 6 digits and
-        if( ccNumValidation.test($F(ccNumberField), ccNumberField) && !this.requestLocks.token && 
+        if( /*ccNumValidation.test($F(ccNumberField), ccNumberField) &&*/ 
+            !this.requestLocks.token && 
             this.getCardData("brand") && this.getCardData("cid") && 
             this.getCardData("expMonth") && this.getCardData("expYear") )
         {
@@ -1160,18 +1222,13 @@ RMPagSeguro_Multicc_CardForm = Class.create
     _populateInstallments: function(response)
     {
         var remoteInstallments = Object.values(response.installments)[0];
-        var selectbox = this._clearInstallmentsOptions();
+        var maxInstallments = this.config.installment_limit;
+        var selectbox = this._clearInstallmentsOptions("Selecione a quantidade de parcelas");
 
-        if(this.config.force_installments_selection)
-        {
-            $(selectbox.options[0]).update("Selecione a quantidade de parcelas");
-        }
-        else
+        if(!this.config.force_installments_selection)
         {
             selectbox.remove(0);
         }
-
-        var maxInstallments = this.config.installment_limit;
 
         for(var x = 0; x < remoteInstallments.length; x++)
         {
@@ -1218,15 +1275,9 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _populateSafeInstallments: function(response)
     {
-        var selectbox = this._clearInstallmentsOptions();
-        selectbox.options[0].text = "Falha ao obter demais parcelas junto ao pagseguro";
-
-        var option = document.createElement('option');
-        option.text = "1x de R$" + this.grandTotal.toFixed(2).toString().replace('.',',') + " sem juros";
-        option.selected = true;
-        option.value = "1|" + this.grandTotal.toFixed(2);
-        selectbox.add(option);
-
+        this._clearInstallmentsOptions("Falha ao obter demais parcelas junto ao pagseguro");
+        this._insert1xInstallmentsOption();
+        
         console.error('Somente uma parcela será exibida. Erro ao obter parcelas junto ao PagSeguro:');
         console.error(response);
     },
@@ -1234,11 +1285,13 @@ RMPagSeguro_Multicc_CardForm = Class.create
     /**
      * Remove all options from installments select box,
      * except the one with empty value
+     * 
+     * @return DOMElement
      */
-    _clearInstallmentsOptions()
+    _clearInstallmentsOptions(emptyOptionText = false)
     {
         var field = this._getFieldElement("installments");
-
+        
         for(var i = 0; i < field.length; i++)
         {
             if(field.options[i].value != "")
@@ -1247,6 +1300,29 @@ RMPagSeguro_Multicc_CardForm = Class.create
                 i--;
             }
         }
+
+        if(emptyOptionText)
+        {
+            field.options[0].text = emptyOptionText;
+        }
+
+        return field;
+    },
+
+    /**
+     * Creates 1x installment option and inserts into selectbox
+     * 
+     * @return DOMElement
+     */
+    _insert1xInstallmentsOption()
+    {
+        var field = this._getFieldElement("installments");
+
+        var option = document.createElement('option');
+        option.text = "1x de R$" + this.grandTotal.toFixed(2).toString().replace('.',',') + " sem juros";
+        option.selected = true;
+        option.value = "1|" + this.grandTotal.toFixed(2);
+        field.add(option);
 
         return field;
     },
@@ -1680,7 +1756,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     {
         var valid = true;
 
-        this._getHTMLFormInputsAndSelects().each(function(element)
+        this.getHTMLFormInputsAndSelects().each(function(element)
         {
             if($(element).readAttribute("name"))
             {
@@ -1695,7 +1771,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     /**
      * Retrieve all the HTML form fields
      */
-    _getHTMLFormInputsAndSelects: function()
+    getHTMLFormInputsAndSelects: function()
     {
         return $$
         (
@@ -1770,10 +1846,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
         formattedValue += digits.substring(0, 4) + " ";
         lastIndex = 4;
 
-        if(digits.length > 8) { formattedValue += digits.substring(4, 8) + " "; lastIndex = 8; }
-        if(digits.length > 12) { formattedValue += digits.substring(8, 12) + " "; lastIndex = 12; }
-        
-        formattedValue += digits.substring(lastIndex, 16);
+        while(digits.length > lastIndex)
+        {
+            formattedValue += " " + digits.substring(lastIndex, lastIndex + 4);
+            lastIndex += 4;
+        }
         
         field.setValue(formattedValue);
     },
@@ -1802,6 +1879,85 @@ RMPagSeguro_Multicc_CardForm = Class.create
         formattedValue += digits.substring(lastIndex);
         
         field.setValue(formattedValue);
+    },
+
+    /**
+     * Verifies if the card total is a number between 0 and the grand total
+     * @return boolean
+     */
+    _validateTotal: function(value, elm)
+    {
+        var total = (value != "")
+                ? parseFloat(value.replace(",", ".").replace(/^\s+|\s+$/g,''))
+                : 0;
+
+        if(total <= 0)
+        {
+            return false;
+        }
+
+        if(total >= this.grandTotal)
+        {
+            return false;
+        }
+
+        return true;
+    },
+
+    /**
+     * Verifies if the card number is valid, testing it against the indicated 
+     * algorithm by PagSeguro web service
+     * @return boolean
+     */
+     _validateCcNumber: function(value)
+    {
+        value = value.replace(/\D/g,'');
+
+        if(!this.getCardData("brand"))
+        {
+            return false;
+        }
+
+        var valid = true;
+
+        switch(this.getCardMetadata("validation_algorithm"))
+        {
+            case "LUHN":
+                valid = this._validateLuhn(value);
+                break;
+            
+            default:
+                valid = value.length >= 6;
+        }
+
+        return valid;
+    },
+
+    /**
+     * Test if a number passes the Luhn algorithm test
+     * @return boolean
+     */
+    _validateLuhn: function(num)
+    {
+        var digit, digits, j, len, odd, sum;
+	    odd = true;
+	    sum = 0;
+	    digits = (num + '').split('').reverse();
+        for (j = 0, len = digits.length; j < len; j++)
+        {
+            digit = digits[j];
+            digit = parseInt(digit, 10);
+            if ((odd = !odd))
+            {
+                digit *= 2;
+            }
+            if (digit > 9)
+            {
+                digit -= 9;
+            }
+            sum += digit;
+        }
+        return sum % 10 === 0;
     },
 
     /**

@@ -98,7 +98,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         	case self::PS_TRANSACTION_STATUS_CONTESTED:
         	case self::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION:
-        		$this->_holdOrder();
+        		$this->_holdOrder($payment, $notification);
         		break;
         }
 
@@ -268,7 +268,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $return->setIsTransactionPending(false);
                 break;
             case self::PS_TRANSACTION_STATUS_CONTESTED:
-                $return->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
+                $return->setState(Mage_Sales_Model_Order::STATE_HOLDED);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
                 $return->setMessage(
@@ -732,24 +732,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         if($order->canHold())
         {
             $order->hold();
-        }
-
-        $message = "";
-
-        switch($notification->getStatus())
-        {
-            case self::PS_TRANSACTION_STATUS_CONTESTED:
-                $message = sprintf("O cliente abriu uma disputa no PagSeguro para a transação %s", $notification->getTransactionId());
-                break;
-
-            case self::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION:
-                $message = sprintf("O cliente abriu uma solicitação de chargeback no PagSeguro para a transação %s", $notification->getTransactionId());
-                break;
-        }
-
-        if($message)
-        {
-            $order->addStatusHistoryComment($message);
         }
     }
 

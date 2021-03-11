@@ -8,7 +8,7 @@ $_iwdEnabled = $_helper->isIwdEnabled();
 <ul class="form-list rm-pagseguro-payment-form" id="payment_form_<?php echo $_code ?>" style="<?php echo (!$_iwdEnabled) ? 'display:none;' : ''; ?>">
     <li class="multi-cc-switch-box">
         <label class="switch">
-            <input type="checkbox" name="payment[use_two_cards]" id="<?php echo $_code; ?>_switch_use_two_cards" />
+            <input type="checkbox" name="payment[use_two_cards]" id="<?php echo $_code; ?>_switch_use_two_cards" class="validate-rm-pagseguro-multi-cc-enabled" />
             <span class="slider round"></span>
         </label>
         <label for="<?php echo $_code; ?>_switch_use_two_cards"><?php echo __('Pay with 2 cards')?></label>
@@ -18,6 +18,9 @@ $_iwdEnabled = $_helper->isIwdEnabled();
     <?php echo $this->createCardFieldsBlock(1)->toHtml(); ?>
 
     <li class="multi-cc-button-box">
+        <div id="advice-validate-rm-pagseguro-multi-cc-enabled-<?php echo $_code; ?>_switch_use_two_cards" class="validation-advice" style="display:none;">
+            Por favor, preencha os dados dos dois cartões antes de concluir o pedido.
+        </div>
         <button type="button" class="button" id="<?php echo $_code ?>_button_go_to_card_two_form" style="display: none;">
             <span><span><?php echo $this->__("Go to second card") ?></span></span>
         </button>
