@@ -49,8 +49,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         if($notification->hasErrors())
 		{
-			//$this->setIsInvalidInstallmentValueError($notification->hasInstallmentsError()); !!! TO DO: uncomment this code before publish
-            $this->setIsInvalidInstallmentValueError(false);
+			$this->setIsInvalidInstallmentValueError($notification->hasInstallmentsError());
             Mage::throwException($notification->getErrorsDescription());
 		}
 

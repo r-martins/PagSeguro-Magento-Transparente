@@ -443,8 +443,8 @@ RMPagSeguro_Multicc_Control = Class.create
     },
 
     /**
-     * Create class instances to control each card form
-     * and show first one for conventional payment flow
+     * Creates class instances to control each card form
+     * and shows first one for conventional payment flow
      */
     _initForms: function()
     {
@@ -489,7 +489,7 @@ RMPagSeguro_Multicc_Control = Class.create
     },
 
     /**
-     * Initialize all navigation observers
+     * Initializes all navigation observers
      */
     _initObservers: function()
     {
@@ -515,17 +515,17 @@ RMPagSeguro_Multicc_Control = Class.create
         }).bind(this));
 
         // summary links 
-        // TO DO !!! this kind of link must be inside a form
         this.forms["cc1"].getSummaryBox().observe('click', this._goToCard.bind(this, "cc1"));
 
-        // sync totals between forms
+        // syncs totals between forms
         var updateOtherTotalFunc = (function(newValue) { return this.grandTotal - newValue; }).bind(this);
         this._syncData("total", "cc1", "cc2", updateOtherTotalFunc);
         this._syncData("total", "cc2", "cc1", updateOtherTotalFunc);
     },
 
     /**
-     * 
+     * Ensures that the two forms are fulfilled before 
+     * place order, when multi cc is enabled
      */
     _validateMultiCcForms: function()
     {
@@ -541,7 +541,10 @@ RMPagSeguro_Multicc_Control = Class.create
         return true;
     },
 
-    _validateForm: function(cardIndex)
+    /**
+     * Validates forms without triggers its advices 
+     */
+     _validateForm: function(cardIndex)
     {
         var valid = true;
 
@@ -565,7 +568,7 @@ RMPagSeguro_Multicc_Control = Class.create
     },
     
     /**
-     * Sync card data between two forms and avoid infinite loop
+     * Syncs card data between two forms and avoids infinite loop
      * @param string data 
      * @param string callingForm 
      * @param string destForm 
@@ -591,7 +594,7 @@ RMPagSeguro_Multicc_Control = Class.create
     },
 
     /**
-     * Apply and remove sync lock 
+     * Applies and removes sync lock 
      * @param string data 
      * @param string callingForm 
      * @param string destForm 
@@ -640,7 +643,7 @@ RMPagSeguro_Multicc_Control = Class.create
     },
 
     /**
-     * Activate multi card funcionality
+     * Activates multi card funcionality
      */
     _enableMultiCc: function()
     {
@@ -657,36 +660,31 @@ RMPagSeguro_Multicc_Control = Class.create
             this.isMultiCcPreEnabled = false;
         }
 
-        // TO DO !!! transiction button still manual, must be 
-        // something automated
         this._getGoToCard2FormButton().show();
     },
 
     /**
-     * Deactivate multi card functionality
+     * Deactivates multi card functionality
      */
     _disableMultiCc: function()
     {
         for(var formId in this.forms) { this.forms[formId].disable(); };
+        this.forms["cc1"].enable();
         this.forms["cc1"].openEditMode();
         this.forms["cc1"].hideTotal();
         this.forms["cc1"].setCardData("total", this.grandTotal);
         
-        // TO DO !!! transiction button still manual, must be 
-        // something automated
         this._getGoToCard2FormButton().hide();
     },
 
     /**
-     * Synthesize {go to card 1 form} actions
+     * Synthesizes {go to card 1 form} actions
      */
     _goToCard: function(index)
     {
         for(var formId in this.forms) { this.forms[formId].closeEditMode(); };   
         this.forms[index].openEditMode();
 
-        // TO DO !!! transiction button still manual, must be 
-        // something automated
         if(index == "cc1")
         {
             this._getGoToCard2FormButton().show();
@@ -727,13 +725,13 @@ RMPagSeguro_Multicc_Control = Class.create
     },
 
     /**
-     * Start system that monitors ajax requests on checkout
+     * Starts system that monitors ajax requests on checkout
      */
     _startAjaxListeners: function()
     {
         var self = this;
 
-        // override browser ajax requests object
+        // overrides browser ajax requests object
         var oldXHR = window.XMLHttpRequest;
         function newXHR()
         {
@@ -767,7 +765,7 @@ RMPagSeguro_Multicc_Control = Class.create
         });
         */
 
-        // register urls
+        // registers urls to be observed
         this.ajaxListeners = [];
         this._registerAjaxListener({url: "onestepcheckout/ajax/saveAddress",         callback: this._ajaxListener__tryToCaptureGrandTotal});
         this._registerAjaxListener({url: "onestepcheckout/ajax/saveFormValues",      callback: this._ajaxListener__tryToCaptureGrandTotal});
@@ -776,7 +774,7 @@ RMPagSeguro_Multicc_Control = Class.create
     },
 
     /**
-     * Add URL to ajax listeners
+     * Adds URL to ajax listeners
      * @param Object listener 
      */
     _registerAjaxListener: function(listener)
@@ -790,7 +788,7 @@ RMPagSeguro_Multicc_Control = Class.create
     },
 
     /**
-     * Verify if the URL is monitored and run callback function
+     * Verifies if the URL is monitored and runs callback function
      * @param string candidateUrl 
      */
     _processAjaxListeners: function(candidateUrl, XMLHttpRequestObj)
@@ -825,16 +823,17 @@ RMPagSeguro_Multicc_Control = Class.create
             console.warn("Total do pedido alterado.");
 
             this.grandTotal = responseJson.grand_total;
+            var isMultiCcEnabled = this._getSwitch().checked;
 
             for(var formId in this.forms)
             {
-                this.forms[formId].updateGrandTotal(this.grandTotal);
+                this.forms[formId].updateGrandTotal(this.grandTotal, isMultiCcEnabled);
             };
         }
     },
 
     /**
-     * Request grand total value on server and update local forms
+     * Requests grand total value on server and updates local forms
      */
     requestUpdateGrandTotal: function()
     {
@@ -845,10 +844,11 @@ RMPagSeguro_Multicc_Control = Class.create
                 if(this.grandTotal != response.responseJSON.total)
                 {
                     this.grandTotal =  response.responseJSON.total;
+                    var isMultiCcEnabled = this._getSwitch().checked;
 
                     for(var formId in this.forms)
                     {
-                        this.forms[formId].updateGrandTotal(this.grandTotal);
+                        this.forms[formId].updateGrandTotal(this.grandTotal, isMultiCcEnabled);
                     };
                 }
 
@@ -856,7 +856,10 @@ RMPagSeguro_Multicc_Control = Class.create
         });
     },
 
-    _declareValidators: function()
+    /**
+     * Creates new Magento validators
+     */
+     _declareValidators: function()
     {
         var self = this;
 
@@ -879,33 +882,43 @@ RMPagSeguro_Multicc_Control = Class.create
 
         Validation.add('validate-rm-pagseguro-customer-document', 'Por favor, insira um número de CPF válido.', function(value)
         {
-            if (value.length != 14) return false;
-            
-            var repeatedDigits = true;
-            value = value.replace(/\D/g,"");
-            
-            for(var i = 0; i < 10; i++)
-            {
-                if(value.charAt(i) != value.charAt(i + 1)) { repeatedDigits = false; break; }
-            }
-            
-            if (repeatedDigits) { return false; }
-            var sum = 0;
-            for (i=0; i < 9; i ++) { sum += parseInt(value.charAt(i)) * (10 - i); }
-            
-            var rev = 11 - (sum % 11);
-            if (rev == 10 || rev == 11) rev = 0;
-            if (rev != parseInt(value.charAt(9))) return false;
-            
-            sum = 0;
-            for (i = 0; i < 10; i ++) { sum += parseInt(value.charAt(i)) * (11 - i); }
-            rev = 11 - (sum % 11);
-
-            if (rev == 10 || rev == 11) rev = 0;
-            if (rev != parseInt(value.charAt(10))) return false;
-            
-            return true;
+            return self._validateCPFNumber(value);
         });
+    },
+
+    /**
+     * Validates document (CPF) numbers
+     * @param String value 
+     * @returns Boolean
+     */
+     _validateCPFNumber: function(value)
+    {
+        if (value.length != 14) return false;
+            
+        var repeatedDigits = true;
+        value = value.replace(/\D/g,"");
+        
+        for(var i = 0; i < 10; i++)
+        {
+            if(value.charAt(i) != value.charAt(i + 1)) { repeatedDigits = false; break; }
+        }
+        
+        if (repeatedDigits) { return false; }
+        var sum = 0;
+        for (i=0; i < 9; i ++) { sum += parseInt(value.charAt(i)) * (10 - i); }
+        
+        var rev = 11 - (sum % 11);
+        if (rev == 10 || rev == 11) rev = 0;
+        if (rev != parseInt(value.charAt(9))) return false;
+        
+        sum = 0;
+        for (i = 0; i < 10; i ++) { sum += parseInt(value.charAt(i)) * (11 - i); }
+        rev = 11 - (sum % 11);
+
+        if (rev == 10 || rev == 11) rev = 0;
+        if (rev != parseInt(value.charAt(10))) return false;
+        
+        return true;
     }
 });
 
@@ -960,13 +973,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Add event listener and data binds to form fields
+     * Adds event listener and data binds to form fields
      */
     _addFieldObservers: function()
     {
-        // these functions can be converted in only one observing the
-        // card fields, but before we need to understand what are the 
-        // default transformations and appropriate events
+        // captures the form inputs fulfillments
         this._addFieldEventListener("total",            "change", function(field){this.setCardData("total", (field.getValue() ? parseFloat(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0));});
         this._addFieldEventListener("number",           "change", function(field){this.setCardData("number", field.getValue().replace(/\D/g,''));});
         this._addFieldEventListener("cid",              "change", function(field){this.setCardData("cid", field.getValue().replace(/\D/g,''));});
@@ -978,7 +989,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this._addFieldEventListener("dob_month",        "change", function(field){this.setCardData("dob_month", field.getValue());});
         this._addFieldEventListener("dob_year",         "change", function(field){this.setCardData("dob_year", field.getValue());});
 
-        // 'masks'
+        // masks
         this._addFieldEventListener("total",            "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("total",            "keyup",   this._formatCurrencyInput);
         this._addFieldEventListener("number",           "keydown", this._disallowNotNumbers);
@@ -1011,7 +1022,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this.addCardDataBind("installments",    this._updateInstallmentsMetadata);
         this.addCardDataBind("token",           this._updateTokenOnHTML);
 
-        // validate fields on blur
+        // triggers fields validation on blur
         this.getHTMLFormInputsAndSelects().each(function(element)
         {
             element.observe("blur", function(){ Validation.validate(element); });
@@ -1019,8 +1030,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Searches for elements inside a li width a declared card index
-     * that has card data binds
+     * Searches for elements with declared data binds on HTML
      */
     _addHTMLCardDataBinds: function()
     {
@@ -1099,8 +1109,8 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     }
 
                     // this validation must be here, to ensure that its going to run after 
-                    // the set data (not happenned when code present on complete callback)
-                    field.validate();
+                    // the set data (not happenned when code was placed on complete callback)
+                    Validation.validate(field);
 
                 }).bind(this),
                 error: (function()
@@ -1110,8 +1120,8 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     this.setCardMetadata("validation_algorithm", "");
 
                     // this validation must be here, to ensure that its going to run after 
-                    // the set data (not happenned when code present on complete callback)
-                    field.validate();
+                    // the set data (not happenned when code was placed on complete callback)
+                    Validation.validate(field);
 
                 }).bind(this),
                 complete: (function()
@@ -1121,7 +1131,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                 }).bind(this)
             });
         }
-        // clear brand if the card data became smaller than 6 digits
+        // clears brand if the card data became smaller than 6 digits
         else if(fieldValue.length < 6)
         {
             this.setCardData("brand", "");
@@ -1162,10 +1172,9 @@ RMPagSeguro_Multicc_CardForm = Class.create
     _createCardTokenOnPagSeguro: function()
     {
         var ccNumberField = this._getFieldElement("number");
-        //var ccNumValidation = Validation.get("validate-cc-number");
+        var ccNumValidation = Validation.get("validate-rm-pagseguro-cc-number");
         
-        // update only if there are at least 6 digits and
-        if( /*ccNumValidation.test($F(ccNumberField), ccNumberField) &&*/ 
+        if( ccNumValidation.test($F(ccNumberField), ccNumberField) && 
             !this.requestLocks.token && 
             this.getCardData("brand") && this.getCardData("cid") && 
             this.getCardData("expMonth") && this.getCardData("expYear") )
@@ -1283,7 +1292,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Remove all options from installments select box,
+     * Removes all options from installments select box,
      * except the one with empty value
      * 
      * @return DOMElement
@@ -1328,7 +1337,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Capture digits inserted in the total field to update
+     * Captures digits inserted in the total field to update
      * progress bar
      * @param DomElement field Total field element
      */
@@ -1340,7 +1349,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
     /**
      * Visual adjustment of the progress bar and remaining value
-     * based on total value
+     * (based on total value)
      * @param float value
      */
     _recalcProgressBarFulfillment: function(value)
@@ -1355,7 +1364,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Visual adjustment of the progress bar based on percentual value
+     * Visual adjustment of the progress bar (based on percentual value)
      * @param float percent
      */
     _updateProgressBar: function(percent)
@@ -1370,17 +1379,19 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Verify if the grand total changed 
+     * Verifies if the grand total changed 
      * @param float|string newValue 
      */
-    updateGrandTotal: function(newValue)
+    updateGrandTotal: function(newValue, isMultiCcEnabled)
     {
         if(newValue != this.grandTotal)
         {
             this.grandTotal = newValue;
-
-            this._recalcProgressBarFulfillment(this.getCardData("total"));
-            this._consultInstallmentsOnPagSeguro();
+            
+            if(!isMultiCcEnabled && this.state == "enabled")
+            {
+                this.setCardData("total", this.grandTotal);
+            }
         }
     },
 
@@ -1462,7 +1473,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Add callback listener to setCardData 
+     * Adds callback listener to setCardData 
      * @param string data 
      * @param function callback 
      */
@@ -1477,7 +1488,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Update the brand image flag on HTML form
+     * Updates the brand image flag on HTML form
      * @param string newBrand 
      */
     _updateBrandOnHTML(newBrand)
@@ -1514,7 +1525,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Update the brand image flag on HTML form
+     * Updates the brand image flag on HTML form
      * @param string newValue 
      */
     _updateTotalHTMLOnSetValue(newValue)
@@ -1530,7 +1541,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Update the token on HTML form hidden input
+     * Updates the token on HTML form hidden input
      * @param string newToken 
      */
     _updateTokenOnHTML(newToken)
@@ -1540,7 +1551,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Split installments value and update card data
+     * Splits installments value and updates card data
      * @param DOMElement field 
      */
     _updateInstallmentsdata(field)
@@ -1550,7 +1561,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Generate installments metadata
+     * Generates installments metadata
      */
     _updateInstallmentsMetadata()
     {
@@ -1559,7 +1570,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Generate formmated number metadata
+     * Generates formmated number metadata
      * @param DOMElement field 
      */
     _updateFormmatedNumberMetadata(newValue)
@@ -1588,7 +1599,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Add and event listener to a form field element
+     * Adds an event listener to a form field element
      */
     _addFieldEventListener: function(fieldRef, eventName, callback)
     {
@@ -1619,7 +1630,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Show / hide card payment fields in the form
+     * Shows / hides card payment fields in the form
      */
     _getCommongFields: function()
     {
@@ -1641,7 +1652,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Show / hide summary
+     * Shows / hides summary
      */
     _getSummaryLine: function()
     {
@@ -1665,7 +1676,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Show / hide summary
+     * Shows / hides summary
      */
     _getTotalLine: function()
     {
@@ -1686,7 +1697,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Show form, so that user can edit 
+     * Shows form, so that user can edit 
      * its fields
      */
     openEditMode: function()
@@ -1697,7 +1708,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Close form edition, showing just its summary
+     * Closes form edition, showing just its summary
      */
     closeEditMode: function()
     {
@@ -1707,7 +1718,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
     
     /**
-     * Turn on form functionalities on interface
+     * Turns on form functionalities on interface
      */
     enable: function()
     {
@@ -1724,7 +1735,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Turn off form functionalities on interface
+     * Turns off form functionalities on interface
      */
     disable: function()
     {
@@ -1737,7 +1748,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
 
     /**
-     * Get the summary box
+     * Gets the summary box
      */
     getSummaryBox: function()
     {
@@ -1750,7 +1761,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Validate HTML form fields
+     * Validates HTML form fields
      */
     validate: function()
     {
@@ -1769,7 +1780,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Retrieve all the HTML form fields
+     * Retrieves all the HTML form fields
      */
     getHTMLFormInputsAndSelects: function()
     {
@@ -1784,7 +1795,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Avoid not number chars
+     * Avoids not number chars
      * @param DOMElement field 
      * @param Event event 
      */
@@ -1856,7 +1867,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * CPF format for value inputs
+     * CPF mask for value inputs
      * @param DOMElement field 
      */
     _formatDocumentInput: function(field)
@@ -1934,7 +1945,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Test if a number passes the Luhn algorithm test
+     * Tests if a number passes the Luhn algorithm test
      * @return boolean
      */
     _validateLuhn: function(num)
@@ -1961,7 +1972,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * 
+     * Imports data from older form control instance
      * @param Object importedData 
      */
      _importData: function(importedData)
@@ -1983,11 +1994,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this._getFieldElement("dob_month").setValue(importedData.cardData.dob_month);
         this._getFieldElement("dob_year").setValue(importedData.cardData.dob_year);
 
-        // format card number
+        // formats card number
         this._formatCardNumber(this._getFieldElement("number"));
         this._formatCurrencyInput(this._getFieldElement("total"));
         
-        // copy data and metadata
+        // copies data and metadata
         for(var dataIdx in importedData.cardData)
         {
             this.setCardData(dataIdx, importedData.cardData[dataIdx]);
@@ -2019,7 +2030,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
     
     /**
-     * Prepare object to be deleted
+     * Prepares object to be deleted
      */
     destroy: function()
     {

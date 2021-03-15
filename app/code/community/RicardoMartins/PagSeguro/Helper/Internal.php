@@ -42,6 +42,13 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
         $pHelper = Mage::helper('ricardomartins_pagseguro/params'); //params helper - helper auxiliar de parametrização
 
+        $creditCardToken = $helper->isMulticcEnabled() 
+                                ? $payment->getAdditionalInformation("credit_card_token")
+                                : $pHelper->getPaymentHash('credit_card_token');
+        $orderReference = $order->getIncrementId();
+        $extraAmmount = $pHelper->getExtraAmount($order);
+
+        // update reference and values, if its multi card transaction
         if($ccIdx = $payment->getData("_current_card_index"))
         {
             $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
@@ -52,14 +59,6 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
                                 : 0.00;
             $extraAmmount += $pHelper->getMultiCcRoundedAmountError($order);
             $extraAmmount = number_format($extraAmmount, 2, ".", "");
-        }
-        else
-        {
-            $creditCardToken = $helper->isMulticcEnabled() 
-                                ? $payment->getAdditionalInformation("credit_card_token")
-                                : $pHelper->getPaymentHash('credit_card_token');
-            $orderReference = $order->getIncrementId();
-            $extraAmmount = $pHelper->getExtraAmount($order);
         }
 
         $params = array(
