@@ -485,8 +485,21 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        $paymentMethod = $order->getPayment()->getMethod();
-        if ($paymentMethod != 'rm_pagseguro_cc' || Mage::registry('is_pagseguro_updater_session')) {
+        $paymentMethod = $order->getPayment()->getMethodInstance();
+
+        if ($paymentMethod->getCode() != 'rm_pagseguro_cc') {
+            return false;
+        }
+        
+        if (Mage::registry('is_pagseguro_updater_session')) {
+            return false;
+        }
+        
+        if
+        (
+            $paymentMethod->getCode() == 'rm_pagseguro_cc' && 
+            $paymentMethod->isMultiCardPayment($order->getPayment())
+        ) {
             return false;
         }
 

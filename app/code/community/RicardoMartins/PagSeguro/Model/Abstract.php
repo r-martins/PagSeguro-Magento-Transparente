@@ -660,7 +660,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $orderEffectivellyRefunded = true;
         }
         // in cases that there are invoices and the order
-        // must be refunded !!! TO DO: verify if its ok to other payment methods
+        // must be refunded
         else if($order->canCreditmemo())
         {
             foreach($order->getInvoiceCollection() as $invoice)

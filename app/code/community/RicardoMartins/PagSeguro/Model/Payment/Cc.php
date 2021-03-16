@@ -787,6 +787,12 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID
         );
 
+        // prevents the refund action on pagseguro to throw an exception
+        if($this->isMultiCardPayment($payment))
+        {
+            Mage::register("rm_pagseguro_force_refund_order", true);
+        }
+
         parent::_cancelOrder($payment, $notification);
     }
 

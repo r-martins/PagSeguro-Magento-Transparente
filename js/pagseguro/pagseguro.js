@@ -1114,7 +1114,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
                     // this validation must be here, to ensure that its going to run after 
                     // the set data (not happenned when code was placed on complete callback)
-                    Validation.validate(field);
+                    if(field !== document.activeElement)
+                    {
+                        Validation.validate(field);
+                    }
+
                     this._createCardTokenOnPagSeguro();
 
                 }).bind(this),
@@ -1126,7 +1130,10 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
                     // this validation must be here, to ensure that its going to run after 
                     // the set data (not happenned when code was placed on complete callback)
-                    Validation.validate(field);
+                    if(field !== document.activeElement)
+                    {
+                        Validation.validate(field);
+                    }
 
                 }).bind(this),
                 complete: (function()
