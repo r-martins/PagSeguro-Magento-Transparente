@@ -73,19 +73,6 @@ class RicardoMartins_PagSeguro_Block_Form_Cc_CardFields extends Mage_Core_Block_
                 ->toHtml();
     }
 
-
-
-
-
-
-
-
-
-
-
-    /** TO DO !!! */
-    /** Review methods above */
-
     /**
      * Get info data from parent block
      * @param string data 
