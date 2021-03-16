@@ -55,31 +55,48 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
             }
 
             $payment->setAdditionalInformation('next_update', $nextUpdate)->save();
-
             $isSandbox = strpos($order->getCustomerEmail(), '@sandbox.pagseguro') !== false;
-            $updatedXml = $this->helper->getOrderStatusXML($transactionCode, $isSandbox);
-            libxml_use_internal_errors(true);
-            $updatedXml = simplexml_load_string($updatedXml);
-            if (!isset($updatedXml->status)) {
-                continue;
+
+            $paymentMethod = $payment->getMethodInstance();
+            $transactionIds = array($transactionCode);
+            
+            if( $paymentMethod->getCode() == "rm_pagseguro_cc" &&
+                $paymentMethod->isMultiCardPayment($payment))
+            {
+                $transactionIds = array();
+
+                foreach($this->getOrderTransactions($payment) as $transaction)
+                {
+                    $transactionIds[] = $transaction->getTxnId();
+                }
             }
-            $processedState = $payment->getMethodInstance()
-                                            ->processStatus((int)$updatedXml->status);
 
-            //if nothing has changed... continue
-            if ($processedState->getState() == $currentState) {
-                continue;
+            foreach($transactionIds as $transactionId)
+            {
+                $updatedXml = $this->helper->getOrderStatusXML($transactionId, $isSandbox);
+                libxml_use_internal_errors(true);
+                $updatedXml = simplexml_load_string($updatedXml);
+                if (!isset($updatedXml->status)) {
+                    continue;
+                }
+                $processedState = $payment->getMethodInstance()
+                                          ->processStatus((int)$updatedXml->status);
+
+                //if nothing has changed... continue
+                if ($processedState->getState() == $currentState) {
+                    continue;
+                }
+
+                $this->helper->writeLog(
+                    sprintf(
+                        'Updater: Processando atualização do pedido %s (%s).', $order->getIncrementId(),
+                        $processedState->getState()
+                    )
+                );
+
+    //            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
+                $paymentMethod->proccessNotificatonResult($updatedXml);
             }
-
-            $this->helper->writeLog(
-                sprintf(
-                    'Updater: Processando atualização do pedido %s (%s).', $order->getIncrementId(),
-                    $processedState->getState()
-                )
-            );
-
-//            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
-            $this->proccessNotificatonResult($updatedXml);
 
             //see \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
             Mage::unregister('sales_order_invoice_save_after_event_triggered');

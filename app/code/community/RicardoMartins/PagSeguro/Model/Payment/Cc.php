@@ -511,15 +511,17 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         foreach($orderTransactions as $transaction)
         {
+            if(!$this->_canRefundTransaction($transaction))
+            {
+                continue;
+            }
+                
             try
             {
-                if($this->_canRefundTransaction($transaction))
-                {
-                    $transactionAmount = $amount * floatval($transaction->getAdditionalInformation("remote_value")) / $payment->getOrder()->getGrandTotal();
+                $transactionAmount = $amount * floatval($transaction->getAdditionalInformation("remote_value")) / $payment->getOrder()->getGrandTotal();
 
-                    $this->_updateTransactionStatus($payment, $transaction);
-                    $this->_refundOrderTransaction($payment, $transactionAmount, $transaction->getTxnId());
-                }
+                $this->_consultOrderTransactionStatus($payment, $transaction);
+                $this->_refundOrderTransaction($payment, $transactionAmount, $transaction->getTxnId());
             }
             catch(Exception $e)
             {
@@ -546,7 +548,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         {
             if($this->_canRefundTransaction($transaction))
             {
-                $this->_updateTransactionStatus($payment, $transaction);
+                $this->_consultOrderTransactionStatus($payment, $transaction);
                 $this->_refundOrderTransaction($payment, (float) $transaction->getAdditionalInformation("remote_value"), $transaction);
             }
         }
@@ -614,13 +616,22 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $params['email'] = $this->_helper->getMerchantEmail();
         }
         
-        if($transactionType == Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND)
+        if( !$this->isMultiCardPayment($payment) &&
+            $transactionType == Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND)
         {
             $params['refundValue'] = number_format($amount, 2, '.', '');
         }
 
         $returnXml = $this->callApi($params, $payment, $uri);
         $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $returnXml));
+
+        $message = sprintf
+        (
+            "[Transação %s] Comunicando solicitação de cancelamento à PagSeguro. %s",
+            $parentTransaction->getTxnId(),
+            $notification->hasErrors() ? $notification->getErrorsDescription() : ""
+        );
+        $payment->getOrder()->addStatusHistoryComment($message);
 
         if($notification->hasErrors())
         {
@@ -646,7 +657,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      * 
      * @return Boolean
      */
-    private function _updateTransactionStatus($payment, & $transaction)
+    private function _consultOrderTransactionStatus($payment, & $transaction)
     {
         $response = $this->_helper->getOrderStatusXML($transaction->getTxnId(), $this->_helper->isSandbox());
         $responseXml = simplexml_load_string($response);
@@ -681,8 +692,20 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     protected function _confirmPayment($payment, $notification)
     {
+        // update transaction data
         $transactionId = $notification->getTransactionId();
-        $canInvoice = true;
+        $orderTransaction = $payment->lookupTransaction($transactionId, Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
+
+        if($orderTransaction)
+        {
+            $transactionDetails = $orderTransaction->getAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS);
+            $transactionDetails["status"] = $notification->getStatus();
+            $transactionDetails["closed_on"] = Zend_Date::now()->toString("YYYY-MM-DD HH:mm:ss");
+            $orderTransaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transactionDetails);
+            $orderTransaction->setAdditionalInformation("status", $notification->getStatus());
+            $orderTransaction->setIsClosed(true);
+            $orderTransaction->save();
+        }
         
         // if its two cards payment, verifies if the other transaction allows invoice
         if($this->isMultiCardPayment($payment))
@@ -708,28 +731,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                     $anotherTransaction->getAdditionalInformation("status")
                 ));
             }
-
-            $canInvoice &= $this->_isOrderTransactionConfirmed($anotherTransaction);
         }
 
-        if($canInvoice)
-        {
-            parent::_confirmPayment($payment, $notification);
-        }
-        
-        // update transaction data
-        $orderTransaction = $payment->lookupTransaction($transactionId, Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
-
-        if($orderTransaction)
-        {
-            $transactionDetails = $orderTransaction->getAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS);
-            $transactionDetails["status"] = $notification->getStatus();
-            $transactionDetails["closed_on"] = Zend_Date::now()->toString("YYYY-MM-DD HH:mm:ss");
-            $orderTransaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transactionDetails);
-            $orderTransaction->setAdditionalInformation("status", $notification->getStatus());
-            $orderTransaction->setIsClosed(true);
-            $orderTransaction->save();
-        }
+        parent::_confirmPayment($payment, $notification);
     }
 
     /**
@@ -737,6 +741,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     protected function _refundOrder($payment, $notification)
     {
+        // register the transaction status informed by the current notification
         $orderTransaction = $this->_updateOrderTransactionStatus
         (
             $payment, 
@@ -744,6 +749,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $notification->getStatus()
         );
 
+        // register the new refund transaction, based on the current notification
         $refundTransaction = $this->_registerRemoteRefundTransaction
         (
             $payment, 
@@ -754,7 +760,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         // prevents the refund action on pagseguro to throw an exception
         if($this->isMultiCardPayment($payment))
         {
-            Mage::register("rm_pagseguro_force_refund_order");
+            Mage::register("rm_pagseguro_force_refund_order", true);
         }
 
         parent::_refundOrder($payment, $notification);
@@ -765,6 +771,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     protected function _cancelOrder($payment, $notification)
     {
+        // register the transaction status informed by the current notification
         $orderTransaction = $this->_updateOrderTransactionStatus
         (
             $payment, 
@@ -772,6 +779,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $notification->getStatus()
         );
 
+        // register the new cancel transaction, based on the current notification
         $cancelTransaction = $this->_registerRemoteRefundTransaction
         (
             $payment, 
@@ -955,7 +963,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     {
         foreach($this->getOrderTransactions($payment) as $transaction)
         {
-            if(!$this->_canConfirmOrderTransaction($transaction))
+            if(!$this->_isOrderTransactionConfirmed($transaction))
             {
                 return false;
             }
@@ -966,32 +974,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
     /**
      * Checks if a transaction can be invoiced
-     * @param Mage_Sales_Model_Order_Payment_Transaction $transaction
-     * 
-     * @return Boolean
-     */
-    protected function _canConfirmOrderTransaction($transaction)
-    {
-        // it means that is already closed
-        if($transaction->getIsClosed())
-        {
-            return false;
-        }
-        
-        // must be in a open status to be closed
-        switch($transaction->getAdditionalInformation("status"))
-        {
-            case self::PS_TRANSACTION_STATUS_REFUNDED:
-            case self::PS_TRANSACTION_STATUS_DEBITED:
-            case self::PS_TRANSACTION_STATUS_CANCELED:
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks if a transaction was already invoiced
      * @param Mage_Sales_Model_Order_Payment_Transaction $transaction
      * 
      * @return Boolean
@@ -1019,6 +1001,28 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     public function processStatus($statusCode, $notification = null)
     {
         $processedState = parent::processStatus($statusCode, $notification);
+        $payment = $this->getInfoInstance();
+
+        // avoids status change when there is one pending transaction
+        if($this->isMultiCardPayment($payment) && $notification)
+        {
+            $anotherTransaction = $this->getAnotherOrderTransaction($payment, $notification->getTransactionId());
+            $confirmedStatus = array
+            (
+                RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PAID,
+                RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_AVAILABLE,
+            );
+
+            if( $anotherTransaction &&
+                (
+                    !in_array($notification->getStatus(), $confirmedStatus) || 
+                    !in_array($anotherTransaction->getAdditionalInformation("status"), $confirmedStatus)
+                )
+            ) {
+                $processedState->setStateChanged(false);
+                $processedState->setIsCustomerNotified(false);
+            }
+        }
 
         if($notification)
         {

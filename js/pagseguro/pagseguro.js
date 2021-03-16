@@ -451,6 +451,7 @@ RMPagSeguro_Multicc_Control = Class.create
         this.forms["cc1"] = new RMPagSeguro_Multicc_CardForm
         ({
             cardIndex         : 1, 
+            parentObj         : this, 
             paymentMethodCode : this.paymentMethodCode, 
             grandTotal        : this.grandTotal,
             oldGrandTotal     : this.importedFormData ? this.importedFormData.grandTotal : false,
@@ -462,6 +463,7 @@ RMPagSeguro_Multicc_Control = Class.create
         this.forms["cc2"] = new RMPagSeguro_Multicc_CardForm
         ({
             cardIndex         : 2, 
+            parentObj         : this, 
             paymentMethodCode : this.paymentMethodCode, 
             grandTotal        : this.grandTotal, 
             config            : { _summary: false },
@@ -484,8 +486,9 @@ RMPagSeguro_Multicc_Control = Class.create
         if(this.sequentialNumber == 1)
         {
             this.requestUpdateGrandTotal();
-            this._declareValidators();
         }
+
+        this._declareValidators();
     },
 
     /**
@@ -926,6 +929,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
 ({
     initialize: function(params)
     {
+        this.parentObj = params.parentObj;
         this.paymentMethodCode = params.paymentMethodCode;
         this.cardIndex = params.cardIndex;
         this.grandTotal = params.grandTotal;
@@ -1111,6 +1115,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     // this validation must be here, to ensure that its going to run after 
                     // the set data (not happenned when code was placed on complete callback)
                     Validation.validate(field);
+                    this._createCardTokenOnPagSeguro();
 
                 }).bind(this),
                 error: (function()
