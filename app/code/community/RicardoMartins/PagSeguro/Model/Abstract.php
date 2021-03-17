@@ -58,10 +58,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             Mage::throwException('Retorno inválido. Referência do pedido não encontrada.');
         }
 
-        // triggers kiosk notification to possibly update
-        // the transaction reference
-        $this->_triggerKioskNotification($notification);
-
         /** @var Mage_Sales_Model_Order $order */
         $order = $notification->getOrder();
         $payment = $order->getPayment();
@@ -731,28 +727,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         if($order->canHold())
         {
             $order->hold();
-        }
-    }
-
-    /**
-     * @param SimpleXMLElement $document
-     */
-    protected function _triggerKioskNotification($notification)
-    {
-        // kiosk mode: payment link
-        if(strstr($notification->getReference(), 'kiosk_') !== false)
-        {
-            $kioskNotification = new Varien_Object();
-            $kioskNotification->setOrderNo($notification->getReference());
-            $kioskNotification->setNotificationXml($notification->getDocument());
-            Mage::dispatchEvent
-            (
-                'ricardomartins_pagseguro_kioskorder_notification_received',
-                array('kiosk_notification' => $kioskNotification)
-            );
-
-            // updates notification reference
-            $notification->setReference($kioskNotification->getOrderNo());
         }
     }
 

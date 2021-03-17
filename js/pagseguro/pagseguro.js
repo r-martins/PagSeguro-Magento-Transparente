@@ -1246,11 +1246,6 @@ RMPagSeguro_Multicc_CardForm = Class.create
         var maxInstallments = this.config.installment_limit;
         var selectbox = this._clearInstallmentsOptions("Selecione a quantidade de parcelas");
 
-        if(!this.config.force_installments_selection)
-        {
-            selectbox.remove(0);
-        }
-
         for(var x = 0; x < remoteInstallments.length; x++)
         {
             if(maxInstallments && maxInstallments <= x)
@@ -1280,6 +1275,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
             }
 
             selectbox.add(option);
+        }
+
+        if(!this.config.force_installments_selection)
+        {
+            this._removeEmptyInstallmentsOptions();
         }
 
         // forces data binds to run
@@ -1322,11 +1322,53 @@ RMPagSeguro_Multicc_CardForm = Class.create
             }
         }
 
+        if(field.options.length == 0)
+        {
+            field.add(new Element('option', {"value": ""}));
+            field.options[0].text = "Por favor, preencha os dados do cartão para calcular as parcelas.";
+        }
+
         if(emptyOptionText)
         {
             field.options[0].text = emptyOptionText;
         }
 
+        return field;
+    },
+
+    /**
+     * Removes all the empty options from installments selectbox,
+     * if there are not empty options available
+     * 
+     * @return DOMElement
+     */
+    _removeEmptyInstallmentsOptions()
+    {
+        var field = this._getFieldElement("installments");
+        var notEmptyAvailble = false;
+
+        for(var i = 0; i < field.length; i++)
+        {
+            if(field.options[i].value != "")
+            {
+                notEmptyAvailble = true;
+            }
+        }
+
+        if(!notEmptyAvailble)
+        {
+            return field;
+        }
+         
+        for(var i = 0; i < field.length; i++)
+        {
+            if(field.options[i].value == "")
+            {
+                field.remove(i);
+                i--;
+            }
+        }
+ 
         return field;
     },
 
@@ -2001,10 +2043,17 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this._getFieldElement("expiration_mth").setValue(importedData.cardData.expMonth);
         this._getFieldElement("expiration_yr").setValue(importedData.cardData.expYear);
         this._getFieldElement("owner").setValue(importedData.cardData.owner);
-        this._getFieldElement("owner_document").setValue(importedData.cardData.owner_doc);
-        this._getFieldElement("dob_day").setValue(importedData.cardData.dob_day);
-        this._getFieldElement("dob_month").setValue(importedData.cardData.dob_month);
-        this._getFieldElement("dob_year").setValue(importedData.cardData.dob_year);
+        
+        var ownerDoc = this._getFieldElement("owner_document");
+        if(ownerDoc) ownerDoc.setValue(importedData.cardData.owner_doc);
+
+        var ownerDob = this._getFieldElement("dob_day");
+        if(ownerDob)
+        {
+            ownerDob.setValue(importedData.cardData.dob_day);
+            this._getFieldElement("dob_month").setValue(importedData.cardData.dob_month);
+            this._getFieldElement("dob_year").setValue(importedData.cardData.dob_year);
+        }        
 
         // formats card number
         this._formatCardNumber(this._getFieldElement("number"));

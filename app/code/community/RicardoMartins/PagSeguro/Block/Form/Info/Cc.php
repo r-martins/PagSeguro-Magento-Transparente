@@ -32,15 +32,7 @@ class RicardoMartins_PagSeguro_Block_Form_Info_Cc extends Mage_Payment_Block_Inf
     protected function _construct()
     {
         parent::_construct();
-        
-        if($this->helper("ricardomartins_pagseguro")->isMultiCcEnabled())
-        {
-            $this->setTemplate('ricardomartins_pagseguro/form/info/multi-cc.phtml');
-        }
-        else
-        {
-            $this->setTemplate('ricardomartins_pagseguro/form/info/cc.phtml');
-        }
+        $this->setTemplate('ricardomartins_pagseguro/form/info/cc.phtml');
     }
 
     public function isSandbox()
@@ -145,5 +137,20 @@ class RicardoMartins_PagSeguro_Block_Form_Info_Cc extends Mage_Payment_Block_Inf
             "order_id"       => $this->getInfo()->getOrder()->getId(),
             "transaction_id" => $transactionId,
         ));
+    }
+    
+    private function _useNewInfoFormat()
+    {
+        return $this->getInfo()->getAdditionalInformation("cc1") != null;
+    }
+
+    protected function _beforeToHtml()
+    {
+        if($this->_useNewInfoFormat())
+        {
+            $this->setTemplate('ricardomartins_pagseguro/form/info/multi-cc.phtml');
+        }
+
+        return $this;
     }
 }

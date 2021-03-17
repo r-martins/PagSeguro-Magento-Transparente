@@ -52,10 +52,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Notification
      * 
      * @return RicardoMartins_PagSeguro_Model_Payment_Notification
      */
-    public function setReference($value)
+    private function _setReference($value)
     {
         $nodes = $this->_getNodes("reference");
-        $nodes[0] = $value;
+        $nodes[0][0] = $value;
 
         return $this;
     }
@@ -286,19 +286,22 @@ class RicardoMartins_PagSeguro_Model_Payment_Notification
                 Mage::throwException("Could not load order related to payment notification. Reference not found.");
             }
 
-            $transactionReference = $this->getReference();
-            $incrementId = $transactionReference;
-
-            // verifies if there is a card suffix
-            $referenceSuffix = strlen($transactionReference) > 4
-                                ? substr($transactionReference, strlen($transactionReference) - 4)
-                                : "";
-
-            if($referenceSuffix == "-cc1" || $referenceSuffix == "-cc2")
+            // if its a payment link (kiosk) order notification, 
+            // triggers the event that creates the order
+            if($this->_isKioskOrderNotification())
             {
-                $incrementId = substr($transactionReference, 0, strlen($transactionReference) - 4);
+                $this->_triggerKioskOrderCreation();
             }
-            
+
+            $incrementId = $this->getReference();
+
+            // if its a multi credit card order notification,
+            // ajust the order increment ID
+            if($this->_isMultiCcOrderNotification())
+            {
+                $incrementId = substr($incrementId, 0, strlen($incrementId) - 4);
+            }
+
             $this->_order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
 
             if(!$this->_order || !$this->_order->getId())
@@ -308,6 +311,48 @@ class RicardoMartins_PagSeguro_Model_Payment_Notification
         }
 
         return $this->_order;
+    }
+
+    /**
+     * Checks if the notification is related to a payment
+     * link (kiosk) notification
+     * @return Boolean
+     */
+    private function _isKioskOrderNotification()
+    {
+        return strstr($this->getReference(), 'kiosk_') !== false;
+    }
+
+    /**
+     * Checks if the notification is related to a multi
+     * credit card order notification
+     * @return Boolean
+     */
+    private function _isMultiCcOrderNotification()
+    {
+        $referenceSuffix = strlen($this->getReference()) > 4
+                            ? substr($this->getReference(), strlen($this->getReference()) - 4)
+                            : "";
+
+        return $referenceSuffix == "-cc1" || $referenceSuffix == "-cc2";
+    }
+
+    /**
+     * Triggers the event of order creation for payment links (kiosk mode)
+     */
+    private function _triggerKioskOrderCreation()
+    {
+        $kioskNotification = new Varien_Object();
+        $kioskNotification->setOrderNo($this->getReference());
+        $kioskNotification->setNotificationXml($this->getDocument());
+        Mage::dispatchEvent
+        (
+            'ricardomartins_pagseguro_kioskorder_notification_received',
+            array('kiosk_notification' => $kioskNotification)
+        );
+
+        // updates notification reference
+        $this->_setReference($kioskNotification->getOrderNo());
     }
 
     /**
