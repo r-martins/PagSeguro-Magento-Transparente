@@ -478,6 +478,7 @@ RMPagSeguro_Multicc_Control = Class.create
         }
         else
         {
+            this._getSwitch().checked = false; // ensures that browser or OSC won't play with us
             this._disableMultiCc();
         }
 
@@ -1380,11 +1381,12 @@ RMPagSeguro_Multicc_CardForm = Class.create
     _insert1xInstallmentsOption()
     {
         var field = this._getFieldElement("installments");
+        var total = this.getCardData("total").toFixed(2);
 
         var option = document.createElement('option');
-        option.text = "1x de R$" + this.grandTotal.toFixed(2).toString().replace('.',',') + " sem juros";
+        option.text = "1x de R$" + total.toString().replace('.',',') + " sem juros";
         option.selected = true;
-        option.value = "1|" + this.grandTotal.toFixed(2);
+        option.value = "1|" + total;
         field.add(option);
 
         return field;
@@ -1397,7 +1399,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _instantReflectTotalInProgressBar: function(field)
     {
-        var value = field.getValue() ? parseInt(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0;
+        var value = field.getValue() ? parseFloat(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0;
         this._recalcProgressBarFulfillment(value);
     },
 
@@ -1549,7 +1551,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     {
         if(newBrand)
         {
-            var imageUrl = "https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/42x20/" + newBrand + ".png";
+            var imageUrl = "https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/" + newBrand + ".png";
             this._getFieldElement("number").setStyle({ "background-image": "url('" + imageUrl + "')" });
             this._getFieldElement("brand").setValue(newBrand);
         }

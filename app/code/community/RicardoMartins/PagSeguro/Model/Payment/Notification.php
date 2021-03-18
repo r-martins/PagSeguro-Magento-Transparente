@@ -22,7 +22,19 @@ class RicardoMartins_PagSeguro_Model_Payment_Notification
     {
         if(!isset($params["document"]))
         {
-            throw new Exception("XML Document is a required parameter");
+            throw new Exception("Parâmetro 'document' é obrigatório.");
+        }
+
+        if(is_string($params["document"]))
+        {
+            try
+            {
+                $params["document"] = simplexml_load_string($params["document"]);
+            }
+            catch(Exception $e)
+            {
+                throw new Exception("Não foi possível interpretar a resposta da PagSeguro.");
+            }
         }
 
         $this->_xmlDocument = $params["document"];

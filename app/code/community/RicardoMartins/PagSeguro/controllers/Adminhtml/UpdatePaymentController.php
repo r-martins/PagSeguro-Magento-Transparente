@@ -85,7 +85,15 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
             // consults PagSeguro web services
             $helper = Mage::helper("ricardomartins_pagseguro");
             $response = $helper->getOrderStatusXML($transaction->getTxnId(), $helper->isSandbox());
-            $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => simplexml_load_string($response)));
+
+            $helper->writeLog(sprintf
+            (
+                "Retorno do Pagseguro para a consulta da transacao %s via controlador da administracao: %s",
+                $transaction->getTxnId(),
+                Mage::helper('core/string')->truncate(@iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $response), 400, '...(continua)'))
+            );
+
+            $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $response));
 
             if(!$notification->getStatus())
             {

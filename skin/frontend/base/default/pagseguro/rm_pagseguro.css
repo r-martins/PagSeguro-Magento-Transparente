@@ -4,6 +4,7 @@
     background-image: none;
     background-repeat: no-repeat;
     background-position: calc(100% - 5px) center;
+    background-size: auto calc(100% - 6px);
 }
 
 /* multi credit card switch */

@@ -50,10 +50,11 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
             $transactionCode = $payment->getAdditionalInformation('transaction_id');
             $order = Mage::getModel('sales/order')->load($payment->getParentId());
             $currentState = $order->getState();
+
             if (($currentNextUpdate && strtotime($currentNextUpdate) > strtotime($now)) || !$transactionCode) {
                 continue;
             }
-
+            
             $payment->setAdditionalInformation('next_update', $nextUpdate)->save();
             $isSandbox = strpos($order->getCustomerEmail(), '@sandbox.pagseguro') !== false;
 
@@ -73,14 +74,23 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
 
             foreach($transactionIds as $transactionId)
             {
-                $updatedXml = $this->helper->getOrderStatusXML($transactionId, $isSandbox);
+                $response = $this->helper->getOrderStatusXML($transactionId, $isSandbox);
+                
+                $this->helper->writeLog(sprintf
+                (
+                    "Retorno do Pagseguro para a consulta da transacao %s via updater: %s",
+                    $transactionId,
+                    Mage::helper('core/string')->truncate(@iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $response), 400, '...(continua)'))
+                );
+
                 libxml_use_internal_errors(true);
-                $updatedXml = simplexml_load_string($updatedXml);
-                if (!isset($updatedXml->status)) {
+                $responseXml = simplexml_load_string($response);
+                if (!isset($responseXml->status)) {
                     continue;
                 }
+
                 $processedState = $payment->getMethodInstance()
-                                          ->processStatus((int)$updatedXml->status);
+                                          ->processStatus((int)$responseXml->status);
 
                 //if nothing has changed... continue
                 if ($processedState->getState() == $currentState) {
@@ -95,7 +105,7 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
                 );
 
     //            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
-                $paymentMethod->proccessNotificatonResult($updatedXml);
+                $paymentMethod->proccessNotificatonResult($responseXml);
             }
 
             //see \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
