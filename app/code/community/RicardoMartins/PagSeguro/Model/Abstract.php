@@ -418,7 +418,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             )
         );
         $params = $paramsObj->getParams();
-        if (strpos($params['senderEmail'], '@sandbox.pagseguro') !== false && !$helper->isSandbox())
+        $senderEmail = isset($params['senderEmail']) ? $params['senderEmail'] : "";
+
+        if (strpos($senderEmail, '@sandbox.pagseguro') !== false && !$helper->isSandbox())
         {
             Mage::throwException('E-mail @sandbox.pagseguro não deve ser usado em produção');
         }
