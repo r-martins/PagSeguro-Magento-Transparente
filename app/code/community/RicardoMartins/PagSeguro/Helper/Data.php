@@ -50,7 +50,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         if ($fromCache = $this->getSavedSessionId()) {
             return $fromCache;
         }
-        
+
         $useApp = $this->getLicenseType() == 'app';
         $url = $this->getWsUrl('sessions', $useApp);
 
