@@ -411,7 +411,9 @@ RMPagSeguro_Multicc_Control = Class.create
         this.forms = {};
         this.syncLocks = {};
         this.importedFormData = {};
+        this.psFunctionsQueues = {};
         this.sequentialNumber = null;
+        this.config = Object.assign((params.config ? params.config : {}), RMPagSeguroObj.config);
 
         this._setupUniqueObject();
         this._initForms();
@@ -584,7 +586,11 @@ RMPagSeguro_Multicc_Control = Class.create
         var self = this;
         var passedFunction = function(newValue, previousValue)
         {
-            if(self._hasSyncLock(data, callingForm, destForm)) return;
+            if( self._hasSyncLock(data, destForm, callingForm) ||
+                self._hasSyncLock(data, callingForm, destForm) )
+            {
+                return;
+            }
 
             var updatingValue = relationFunction(newValue, previousValue);
 
@@ -923,6 +929,95 @@ RMPagSeguro_Multicc_Control = Class.create
         if (rev != parseInt(value.charAt(10))) return false;
         
         return true;
+    },
+
+    /**
+     * Adds PagSeguro lib function calling to queue, avoiding concurrence problems
+     * @param String fun 
+     * @param Object params 
+     */
+    queuePSCall: function(fun, params)
+    {
+        if(typeof this.psFunctionsQueues[fun] === "undefined")
+        {
+            this.psFunctionsQueues[fun] = 
+            {
+                "queue" : [],
+                "lock"  : false
+            }
+        }
+
+        this.psFunctionsQueues[fun].queue.push(params);
+
+        this._processPSCallQueue(fun);
+    },
+
+    /**
+     * Triggers processing of one entry of the queue of PagSeguro lib 
+     * function callings
+     * @param String fun 
+     */
+    _processPSCallQueue: function(fun)
+    {
+        if( typeof this.psFunctionsQueues[fun] === "undefined" ||
+            this.psFunctionsQueues[fun].queue.length == 0 ||
+            this.psFunctionsQueues[fun].lock == true )
+        {
+            return;
+        }
+
+        this.psFunctionsQueues[fun].lock = true;
+
+        var self = this;
+        var params = this.psFunctionsQueues[fun].queue.shift();
+        var localCallbacks = 
+        {
+            success : function() {},
+            error   : function() {},
+            always  : function() {}
+        };
+
+        // overrides success, error and always callback functions
+        if(params.success) { localCallbacks.success = params.success; }
+        if(params.error)   { localCallbacks.error = params.error; }
+        if(params.always)  { localCallbacks.always = params.always; }
+
+        params.success = function(response)
+        {
+            localCallbacks.success(response);
+            
+            // if you trust in PagSeguro lib, move this to always callback
+            self.psFunctionsQueues[fun].lock = false;
+            self._processPSCallQueue(fun);
+        };
+
+        params.error = function(response)
+        {
+            localCallbacks.error(response);
+
+            // if you trust in PagSeguro lib, move this to always callback
+            self.psFunctionsQueues[fun].lock = false;
+            self._processPSCallQueue(fun);
+        };
+
+        params.always = function(response)
+        {
+            localCallbacks.always(response);
+        };
+
+        PagSeguroDirectPayment[fun](params);
+    },
+    
+    /**
+     * Prints information on browser console log.
+     * @param mixed msg 
+     */
+    debug: function(msg)
+    {
+        if(this.config.debug)
+        {
+            console.log(msg);
+        }
     }
 });
 
@@ -1170,13 +1265,17 @@ RMPagSeguro_Multicc_CardForm = Class.create
             return;
         }
 
-        PagSeguroDirectPayment.getInstallments
-        ({
+        this._debug("Solicitando parcelas do formulario " + this.cardIndex + " para o valor de " + this.getCardData("total"));
+
+        var params =
+        {
             brand: this.getCardData("brand"),
             amount: this.getCardData("total"),
             success: this._populateInstallments.bind(this),
             error: this._populateSafeInstallments.bind(this)
-        });
+        };
+
+        this.parentObj.queuePSCall("getInstallments", params);
     },
 
     /**
@@ -1243,6 +1342,8 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _populateInstallments: function(response)
     {
+        this._debug("Preenchendo as parcelas do formulario " + this.cardIndex + " para o valor de " + this.getCardData("total"));
+
         var remoteInstallments = Object.values(response.installments)[0];
         var maxInstallments = this.config.installment_limit;
         var selectbox = this._clearInstallmentsOptions("Selecione a quantidade de parcelas");
@@ -1281,6 +1382,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
         if(!this.config.force_installments_selection)
         {
             this._removeEmptyInstallmentsOptions();
+
+            if(!this.getCardData("installments"))
+            {
+                this.setCardData("installments", 1);
+            }
         }
 
         // forces data binds to run
@@ -2025,6 +2131,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
             sum += digit;
         }
         return sum % 10 === 0;
+    },
+
+    _debug: function(msg)
+    {
+        this.parentObj.debug(msg);
     },
 
     /**
