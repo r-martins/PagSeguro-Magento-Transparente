@@ -34,9 +34,9 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         }
 
         //update kiosk order
-        $this->setPagseguroEmail((string)$notificationXML->sender->email);
+        $this->setEmail((string)$notificationXML->sender->email);
         $this->setTransactionCode((string)$notificationXML->code);
-
+Zend_Debug::dump($notificationXML); exit;
         $productIds = array($this->getProductId());
 
         $quote = Mage::getModel('sales/quote')->setStoreId($this->_store->getId())->setIsKiosk(true);
