@@ -542,6 +542,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             if($ccIdx = $payment->getData("_current_card_index"))
             {
                 $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+
                 if (is_array($cardData) && isset($cardData["owner_dob"]))
                 {
                     return $cardData["owner_dob"];

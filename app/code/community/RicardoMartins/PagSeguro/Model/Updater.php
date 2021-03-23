@@ -66,7 +66,7 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
             {
                 $transactionIds = array();
 
-                foreach($this->getOrderTransactions($payment) as $transaction)
+                foreach($paymentMethod->getOrderTransactions($payment) as $transaction)
                 {
                     $transactionIds[] = $transaction->getTxnId();
                 }
@@ -89,23 +89,30 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
                     continue;
                 }
 
-                $processedState = $payment->getMethodInstance()
-                                          ->processStatus((int)$responseXml->status);
+                try
+                {
+                    $processedState = $payment->getMethodInstance()
+                                            ->processStatus((int)$responseXml->status);
 
-                //if nothing has changed... continue
-                if ($processedState->getState() == $currentState) {
-                    continue;
+                    //if nothing has changed... continue
+                    if ($processedState->getState() == $currentState) {
+                        continue;
+                    }
+
+                    $this->helper->writeLog(
+                        sprintf(
+                            'Updater: Processando atualização do pedido %s (%s).', $order->getIncrementId(),
+                            $processedState->getState()
+                        )
+                    );
+
+        //            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
+                    $paymentMethod->proccessNotificatonResult($responseXml);
                 }
-
-                $this->helper->writeLog(
-                    sprintf(
-                        'Updater: Processando atualização do pedido %s (%s).', $order->getIncrementId(),
-                        $processedState->getState()
-                    )
-                );
-
-    //            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
-                $paymentMethod->proccessNotificatonResult($responseXml);
+                catch(Exception $e)
+                {
+                    $this->helper->writeLog('Nao foi possivel concluir a atualizacao. Erro: ' . $e->getMessage());
+                }
             }
 
             //see \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult

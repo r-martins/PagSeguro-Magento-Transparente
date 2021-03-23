@@ -190,7 +190,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                    str_pad($formData->getData("ps_multicc{$cardIndex}_dob_month"), 2, "0", STR_PAD_LEFT) . "/" .
                    $formData->getData("ps_multicc{$cardIndex}_dob_year");
                 
-            $cardData["dob"] = $dob;
+            $cardData["owner_dob"] = $dob;
         }
 
         return $cardData;
@@ -750,12 +750,15 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         );
 
         // register the new refund transaction, based on the current notification
-        $refundTransaction = $this->_registerRemoteRefundTransaction
-        (
-            $payment, 
-            $orderTransaction, 
-            Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND
-        );
+        if($orderTransaction)
+        {
+            $refundTransaction = $this->_registerRemoteRefundTransaction
+            (
+                $payment, 
+                $orderTransaction, 
+                Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND
+            );
+        }
 
         // prevents the refund action on pagseguro to throw an exception
         if($this->isMultiCardPayment($payment))
@@ -780,12 +783,15 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         );
 
         // register the new cancel transaction, based on the current notification
-        $cancelTransaction = $this->_registerRemoteRefundTransaction
-        (
-            $payment, 
-            $orderTransaction, 
-            Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID
-        );
+        if($orderTransaction)
+        {
+            $cancelTransaction = $this->_registerRemoteRefundTransaction
+            (
+                $payment, 
+                $orderTransaction, 
+                Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID
+            );
+        }
 
         // prevents the refund action on pagseguro to throw an exception
         if($this->isMultiCardPayment($payment))
@@ -828,6 +834,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         if(!($orderTransaction instanceof Mage_Sales_Model_Payment_Transaction))
         {
             $orderTransaction = $payment->lookupTransaction($orderTransaction, Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
+        }
+
+        if(!$orderTransaction)
+        {
+            return false;
         }
 
         // avoid unnecessary update
@@ -1010,20 +1021,20 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $payment = $this->getInfoInstance();
 
         // avoids status change when there is one pending transaction
-        if($this->isMultiCardPayment($payment) && $notification)
-        {
-            $anotherTransaction = $this->getAnotherOrderTransaction($payment, $notification->getTransactionId());
-            $confirmedStatus = array
-            (
-                RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PAID,
-                RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_AVAILABLE,
-            );
+        $confirmedStatus = array
+        (
+            RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PAID,
+            RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_AVAILABLE,
+        );
 
+        if( $this->isMultiCardPayment($payment) && 
+            $notification && 
+            in_array($notification->getStatus(), $confirmedStatus)
+        ) {
+            $anotherTransaction = $this->getAnotherOrderTransaction($payment, $notification->getTransactionId());
+            
             if( $anotherTransaction &&
-                (
-                    !in_array($notification->getStatus(), $confirmedStatus) || 
-                    !in_array($anotherTransaction->getAdditionalInformation("status"), $confirmedStatus)
-                )
+                !in_array($anotherTransaction->getAdditionalInformation("status"), $confirmedStatus)
             ) {
                 $processedState->setStateChanged(false);
                 $processedState->setIsCustomerNotified(false);

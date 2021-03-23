@@ -226,9 +226,12 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         {
             case self::PS_TRANSACTION_STATUS_PENDING_PAYMENT:
                 $return->setState(Mage_Sales_Model_Order::STATE_PENDING_PAYMENT);
-                $return->setIsCustomerNotified($this->getCode()!='pagseguro_cc');
-                if ($this->getCode()=='rm_pagseguro_cc') {
+                $return->setIsCustomerNotified(true);
+                
+                if ($this->getCode() == 'rm_pagseguro_cc')
+                {
                     $return->setStateChanged(false);
+                    $return->setIsCustomerNotified(false);
                 }
 
                 $return->setMessage(
@@ -347,7 +350,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             )
         );
         $params = $paramsObj->getParams();
-        if (isset($params['senderEmail']) && strpos($params['senderEmail'], '@sandbox.pagseguro') !== false && !$helper->isSandbox())
+        $senderEmail = isset($params['senderEmail']) ? $params['senderEmail'] : "";
+
+        if (strpos($senderEmail, '@sandbox.pagseguro') !== false && !$helper->isSandbox())
         {
             Mage::throwException('E-mail @sandbox.pagseguro não deve ser usado em produção');
         }

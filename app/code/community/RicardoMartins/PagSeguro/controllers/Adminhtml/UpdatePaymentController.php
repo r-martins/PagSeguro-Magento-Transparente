@@ -93,7 +93,15 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
                 Mage::helper('core/string')->truncate(@iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $response), 400, '...(continua)'))
             );
 
-            $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $response));
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($response);
+            if (!isset($xml->status)) {
+                Mage::getSingleton('adminhtml/session')->addError('Retorno inesperado do PagSeguro. Tente novamente mais tarde ou veja os logs para mais detalhes.');
+                $this->helper->writeLog('Retorno inesperado para atualização manual de pedido. Retorno: ' . var_export($response, true));
+                return $this->_redirectReferer();
+            }
+
+            $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $xml));
 
             if(!$notification->getStatus())
             {
