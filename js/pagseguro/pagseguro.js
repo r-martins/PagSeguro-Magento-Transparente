@@ -1210,6 +1210,8 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _consultCardBrandOnPagSeguro: function(field)
     {
+        this._debug("Solicitando bandeira do cartão de crédito");
+
         var fieldValue = field.getValue().replace(/\D/g,'');
         
         // updates only if there are at least 6 digits and
@@ -1229,12 +1231,14 @@ RMPagSeguro_Multicc_CardForm = Class.create
                         this.setCardData("brand", response.brand.name);
                         this.setCardMetadata("cid_size", response.brand.cvvSize);
                         this.setCardMetadata("validation_algorithm", response.brand.validationAlgorithm);
+                        this._debug("Bandeira armazenada com sucesso");
                     }
                     else
                     {
                         this.setCardData("brand", "");
                         this.setCardMetadata("cid_size", "");
                         this.setCardMetadata("validation_algorithm", "");
+                        this._debug("Bandeira não encontrada");
                     }
 
                     // this validation must be here, to ensure that its going to run after 
@@ -1252,6 +1256,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     this.setCardData("brand", "");
                     this.setCardMetadata("cid_size", "");
                     this.setCardMetadata("validation_algorithm", "");
+                    this._debug("Bandeira não encontrada");
 
                     // this validation must be here, to ensure that its going to run after 
                     // the set data (not happenned when code was placed on complete callback)
@@ -1314,6 +1319,8 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _createCardTokenOnPagSeguro: function()
     {
+        this._debug("Solicitando token do cartão");
+
         var ccNumberField = this._getFieldElement("number");
         var ccNumValidation = Validation.get("validate-rm-pagseguro-cc-number");
         
@@ -1338,6 +1345,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     if(response && response.card && response.card.token)
                     {
                         this.setCardData("token", response.card.token);
+                        this._debug("Token armazenado com sucesso");
                     }
 
                 }).bind(this),
@@ -1350,7 +1358,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     {
                         errorsDesc.push(response.errors[idx]);
                     }
-                    this._debug("Erros no cartão: " + errorsDesc.join("; "));
+                    this._debug("Token não informado, por erros no cartão: " + errorsDesc.join("; "));
                     
                     alert("Por favor, reveja os dados do seu cartão.");
 
