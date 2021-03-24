@@ -1184,11 +1184,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
         var fieldValue = field.getValue().replace(/\D/g,'');
         
         // updates only if there are at least 6 digits and
-        if(fieldValue.length >= 6 && !this.getCardData("brand") /* && !this.requestLocks.brand */)
+        if(fieldValue.length >= 6 && !this.getCardData("brand") && !this._hasRequestLock("brand"))
         {
-            // TO DO: add expiring time to this lock before using it, 
-            // because of the PagSeguro lib instability
-            this.requestLocks.brand = true;
+            // adds expiring time to this lock before using it, 
+            // because of the PagSeguro lib unreliability
+            this._setupSyncLock("brand");
 
             PagSeguroDirectPayment.getBrand
             ({
@@ -1234,7 +1234,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                 }).bind(this),
                 complete: (function()
                 {
-                    this.requestLocks.brand = false;
+                    this._removeSyncLock("brand");
 
                 }).bind(this)
             });
@@ -1265,7 +1265,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
             return;
         }
 
-        this._debug("Solicitando parcelas do formulario " + this.cardIndex + " para o valor de " + this.getCardData("total"));
+        this._debug("Solicitando parcelas para o valor de " + this.getCardData("total"));
 
         var params =
         {
@@ -1342,7 +1342,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _populateInstallments: function(response)
     {
-        this._debug("Preenchendo as parcelas do formulario " + this.cardIndex + " para o valor de " + this.getCardData("total"));
+        this._debug("Preenchendo as parcelas para o valor de " + this.getCardData("total"));
 
         var remoteInstallments = Object.values(response.installments)[0];
         var maxInstallments = this.config.installment_limit;
@@ -2135,7 +2135,65 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
     _debug: function(msg)
     {
-        this.parentObj.debug(msg);
+        this.parentObj.debug("[Cartao " + this.cardIndex + "] " + msg);
+    },
+
+    /**
+     * Setups a lock to avoid request duplicity
+     * @param String lockName 
+     */
+    _setupSyncLock: function(lockName, timeout = 2000)
+    {
+        if(typeof this.requestLocks[lockName] === "undefined")
+        {
+            return;
+        }
+
+        var thisTimeoutId = setTimeout((function()
+        {
+            this._debug("O valor de timeoutid = " + thisTimeoutId);
+            if(this.requestLocks[lockName] == thisTimeoutId)
+            {
+                this._removeSyncLock(lockName);
+            }
+        }).bind(this), timeout);
+
+        this.requestLocks[lockName] = thisTimeoutId;
+        this._debug("Travando consultas do tipo: " + lockName);
+    },
+
+    /**
+     * Frees a request lock
+     * @param String lockName 
+     */
+     _removeSyncLock(lockName)
+    {
+        if(typeof this.requestLocks[lockName] === "undefined")
+        {
+            return;
+        }
+
+        if(this.requestLocks[lockName] === false)
+        {
+            return;
+        }
+
+        this.requestLocks[lockName] = false;
+        this._debug("Liberando consultas do tipo: " + lockName);
+    },
+
+    /**
+     * Verifies if there is a request lock
+     * @param String lockName 
+     */
+    _hasRequestLock(lockName)
+    {
+        if(typeof this.requestLocks[lockName] === "undefined")
+        {
+            return false;
+        }
+
+        return this.requestLocks[lockName];
     },
 
     /**
