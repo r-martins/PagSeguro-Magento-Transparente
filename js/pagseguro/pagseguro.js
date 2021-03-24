@@ -1013,7 +1013,10 @@ RMPagSeguro_Multicc_Control = Class.create
                 params.always = function(){};
 
                 // requeue the request
-                //this.queuePSCall(fun, originalParams);
+                if(this.psFunctionsQueues[fun].queue.length == 0)
+                {
+                    this.queuePSCall(fun, originalParams);
+                }
 
                 // resume the queue
                 this._resumePSCallQueue(fun);
@@ -1292,6 +1295,8 @@ RMPagSeguro_Multicc_CardForm = Class.create
         }
 
         this._debug("Solicitando parcelas para o valor de " + this.getCardData("total"));
+        this._clearInstallmentsOptions("Consultando demais parcelas na PagSeguro...");
+        //this._insert1xInstallmentsOption();
 
         var params =
         {
@@ -1368,9 +1373,20 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _populateInstallments: function(response)
     {
+        var remoteInstallments = Object.values(response.installments)[0];
+
+        // redundant verification, beacause of the possibility of callback
+        // crossover on PagSeguro lib
+        if( remoteInstallments.length > 0 &&
+            this.getCardData("total") != remoteInstallments[0].totalAmount
+        ) {
+            this._debug("Valor das parcelas difere do total do cartão: " + remoteInstallments[0].totalAmount + " | " + this.getCardData("total"));
+            return;
+        }
+
         this._debug("Preenchendo as parcelas para o valor de " + this.getCardData("total"));
 
-        var remoteInstallments = Object.values(response.installments)[0];
+        
         var maxInstallments = this.config.installment_limit;
         var selectbox = this._clearInstallmentsOptions("Selecione a quantidade de parcelas");
 
