@@ -961,15 +961,14 @@ RMPagSeguro_Multicc_Control = Class.create
     {
         if( typeof this.psFunctionsQueues[fun] === "undefined" ||
             this.psFunctionsQueues[fun].queue.length == 0 ||
-            this.psFunctionsQueues[fun].lock == true )
+            this.psFunctionsQueues[fun].lock !== false )
         {
             return;
         }
 
-        this.psFunctionsQueues[fun].lock = true;
-
         var self = this;
-        var params = this.psFunctionsQueues[fun].queue.shift();
+        var originalParams = this.psFunctionsQueues[fun].queue.shift();
+        var params = Object.assign({}, originalParams);
         var localCallbacks = 
         {
             success : function() {},
@@ -987,8 +986,7 @@ RMPagSeguro_Multicc_Control = Class.create
             localCallbacks.success(response);
             
             // if you trust in PagSeguro lib, move this to always callback
-            self.psFunctionsQueues[fun].lock = false;
-            self._processPSCallQueue(fun);
+            self._resumePSCallQueue(fun);
         };
 
         params.error = function(response)
@@ -996,8 +994,7 @@ RMPagSeguro_Multicc_Control = Class.create
             localCallbacks.error(response);
 
             // if you trust in PagSeguro lib, move this to always callback
-            self.psFunctionsQueues[fun].lock = false;
-            self._processPSCallQueue(fun);
+            self._resumePSCallQueue(fun);
         };
 
         params.always = function(response)
@@ -1005,7 +1002,36 @@ RMPagSeguro_Multicc_Control = Class.create
             localCallbacks.always(response);
         };
 
+        // set a time limit for the lock
+        var thisTimeoutId = setTimeout((function()
+        {
+            if(this.psFunctionsQueues[fun].lock == thisTimeoutId)
+            {
+                // avoid late response to do wrong work
+                params.success = function(){};
+                params.error = function(){};
+                params.always = function(){};
+
+                // requeue the request
+                //this.queuePSCall(fun, originalParams);
+
+                // resume the queue
+                this._resumePSCallQueue(fun);
+            }
+        }).bind(this), 10000);
+        this.psFunctionsQueues[fun].lock = thisTimeoutId;
+
         PagSeguroDirectPayment[fun](params);
+    },
+
+    /**
+     * Force the queue processing to continue
+     * @param String fun 
+     */
+    _resumePSCallQueue: function(fun)
+    {
+        this.psFunctionsQueues[fun].lock = false;
+        this._processPSCallQueue(fun);
     },
     
     /**
@@ -2151,7 +2177,6 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
         var thisTimeoutId = setTimeout((function()
         {
-            this._debug("O valor de timeoutid = " + thisTimeoutId);
             if(this.requestLocks[lockName] == thisTimeoutId)
             {
                 this._removeSyncLock(lockName);
