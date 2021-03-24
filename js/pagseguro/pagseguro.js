@@ -1341,9 +1341,18 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     }
 
                 }).bind(this),
-                error: (function()
+                error: (function(response)
                 {
                     this.setCardData("token", "");
+
+                    var errorsDesc = [];
+                    for(var idx in response.errors)
+                    {
+                        errorsDesc.push(response.errors[idx]);
+                    }
+                    this._debug("Erros no cartão: " + errorsDesc.join("; "));
+                    
+                    alert("Por favor, reveja os dados do seu cartão.");
 
                 }).bind(this),
                 complete: (function()
@@ -2058,7 +2067,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
             return;
         }
         
-        formattedValue += digits.substring(0, 4) + " ";
+        formattedValue += digits.substring(0, 4);
         lastIndex = 4;
 
         while(digits.length > lastIndex)
