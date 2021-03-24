@@ -17,14 +17,11 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
     protected function _construct()
     {
         parent::_construct();
+        $this->setTemplate('ricardomartins_pagseguro/form/cc.phtml');
 
         if($this->helper("ricardomartins_pagseguro")->isMultiCcEnabled())
         {
             $this->setTemplate('ricardomartins_pagseguro/form/multi-cc.phtml');
-        }
-        else
-        {
-            $this->setTemplate('ricardomartins_pagseguro/form/cc.phtml');
         }
     }
 
