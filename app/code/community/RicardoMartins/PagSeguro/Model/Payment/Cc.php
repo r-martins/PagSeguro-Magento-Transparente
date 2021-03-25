@@ -414,13 +414,13 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         
         switch($notification->getStatus())
         {
-            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PENDING_PAYMENT:
-            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_REVIEW:
+            case self::PS_TRANSACTION_STATUS_PENDING_PAYMENT:
+            case self::PS_TRANSACTION_STATUS_REVIEW:
                 $transaction->setIsClosed(false);
                 break;
             
-            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PAID:
-            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_AVAILABLE:
+            case self::PS_TRANSACTION_STATUS_PAID:
+            case self::PS_TRANSACTION_STATUS_AVAILABLE:
                 $transaction->setIsClosed(true);
                 break;
             
@@ -511,6 +511,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         foreach($orderTransactions as $transaction)
         {
+            $this->_consultOrderTransactionStatus($payment, $transaction);
+
             if(!$this->_canRefundTransaction($transaction))
             {
                 continue;
@@ -520,7 +522,6 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             {
                 $transactionAmount = $amount * floatval($transaction->getAdditionalInformation("remote_value")) / $payment->getOrder()->getGrandTotal();
 
-                $this->_consultOrderTransactionStatus($payment, $transaction);
                 $this->_refundOrderTransaction($payment, $transactionAmount, $transaction->getTxnId());
             }
             catch(Exception $e)
@@ -546,10 +547,25 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     {
         foreach($this->getOrderTransactions($payment) as $transaction)
         {
-            if($this->_canRefundTransaction($transaction))
+            $this->_consultOrderTransactionStatus($payment, $transaction);
+
+            if(!$this->_canRefundTransaction($transaction))
             {
-                $this->_consultOrderTransactionStatus($payment, $transaction);
+                continue;
+            }
+
+            try
+            {
                 $this->_refundOrderTransaction($payment, (float) $transaction->getAdditionalInformation("remote_value"), $transaction);
+            }
+            catch(Exception $e)
+            {
+                if(!Mage::registry("rm_pagseguro_force_refund_order"))
+                {
+                    throw $e;
+                }
+                
+                $payment->getOrder()->addStatusHistoryComment($e->getMessage());
             }
         }
     }
@@ -582,6 +598,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             case self::PS_TRANSACTION_STATUS_PENDING_PAYMENT:
             case self::PS_TRANSACTION_STATUS_REVIEW:
                 $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID;
+                $successStatus = self::PS_TRANSACTION_STATUS_CANCELED;
                 $uri = 'transactions/cancels';
                 break;
             
@@ -589,6 +606,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             case self::PS_TRANSACTION_STATUS_AVAILABLE:
             case self::PS_TRANSACTION_STATUS_CONTESTED:
                 $transactionType = Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND;
+                $successStatus = self::PS_TRANSACTION_STATUS_REFUNDED;
                 $uri = 'transactions/refunds';
                 break;
             
@@ -644,6 +662,14 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             Mage::throwException($message);
         }
 
+        // update the parent transaction status
+        $this->_updateOrderTransactionStatus
+        (
+            $payment, 
+            $parentTransaction, 
+            $successStatus
+        );
+
         $payment->setTransactionId($parentTransaction->getTxnId() . "-" . $transactionType);
         $payment->setParentTransactionId($parentTransaction->getTxnId());
         $payment->setShouldCloseParentTransaction(true);
@@ -667,9 +693,19 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             return false;
         }
 
+        $newStatus = (string) $responseXml->status;
+        
+        // checks if the status hasnt changed, everything its 
+        // ok and lets consider updated
+        if($newStatus == $transaction->getAdditionalInformation("status"))
+        {
+            return true;
+        }
+
+        // otherwise, registers the new status data
         $transactionDetails = $transaction->getAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS);
-        $transaction->setAdditionalInformation("status", (string) $responseXml->status);
-        $transactionDetails["status"] = (string) $responseXml->status;
+        $transaction->setAdditionalInformation("status", $newStatus);
+        $transactionDetails["status"] = $newStatus;
 
         if(isset($responseXml->last_event_date))
         {
@@ -680,6 +716,34 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $transaction->setAdditionalInformation(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transactionDetails);
         $transaction->setOrderPaymentObject($payment);
         $transaction->save();
+
+        // if was remotely refunded, registers locally the remote transaction
+        $refundedStatus = array
+        (
+            self::PS_TRANSACTION_STATUS_REFUNDED,
+            self::PS_TRANSACTION_STATUS_DEBITED,
+        );
+        $cancelledStatus = array
+        (
+            self::PS_TRANSACTION_STATUS_CANCELED,
+        );
+
+        $wasRefunded = in_array($newStatus, $refundedStatus);
+        $wasCancelled = in_array($newStatus, $cancelledStatus);
+
+        if($wasRefunded || $wasCancelled)
+        {
+            $refundTransaction = $this->_registerRemoteRefundTransaction
+            (
+                $payment, 
+                $transaction, 
+                $wasRefunded 
+                    ? Mage_Sales_Model_Order_Payment_Transaction::TYPE_REFUND
+                    : Mage_Sales_Model_Order_Payment_Transaction::TYPE_VOID
+            );
+
+            $refundTransaction->save();
+        }
 
         return true;
     }
@@ -712,11 +776,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         {
             $notAllowedStatus = array
             (
-                //RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_CONTESTED,
-                RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_REFUNDED,
-                RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_CANCELED,
-                RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_DEBITED,
-                //RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION,
+                //self::PS_TRANSACTION_STATUS_CONTESTED,
+                self::PS_TRANSACTION_STATUS_REFUNDED,
+                self::PS_TRANSACTION_STATUS_CANCELED,
+                self::PS_TRANSACTION_STATUS_DEBITED,
+                //self::PS_TRANSACTION_STATUS_TEMPORARY_RETENTION,
             );
             
             $anotherTransaction = $this->getAnotherOrderTransaction($payment, $transactionId);
@@ -831,7 +895,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     private function _updateOrderTransactionStatus($payment, $orderTransaction, $status)
     {
-        if(!($orderTransaction instanceof Mage_Sales_Model_Payment_Transaction))
+        if(!($orderTransaction instanceof Mage_Sales_Model_Order_Payment_Transaction))
         {
             $orderTransaction = $payment->lookupTransaction($orderTransaction, Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
         }
@@ -904,9 +968,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
 
         switch($transaction->getAdditionalInformation("status"))
         {
-            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_REFUNDED:
-            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_CANCELED:
-            case RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_DEBITED:
+            case self::PS_TRANSACTION_STATUS_REFUNDED:
+            case self::PS_TRANSACTION_STATUS_CANCELED:
+            case self::PS_TRANSACTION_STATUS_DEBITED:
                 return false;
         }
 
@@ -1023,8 +1087,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         // avoids status change when there is one pending transaction
         $confirmedStatus = array
         (
-            RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_PAID,
-            RicardoMartins_PagSeguro_Model_Abstract::PS_TRANSACTION_STATUS_AVAILABLE,
+            self::PS_TRANSACTION_STATUS_PAID,
+            self::PS_TRANSACTION_STATUS_AVAILABLE,
         );
 
         if( $this->isMultiCardPayment($payment) && 
@@ -1037,7 +1101,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 !in_array($anotherTransaction->getAdditionalInformation("status"), $confirmedStatus)
             ) {
                 $processedState->setStateChanged(false);
-                $processedState->setIsCustomerNotified(false);
+                $processedState->setIsCustomerNotified(true);
             }
         }
 

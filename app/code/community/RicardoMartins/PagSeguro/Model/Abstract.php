@@ -126,6 +126,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         $payment->save();
         $order->save();
+        $order->sendOrderUpdateEmail($processedState->getIsCustomerNotified(), $message);
 
         Mage::dispatchEvent
         (
