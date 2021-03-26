@@ -193,6 +193,7 @@
 "card %s","cartão %s"
 "edit","editar"
 "Enable 2 cards payment","Habilitar pagamento com dois cartões"
+"Payment with 2 cards only works if the application mode is enabled.","Pagamento com 2 cartões está disponível somente no modelo de aplicação. <a href='//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html' target='_blank'><strong>Autorize sua conta</strong></a> e habilite novamente esta opção."
 "security field with invalid length","código de segurança possui o tamanho incorreto"
 "cvv is mandatory","código de segurança é um campo obrigatório"
 "invalid creditcard brand","bandeira do cartão não identificada"

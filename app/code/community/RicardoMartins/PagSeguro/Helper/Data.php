@@ -217,7 +217,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function isMultiCcEnabled()
     {
-        return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE);
+        return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE) 
+               && $this->getLicenseType() == 'app';
     }
 
     /**
