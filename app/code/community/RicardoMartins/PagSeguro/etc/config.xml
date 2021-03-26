@@ -144,6 +144,15 @@
                 </observers>
             </admin_system_config_changed_section_payment>
         </events>
+        <translate>
+            <modules>
+                <ricardomartins_pagseguro>
+                    <files>
+                        <default>RicardoMartins_PagSeguro.csv</default>
+                    </files>
+                </ricardomartins_pagseguro>
+            </modules>
+        </translate>
     </adminhtml>
     <default>
         <payment>
@@ -185,6 +194,7 @@
                 <jsdelivr_enabled>1</jsdelivr_enabled>
                 <jsdelivr_minify>1</jsdelivr_minify>
                 <updater_enabled>0</updater_enabled>
+                <send_status_change_email>0</send_status_change_email>
             </rm_pagseguro>
             <rm_pagseguro_kiosk>
                 <active>0</active>

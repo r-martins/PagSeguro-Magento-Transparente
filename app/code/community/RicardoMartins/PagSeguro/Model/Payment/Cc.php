@@ -805,7 +805,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     protected function _refundOrder($payment, $notification)
     {
-        // register the transaction status informed by the current notification
+        // registers the transaction status informed by the current notification
         $orderTransaction = $this->_updateOrderTransactionStatus
         (
             $payment, 
@@ -813,7 +813,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $notification->getStatus()
         );
 
-        // register the new refund transaction, based on the current notification
+        // registers the new refund transaction, based on the current notification
         if($orderTransaction)
         {
             $refundTransaction = $this->_registerRemoteRefundTransaction
@@ -830,7 +830,47 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             Mage::register("rm_pagseguro_force_refund_order", true);
         }
 
-        parent::_refundOrder($payment, $notification);
+        $order = $payment->getOrder();
+
+        // unhold order, to allow further actions
+        if($order->canUnhold())
+        {
+            $order->unhold();
+        }
+
+        // in cases that there arent invoices and the order
+        // can be canceled
+        if($order->canCancel())
+        {
+            $order->cancel();
+        }
+        // in cases that there are invoices and the order
+        // must be refunded
+        else if($order->canCreditmemo())
+        {
+            foreach($order->getInvoiceCollection() as $invoice)
+            {
+                $service = Mage::getModel('sales/service_order', $order);
+
+                $creditmemo = $service->prepareInvoiceCreditmemo($invoice);
+                $creditmemo->setRefundRequested(true)
+                        ->setOfflineRequested(false)
+                        ->register();
+
+                Mage::getModel('core/resource_transaction')
+                    ->addObject($creditmemo)
+                    ->addObject($creditmemo->getOrder())
+                    ->addObject($creditmemo->getInvoice())
+                    ->save();
+            }
+        }
+        // for unpredictable situations: if cannot cancel or refund, must 
+        // force the Closed status
+        else
+        {
+            $payment->registerRefundNotification($notification->getGrossAmount());
+            $order->addStatusHistoryComment('Devolvido: o valor foi devolvido ao comprador.');
+        }
     }
 
     /**
@@ -1101,13 +1141,42 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 !in_array($anotherTransaction->getAdditionalInformation("status"), $confirmedStatus)
             ) {
                 $processedState->setStateChanged(false);
-                $processedState->setIsCustomerNotified(true);
+                $processedState->setIsCustomerNotified(false);
             }
         }
 
+        // if is refunding, unsets the 'state changed' flag, because the
+        // change of state must be realized by the credit memo creation
+        if($notification && $notification->getStatus() == self::PS_TRANSACTION_STATUS_REFUNDED)
+        {
+            $processedState->setStateChanged(false);
+            $processedState->setIsCustomerNotified(true);
+        }
+
+        // adds card last 4 digits on comment, to helps on its identification
         if($notification)
         {
-            $processedState->setMessage(sprintf("[Transação %s] %s", $notification->getTransactionId(), $processedState->getMessage()));
+            $last4 = $payment->getCcLast4();
+            
+            $cc1Data = $payment->getAdditionalInformation("cc1");
+            
+            if( $cc1Data && 
+                isset($cc1Data["transaction_id"]) && 
+                $cc1Data["transaction_id"] == $notification->getTransactionId()
+            ) {
+                $last4 = $cc1Data["last4"];
+            }
+
+            $cc2Data = $payment->getAdditionalInformation("cc2");
+            
+            if( $cc2Data && 
+                isset($cc2Data["transaction_id"]) && 
+                $cc2Data["transaction_id"] == $notification->getTransactionId()
+            ) {
+                $last4 = $cc2Data["last4"];
+            }
+
+            $processedState->setMessage(sprintf("[Cartão de final %s] %s", $last4, $processedState->getMessage()));
         }
 
         return $processedState;

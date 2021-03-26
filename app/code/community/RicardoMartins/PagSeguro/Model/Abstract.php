@@ -113,7 +113,8 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
         else
         {
-            $order->addStatusHistoryComment($message);
+            $order->addStatusHistoryComment($message)
+                  ->setIsCustomerNotified($processedState->getIsCustomerNotified());
         }
 
         // registers fee and net amount
@@ -126,7 +127,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         $payment->save();
         $order->save();
-        $order->sendOrderUpdateEmail($processedState->getIsCustomerNotified(), $message);
+
+        // send e-mail to customer with that status change, if is configured to
+        $mustSendMail = Mage::getStoreConfigFlag('payment/rm_pagseguro/send_status_change_email') && 
+                        $processedState->getIsCustomerNotified();
+        $order->sendOrderUpdateEmail($mustSendMail, $message);
 
         Mage::dispatchEvent
         (
@@ -277,7 +282,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 break;
             case self::PS_TRANSACTION_STATUS_REFUNDED:
                 $return->setState(Mage_Sales_Model_Order::STATE_CLOSED);
-                $return->setStateChanged(false);
                 $return->setIsCustomerNotified(false);
                 $return->setIsTransactionPending(false);
                 $return->setMessage('Devolvida: o valor da transação foi devolvido para o comprador.');
@@ -644,49 +648,23 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
     protected function _refundOrder($payment, $notification)
     {
         $order = $payment->getOrder();
-        $remoteAmount = $notification->getGrossAmount();
-
+        
         if($order->canUnhold())
         {
             $order->unhold();
         }
-
-        $orderEffectivellyRefunded = false;
 
         // in cases that there arent invoices and the order
         // can be canceled
         if($order->canCancel())
         {
             $order->cancel();
-
-            $orderEffectivellyRefunded = true;
         }
         // in cases that there are invoices and the order
         // must be refunded
-        else if($order->canCreditmemo())
+        else
         {
-            foreach($order->getInvoiceCollection() as $invoice)
-            {
-                $service = Mage::getModel('sales/service_order', $order);
-
-                $creditmemo = $service->prepareInvoiceCreditmemo($invoice);
-                $creditmemo->setRefundRequested(true)
-                        ->setOfflineRequested(false)
-                        ->register();
-
-                Mage::getModel('core/resource_transaction')
-                    ->addObject($creditmemo)
-                    ->addObject($creditmemo->getOrder())
-                    ->addObject($creditmemo->getInvoice())
-                    ->save();
-            }
-
-            $orderEffectivellyRefunded = true;
-        }
-
-        if(!$orderEffectivellyRefunded)
-        {
-            $payment->registerRefundNotification($remoteAmount);
+            $payment->registerRefundNotification($notification->getGrossAmount());
             $order->addStatusHistoryComment('Devolvido: o valor foi devolvido ao comprador.');
         }
     }
