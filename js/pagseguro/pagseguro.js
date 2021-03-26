@@ -879,7 +879,7 @@ RMPagSeguro_Multicc_Control = Class.create
             return self.forms["cc" + cardIndex]._validateCcNumber(value, elm);
         });
 
-        Validation.add('validate-rm-pagseguro-cc-cid', 'Por favor, averigue o código de segurança do cartão.', function(value, elm)
+        Validation.add('validate-rm-pagseguro-cc-cid', 'Por favor, verifique o código de segurança do cartão.', function(value, elm)
         {
             var cardIndex = $(elm).getAttribute("data-card-index");
             return self.forms["cc" + cardIndex]._validateCcCid(value, elm);

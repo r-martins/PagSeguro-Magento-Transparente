@@ -6,7 +6,7 @@ class RicardoMartins_PagSeguro_Model_System_Config_Backend_ValidateMultiCc
     /**
      * Verifies if the app key is configured to enable 2 cards payment
      */
-    public function _beforeSave()
+    protected function _beforeSave()
     {
         $helper = Mage::helper("ricardomartins_pagseguro");
         $key = $this->_getSavingConfigValue("pagseguropro/key");
@@ -19,7 +19,10 @@ class RicardoMartins_PagSeguro_Model_System_Config_Backend_ValidateMultiCc
                 ($isSandbox && strlen($sandboxKey) <= 6)
             )
         ) {
-            Mage::getSingleton('core/session')->addError($helper->__('This functionality only works if the application mode is enabled.'));
+            Mage::getSingleton('adminhtml/session')->addNotice(
+                __('PagSeguro: Payment with two credit cards is only '
+                . 'available in the application model. Authorize your account for free to enable it.')
+            );
             $this->setValue(0);
         }
 
