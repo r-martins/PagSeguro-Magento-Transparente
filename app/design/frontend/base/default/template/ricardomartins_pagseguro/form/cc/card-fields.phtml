@@ -83,11 +83,12 @@ $_helper = $this->helper('ricardomartins_pagseguro');
                 id="<?php echo $this->getElementId("cid") ?>" 
                 name="<?php echo $this->getFieldName("cid") ?>" 
                 value="" 
-                class="input-text cvv required-entry validate-cc-cvn" 
+                class="input-text cvv required-entry validate-cc-cvn validate-rm-pagseguro-cc-cid" 
                 title="<?php echo $this->__('Card Verification Number') ?>" 
                 maxlength="4"
                 placeholder="***"
                 autocomplete="off"
+                data-card-index="<?php echo $this->getCardIndex() ?>"
                 />
         </div>
         <a href="#" class="cvv-what-is-this"><?php echo $this->__('What is this?') ?></a>

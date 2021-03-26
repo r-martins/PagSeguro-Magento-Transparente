@@ -766,7 +766,7 @@ RMPagSeguro_Multicc_Control = Class.create
         ({
             onCreate: function()
             {
-                alert('a request has been initialized!');
+                alert('a request has been initialized');
             }, 
             onComplete: function()
             {
@@ -877,6 +877,12 @@ RMPagSeguro_Multicc_Control = Class.create
         {
             var cardIndex = $(elm).getAttribute("data-card-index");
             return self.forms["cc" + cardIndex]._validateCcNumber(value, elm);
+        });
+
+        Validation.add('validate-rm-pagseguro-cc-cid', 'Por favor, averigue o código de segurança do cartão.', function(value, elm)
+        {
+            var cardIndex = $(elm).getAttribute("data-card-index");
+            return self.forms["cc" + cardIndex]._validateCcCid(value, elm);
         });
 
         Validation.add('validate-rm-pagseguro-cc-total', 'O valor a ser pago no cartão deve ser maior que zero e menor do que o total do pedido.', function(value, elm)
@@ -1107,7 +1113,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     _addFieldObservers: function()
     {
         // captures the form inputs fulfillments
-        this._addFieldEventListener("total",            "change", function(field){this.setCardData("total", (field.getValue() ? parseFloat(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0));});
+        this._addFieldEventListener("total",            "change", function(field){this.setCardData("total", (field.getValue() ? parseFloat(field.getValue().replaceAll(".", "").replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0));});
         this._addFieldEventListener("number",           "change", function(field){this.setCardData("number", field.getValue().replace(/\D/g,''));});
         this._addFieldEventListener("cid",              "change", function(field){this.setCardData("cid", field.getValue().replace(/\D/g,''));});
         this._addFieldEventListener("expiration_mth",   "change", function(field){this.setCardData("expMonth", field.getValue());});
@@ -1121,6 +1127,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         // masks
         this._addFieldEventListener("total",            "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("total",            "keyup",   this._formatCurrencyInput);
+        this._addFieldEventListener("total",            "blur",    this._formatCurrencyInput);
         this._addFieldEventListener("number",           "keydown", this._disallowNotNumbers);
         this._addFieldEventListener("number",           "keyup",   this._formatCardNumber);
         this._addFieldEventListener("number",           "change",  this._formatCardNumber);
@@ -1210,8 +1217,6 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _consultCardBrandOnPagSeguro: function(field)
     {
-        this._debug("Solicitando bandeira do cartão de crédito");
-
         var fieldValue = field.getValue().replace(/\D/g,'');
         
         // updates only if there are at least 6 digits and
@@ -1220,6 +1225,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
             // adds expiring time to this lock before using it, 
             // because of the PagSeguro lib unreliability
             this._setupSyncLock("brand");
+            this._debug("Solicitando bandeira do cartão de crédito");
 
             PagSeguroDirectPayment.getBrand
             ({
@@ -1319,12 +1325,13 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _createCardTokenOnPagSeguro: function()
     {
-        this._debug("Solicitando token do cartão");
-
         var ccNumberField = this._getFieldElement("number");
+        var ccCidField = this._getFieldElement("cid");
         var ccNumValidation = Validation.get("validate-rm-pagseguro-cc-number");
+        var ccCidValidation = Validation.get("validate-rm-pagseguro-cc-cid");
         
         if( ccNumValidation.test($F(ccNumberField), ccNumberField) && 
+            ccCidValidation.test($F(ccCidField), ccCidField) && 
             !this.requestLocks.token && 
             this.getCardData("brand") && this.getCardData("cid") && 
             this.getCardData("expMonth") && this.getCardData("expYear") )
@@ -1332,6 +1339,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
             // TO DO: add expiring time to this lock before using it, 
             // because of the PagSeguro lib instability
             //this.requestLocks.token = true;
+            this._debug("Solicitando token do cartão");
 
             PagSeguroDirectPayment.createCardToken
             ({
@@ -1356,11 +1364,19 @@ RMPagSeguro_Multicc_CardForm = Class.create
                     var errorsDesc = [];
                     for(var idx in response.errors)
                     {
-                        errorsDesc.push(response.errors[idx]);
+                        errorsDesc.push(Translator.translate(response.errors[idx]));
                     }
-                    this._debug("Token não informado, por erros no cartão: " + errorsDesc.join("; "));
                     
-                    alert("Por favor, reveja os dados do seu cartão.");
+                    var message = "Por favor, reveja os dados do seu cartão, incluindo data e código de segurança.";
+                    
+                    if(errorsDesc.length > 0)
+                    {
+                        message = "Por favor, reveja os dados do seu cartão: " + errorsDesc.join("; ") + ".";
+                    }
+                    
+                    alert(message);
+                    this._debug("Erro na tentativa de obter o token do cartão:");
+                    this._debug(response);
 
                 }).bind(this),
                 complete: (function()
@@ -1564,7 +1580,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _instantReflectTotalInProgressBar: function(field)
     {
-        var value = field.getValue() ? parseFloat(field.getValue().replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0;
+        var value = field.getValue() ? parseFloat(field.getValue().replaceAll(".", "").replace(",", ".").replace(/^\s+|\s+$/g,'')) : 0;
         this._recalcProgressBarFulfillment(value);
     },
 
@@ -1575,12 +1591,17 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _recalcProgressBarFulfillment: function(value)
     {
-        var percent = value * 100 / this.grandTotal;
+        var percent = 100;
         var remainingValue = (this.grandTotal > value)
-                                ? ((value > 0) ? this.grandTotal - value : this.grandTotal)
-                                : 0;
+                                    ? ((value > 0) ? this.grandTotal - value : this.grandTotal)
+                                    : 0;
 
-        this.setCardMetadata("remaining_total", "R$" + remainingValue.toFixed(2).replace(".", ","));
+        if(this.cardIndex == 1)
+        {
+            percent = value * 100 / this.grandTotal;
+        }
+
+        this.setCardMetadata("remaining_total", "R$" + this._formatCurrency(remainingValue * 100));
         this._updateProgressBar(percent);
     },
 
@@ -1753,9 +1774,9 @@ RMPagSeguro_Multicc_CardForm = Class.create
     {
         var field = this._getFieldElement("total");
         
-        if(newValue != field.getValue())
+        if(newValue != field.getValue().replace(",", "."))
         {
-            field.setValue(newValue.toFixed(2).replace(".", ","));
+            field.setValue(this._formatCurrency(newValue * 100));
         }
 
         this._recalcProgressBarFulfillment(newValue);
@@ -2034,29 +2055,66 @@ RMPagSeguro_Multicc_CardForm = Class.create
      */
     _formatCurrencyInput: function(field)
     {
-        var formattedValue = field.getValue().replace(/\D/g,'');
-            
-        while(formattedValue.length > 0 && formattedValue.substring(0, 1) == 0)
+        field.setValue(this._formatCurrency(field.getValue()));
+    },
+
+    /**
+     * Money format
+     * @param String field 
+     * @return String 
+     */
+    _formatCurrency: function(value)
+    {
+        if(typeof value !== "string")
         {
-            formattedValue = formattedValue.substring(1);
+            value = value.toString();
         }
 
-        if(formattedValue.length == 1)
+        var unformattedValue = value.replace(/\D/g,'');
+        var formattedValue = "";
+        
+        // remove zeros on left side
+        while(unformattedValue.length > 0 && unformattedValue.substring(0, 1) == 0)
         {
-            formattedValue = "0,0" + formattedValue;
+            unformattedValue = unformattedValue.substring(1);
         }
-        else if(formattedValue.length == 2)
+
+        if(unformattedValue.length == 0)
         {
-            formattedValue = "0," + formattedValue;
+            return "0,00";
         }
-        else if(formattedValue.length > 2)
+
+        // format decimals separator
+        if(unformattedValue.length == 1)
         {
-            formattedValue = formattedValue.substring(0, formattedValue.length - 2) + 
+            formattedValue = "0,0" + unformattedValue;
+        }
+        else if(unformattedValue.length == 2)
+        {
+            formattedValue = "0," + unformattedValue;
+        }
+        else if(unformattedValue.length > 2)
+        {
+            formattedValue = unformattedValue.substring(0, unformattedValue.length - 2) + 
                              "," + 
-                             formattedValue.substring(formattedValue.length - 2);
+                             unformattedValue.substring(unformattedValue.length - 2);
+        }
+
+        // format thousands separator
+        var separatorIndex = 5;
+        var separatorCounter = 0;
+
+        while(unformattedValue.length > separatorIndex)
+        {
+            formattedValue = formattedValue.substring(0, unformattedValue.length - separatorIndex) +
+                                "." + 
+                                formattedValue.substring(unformattedValue.length - separatorIndex);
+
+            separatorIndex += 3;
+            separatorCounter++;
         }
         
-        field.setValue(formattedValue);
+        return formattedValue;
     },
 
     /**
@@ -2166,6 +2224,23 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
+     * Verifies if the cid is valid, accordingly to PagSeguro validation
+     * @return boolean
+     */
+     _validateCcCid: function(value)
+    {
+        value = value.replace(/\D/g,'');
+
+        if( this.getCardMetadata("cid_size") &&
+            this.getCardMetadata("cid_size") != value.length
+        ) {
+            return false;
+        }
+
+        return true;
+    },
+
+    /**
      * Tests if a number passes the Luhn algorithm test
      * @return boolean
      */
@@ -2194,7 +2269,14 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
     _debug: function(msg)
     {
-        this.parentObj.debug("[Cartao " + this.cardIndex + "] " + msg);
+        if(typeof msg == "string")
+        {
+            this.parentObj.debug("[Cartao " + this.cardIndex + "] " + msg);
+            return;
+        }
+
+        this.parentObj.debug("[Cartao " + this.cardIndex + "]");
+        this.parentObj.debug(msg);
     },
 
     /**
