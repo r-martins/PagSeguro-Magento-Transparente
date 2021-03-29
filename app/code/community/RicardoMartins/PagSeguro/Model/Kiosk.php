@@ -22,8 +22,6 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
     public function createOrderFromNotification($observer)
     {
         $notificationXML = $observer->getKioskNotification()->getNotificationXml();
-
-        $this->getCollection()->addFieldToFilter('temporary_reference', (string)$notificationXML->reference);
         $this->loadByTemporaryReference((string)$notificationXML->reference);
 
         //if order exists
@@ -34,10 +32,9 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         }
 
         //update kiosk order
+        $this->setTemporaryReference((string) $notificationXML->reference);
         $this->setEmail((string)$notificationXML->sender->email);
         $this->setTransactionCode((string)$notificationXML->code);
-Zend_Debug::dump($notificationXML); exit;
-        $productIds = array($this->getProductId());
 
         $quote = Mage::getModel('sales/quote')->setStoreId($this->_store->getId())->setIsKiosk(true);
         $this->loadOrCreateCustomer($notificationXML);
@@ -45,23 +42,35 @@ Zend_Debug::dump($notificationXML); exit;
 
         //Assign customer to a new quote
         $quote->assignCustomer($customer);
-
         $quote->setSendConfirmation(1);
-        foreach ($productIds as $id)
-        {
-            $product = Mage::getModel('catalog/product')->load($id);
-            $quote->addProduct($product, 1);
-        }
 
+        $products = isset($notificationXML->items) ? $notificationXML->items->children() : array();
+        foreach ($products as $item)
+        {
+            $product = Mage::getModel('catalog/product')->load((int) $item->id);
+            $quote->addProduct($product, (int) $item->quantity);
+        }
 
         //assign addresses
         $quote->getBillingAddress()->importCustomerAddress($customer->getDefaultBillingAddress());
-        $quote->getShippingAddress()->importCustomerAddress($customer->getDefaultShippingAddress());
+        $shippingAddress = $quote->getShippingAddress()->importCustomerAddress($customer->getDefaultShippingAddress());
 
+        // collects and set shipping method
+        if(!$quote->isVirtual())
+        {
+            Mage::register("rm_pagseguro_kiosk_order_creation_shipping_data", $notificationXML->shipping);
+            $shippingAddress->setCollectShippingRates(1)
+                            ->collectShippingRates();
+                    
+            $shippingMethod = "rm_pagseguro_kiosk";
+            $rate = $shippingAddress->getShippingRateByCode($shippingMethod);
+            $shippingAddress->setShippingMethod($shippingMethod)
+                            ->setShippingDescription($rate ? $rate->getCarrierTitle() : "");
+        }
+        
         $quote->getPayment()->importData(array('method' => 'rm_pagseguro_kiosk'));
-
         $quote->collectTotals()->save();
-
+        
         //Create order from quote
         $service  = Mage::getModel('sales/service_quote', $quote);
         $service->submitAll();

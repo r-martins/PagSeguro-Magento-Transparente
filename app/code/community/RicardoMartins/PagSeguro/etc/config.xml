@@ -218,6 +218,12 @@
                 <skip_order_review_step>1</skip_order_review_step>
             </paypal_express>-->
         </payment>
+        <carriers>
+            <rm_pagseguro>
+                <active>1</active>
+                <model>ricardomartins_pagseguro/carrier_kiosk</model>
+            </rm_pagseguro>
+        </carriers>
     </default>
     <phpunit>
         <suite>
