@@ -33,16 +33,13 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
         $notificationCode = $this->getRequest()->getPost('notificationCode');
 
         //Workaround for duplicated PagSeguro notifications (Issue #215)
-        // !!! revert this !!!
-        /*
         $exists = Mage::app()->getCache()->load($notificationCode);
         if ($exists) {
             $this->getResponse()->setHttpResponseCode(400);
             $this->getResponse()->setBody('Notificação já enviada a menos de 1 minuto.');
             return;
         }
-        */
-
+        
         Mage::app()->getCache()->save('in_progress', $notificationCode, array('pagseguro_notification'), 60);
 
         /** @var RicardoMartins_PagSeguro_Model_Abstract $model */
