@@ -65,7 +65,8 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
                 $paymentMethod->isMultiCardPayment($payment))
             {
                 $transactionIds = array();
-
+                $payment->setOrder($order);
+                
                 foreach($paymentMethod->getOrderTransactions($payment) as $transaction)
                 {
                     $transactionIds[] = $transaction->getTxnId();
@@ -92,7 +93,7 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
                 try
                 {
                     $processedState = $payment->getMethodInstance()
-                                            ->processStatus((int)$responseXml->status);
+                                              ->processStatus((int)$responseXml->status);
 
                     //if nothing has changed... continue
                     if ($processedState->getState() == $currentState) {
@@ -101,22 +102,24 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
 
                     $this->helper->writeLog(
                         sprintf(
-                            'Updater: Processando atualização do pedido %s (%s).', $order->getIncrementId(),
+                            'Updater: Processando atualização da transacao %s - pedido %s (%s).', 
+                            $transactionId,
+                            $order->getIncrementId(),
                             $processedState->getState()
                         )
                     );
 
         //            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
                     $paymentMethod->proccessNotificatonResult($responseXml);
+
+                    //see \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
+                    Mage::unregister('sales_order_invoice_save_after_event_triggered');
                 }
                 catch(Exception $e)
                 {
                     $this->helper->writeLog('Nao foi possivel concluir a atualizacao. Erro: ' . $e->getMessage());
                 }
             }
-
-            //see \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
-            Mage::unregister('sales_order_invoice_save_after_event_triggered');
         }
 
     }
