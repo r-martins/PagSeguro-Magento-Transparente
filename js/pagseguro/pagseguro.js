@@ -1145,18 +1145,20 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this._addFieldEventListener("installments",     "change", this._updateInstallmentsdata);
         
         // logic data binds
-        this.addCardDataBind("total",           this._consultInstallmentsOnPagSeguro);
-        this.addCardDataBind("total",           this._updateTotalHTMLOnSetValue);
-        this.addCardDataBind("number",          this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("number",          this._updateFormmatedNumberMetadata);
-        //this.addCardDataBind("number",          this._consultInstallmentsOnPagSeguro);
-        this.addCardDataBind("brand",           this._updateBrandOnHTML);
-        this.addCardDataBind("brand",           this._consultInstallmentsOnPagSeguro);
-        this.addCardDataBind("cid",             this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("expMonth",        this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("expYear",         this._createCardTokenOnPagSeguro);
-        this.addCardDataBind("installments",    this._updateInstallmentsMetadata);
-        this.addCardDataBind("token",           this._updateTokenOnHTML);
+        this.addCardDataBind("total",             this._consultInstallmentsOnPagSeguro);
+        this.addCardDataBind("total",             this._updateTotalHTMLOnSetValue);
+        this.addCardDataBind("number",            this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("number",            this._updateFormmatedNumberMetadata);
+        this.addCardDataBind("number",            this._verifyIfCardBinChanged);
+        //this.addCardDataBind("number",            this._consultInstallmentsOnPagSeguro);
+        this.addCardDataBind("brand",             this._updateBrandOnHTML);
+        this.addCardDataBind("brand",             this._consultInstallmentsOnPagSeguro);
+        this.addCardDataBind("cid",               this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("expMonth",          this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("expYear",           this._createCardTokenOnPagSeguro);
+        this.addCardDataBind("installments",      this._updateInstallmentsMetadata);
+        this.addCardDataBind("token",             this._updateTokenOnHTML);
+        this.addCardDataBind("metadata_cid_size", this._updateCidMaskOnHTML);
 
         // triggers fields validation on blur
         this.getHTMLFormInputsAndSelects().each(function(element)
@@ -1275,6 +1277,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
                 complete: (function()
                 {
                     this._removeSyncLock("brand");
+                    this.setCardMetadata("bin_calculated_for", fieldValue.substring(0, 6));
 
                 }).bind(this)
             });
@@ -1283,6 +1286,9 @@ RMPagSeguro_Multicc_CardForm = Class.create
         else if(fieldValue.length < 6)
         {
             this.setCardData("brand", "");
+            this.setCardMetadata("cid_size", "");
+            this.setCardMetadata("validation_algorithm", "");
+            this.setCardMetadata("bin_calculated_for", "");
         }
     },
 
@@ -1793,6 +1799,29 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
+     * Updates the CID field mask
+     * @param string newValue 
+     */
+     _updateCidMaskOnHTML(newValue)
+    {
+        var cidSize = parseInt(newValue);
+        var placeholder = "***";
+
+        if(cidSize > 0)
+        {
+            placeholder = "";
+
+            for(var i = 0; i < cidSize; i++)
+            {
+                placeholder += "*";
+            }
+        }
+
+        // update HTML
+        this._getFieldElement("cid").setAttribute("placeholder", placeholder);
+    },
+
+    /**
      * Splits installments value and updates card data
      * @param DOMElement field 
      */
@@ -1824,6 +1853,21 @@ RMPagSeguro_Multicc_CardForm = Class.create
         if(newValue.length >= 12) { formmatedNumber += "*".repeat(4) + newValue.substring(12); }
         
         this.setCardMetadata("formmated_number", formmatedNumber);
+    },
+
+    /**
+     * Checks if the card bin has changed on card number update
+     * @param String newValue
+     * @param String oldValue
+     */
+     _verifyIfCardBinChanged(newValue, oldValue)
+    {
+        if( newValue.substring(0, 6) != oldValue.substring(0, 6) && 
+            newValue.substring(0, 6) != this.getCardMetadata("bin_calculated_for")
+        ) {
+            this.setCardData("brand", "");
+            this._consultCardBrandOnPagSeguro(this._getFieldElement("number"));
+        }
     },
 
     /**
