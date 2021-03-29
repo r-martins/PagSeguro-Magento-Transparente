@@ -67,10 +67,10 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
             $shippingAddress->setShippingMethod($shippingMethod)
                             ->setShippingDescription($rate ? $rate->getCarrierTitle() : "");
         }
-        
+
         $quote->getPayment()->importData(array('method' => 'rm_pagseguro_kiosk'));
         $quote->collectTotals()->save();
-        
+
         //Create order from quote
         $service  = Mage::getModel('sales/service_quote', $quote);
         $service->submitAll();

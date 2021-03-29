@@ -2,10 +2,14 @@
 
 class RicardoMartins_PagSeguro_Model_Carrier_Kiosk
 	extends Mage_Shipping_Model_Carrier_Abstract
-	// implements Mage_Shipping_Model_Carrier_Interface
 {
 	protected $_code = "rm_pagseguro";
 	
+    /**
+	 * Collects the rate based on shipping data informed on registry
+     * @param Mage_Shipping_Model_Rate_Request $request
+     * @return Mage_Shipping_Model_Rate_Result
+	 **/
 	public function collectRates(Mage_Shipping_Model_Rate_Request $request)
 	{
 		if(!$this->isAvailable())
@@ -33,7 +37,8 @@ class RicardoMartins_PagSeguro_Model_Carrier_Kiosk
 	}
 
 	/**
-	 *
+	 * Enable shipping method only the specific registry is setted
+     * @return Boolean
 	 **/
 	public function isAvailable()
 	{
