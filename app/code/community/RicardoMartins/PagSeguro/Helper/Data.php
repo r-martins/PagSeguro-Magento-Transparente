@@ -51,8 +51,10 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             return $fromCache;
         }
 
-        $useApp = $this->getLicenseType() == 'app';
-
+        $useApp = $this->getLicenseType() == 'app'
+            && !empty(
+                Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_KEY)
+            );
         $url = $this->getWsUrl('sessions', $useApp);
 
         $ch = curl_init($url);
@@ -274,6 +276,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function getLicenseType()
     {
         $key = Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_KEY);
+
         if (!$key || strlen($key) <= 6) {
             return '';
         }
