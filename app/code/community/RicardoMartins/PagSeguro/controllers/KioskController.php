@@ -78,7 +78,7 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
             'itemQuantity1' => (int)$this->getRequest()->getParam('qty', 1),
             'itemDescription1' => substr($product->getName(), 0, 100),
             'itemAmount1' => number_format($product->getFinalPrice(), 2, '.', ''),
-            'shippingAddressRequired' => false,
+            'shippingAddressRequired' => "false",
             'redirectURL' => $successUrl,
             'notificationURL' => Mage::getUrl(
                 'ricardomartins_pagseguro/notification',
