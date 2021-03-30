@@ -33,7 +33,7 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
 
         //update kiosk order
         $this->setTemporaryReference((string) $notificationXML->reference);
-        $this->setEmail((string)$notificationXML->sender->email);
+        $this->setPagseguroEmail((string)$notificationXML->sender->email);
         $this->setTransactionCode((string)$notificationXML->code);
 
         $quote = Mage::getModel('sales/quote')->setStoreId($this->_store->getId())->setIsKiosk(true);
@@ -44,11 +44,11 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         $quote->assignCustomer($customer);
         $quote->setSendConfirmation(1);
 
-        $products = isset($notificationXML->items) ? $notificationXML->items->children() : array();
-        foreach ($products as $item)
+        $productIds = array($this->getProductId());
+        foreach ($productIds as $id)
         {
-            $product = Mage::getModel('catalog/product')->load((int) $item->id);
-            $quote->addProduct($product, (int) $item->quantity);
+            $product = Mage::getModel('catalog/product')->load($id);
+            $quote->addProduct($product, 1);
         }
 
         //assign addresses
@@ -94,7 +94,7 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         //try to load typed customer email
         $customer = Mage::getModel('customer/customer')
             ->setWebsiteId($this->_websiteId)
-            ->loadByEmail($this->getEmail());
+            ->loadByEmail($this->getEmail() ?: $this->getPagseguroEmail());
         if (!$customer->getId()) {
             $pHelper = Mage::helper('ricardomartins_pagseguro/params');
             $name = $pHelper->splitName($notificationXML->sender->name);
@@ -105,7 +105,7 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
             $customer->setData(array(
                'firstname' => $name[0],
                'lastname' => $name[1],
-               'email' => $this->getEmail(),
+               'email' => $this->getEmail() ?: $this->getPagseguroEmail(),
                'password' => uniqid(),
             ))->save();
             /** @var Mage_Customer_Model_Address $address */
