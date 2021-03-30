@@ -68,7 +68,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[No modo de testes, os dados são enviados para sandbox do PagSeguro. Habilite o acesso à Sandbox <a href="https://pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">aqui</a>]]></comment>
+                            <comment><![CDATA[No modo de testes, os dados são enviados para sandbox do PagSeguro. Habilite o acesso à Sandbox <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">aqui</a>]]></comment>
                         </sandbox>
                         <sandbox_merchant_email translate="label">
                             <label>E-mail Sandbox</label>
