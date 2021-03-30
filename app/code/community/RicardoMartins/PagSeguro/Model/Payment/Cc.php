@@ -1183,6 +1183,35 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     }
 
     /**
+     * Searches for transaction and retrieves its status. If is not multi card
+     * payment, just returns the cached info on payment additional information
+     * @param $transactionId
+     * @return String
+     */
+    public function getTransactionStatus($transactionId = null)
+    {
+        if($this->isMultiCardPayment($this->getInfoInstance()))
+        {
+            if(!$transactionId)
+            {
+                throw new Exception("Transaction ID must be informed to consult status of multi card payments");
+            }
+
+            $transaction = $this->getInfoInstance()
+                                ->lookupTransaction($transactionId, Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER);
+
+            if(!$transaction)
+            {
+                throw new Exception("Could not load transaction " . $transactionId);
+            }
+
+            return $transaction->getAdditionalInformation("status");
+        }
+
+        return parent::getTransactionStatus($transactionId);
+    }
+
+    /**
      * Generically get module's config field value
      * @param $field
      *

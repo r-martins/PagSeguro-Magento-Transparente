@@ -58,9 +58,21 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             Mage::throwException('Retorno inválido. Referência do pedido não encontrada.');
         }
 
-        /** @var Mage_Sales_Model_Order $order */
-        $order = $notification->getOrder();
-        $payment = $order->getPayment();
+        $payment = $this->getInfoInstance();
+
+        // tries to get order object from payment method, to get
+        // flags setted on the memory but not persisted yet
+        if($payment->getOrder())
+        {
+            $order = $payment->getOrder();
+        }
+        // otherwise, loads the order from notification data and
+        // reloads payment object from order
+        else
+        {
+            $order = $notification->getOrder();
+            $payment = $order->getPayment();
+        }
 
         // legacy flags and variable updates
         $this->_order = $order;
@@ -69,6 +81,11 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $notification->getTransactionId()
         ) {
             $payment->setAdditionalInformation('transaction_id', $notification->getTransactionId());
+        }
+
+        if($notification->getStatus())
+        {
+            $payment->setAdditionalInformation('transaction_status', $notification->getStatus());
         }
 
         // process order based on returned status
@@ -712,6 +729,17 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         {
             $order->hold();
         }
+    }
+
+    /**
+     * Returns the status info cached in payment additional information
+     * @param $transactionId
+     * @return String
+     */
+    public function getTransactionStatus($transactionId = null)
+    {
+        return $this->getInfoInstance()
+                    ->getAdditionalInformation('transaction_status');
     }
 
     /**

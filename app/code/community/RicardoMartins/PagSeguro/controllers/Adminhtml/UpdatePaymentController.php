@@ -74,22 +74,14 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
                 Mage::throwException('Somente transações via cartão de crédito devem utilizar este método.');
             }
 
-            // loads transaction
-            $transaction = $order->getPayment()->lookupTransaction($transactionId);
-
-            if(!$transaction)
-            {
-                Mage::throwException('Não foi possível carregar a transação para atualizá-la.');
-            }
-
             // consults PagSeguro web services
             $helper = Mage::helper("ricardomartins_pagseguro");
-            $response = $helper->getOrderStatusXML($transaction->getTxnId(), $helper->isSandbox());
+            $response = $helper->getOrderStatusXML($transactionId, $helper->isSandbox());
 
             $helper->writeLog(sprintf
             (
                 "Retorno do Pagseguro para a consulta da transacao %s via controlador da administracao: %s",
-                $transaction->getTxnId(),
+                $transactionId,
                 Mage::helper('core/string')->truncate(@iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $response), 400, '...(continua)'))
             );
 
@@ -109,8 +101,10 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
                 Mage::throwException("Retorno inesperado do PagSeguro. Tente novamente mais tarde ou veja os logs para mais detalhes.");
             }
 
+            $paymentMethodInstance = $order->getPayment()->getMethodInstance();
+
             // verifies if status changed
-            if($notification->getStatus() == $transaction->getAdditionalInformation("status"))
+            if($notification->getStatus() == $paymentMethodInstance->getTransactionStatus($transactionId))
             {
                 Mage::throwException("A situação do pedido permanece a mesma. Nenhuma alteração foi realizada.");
             }
@@ -118,7 +112,7 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
             // proccess returned data
             Mage::unregister('sales_order_invoice_save_after_event_triggered');
             Mage::register('is_pagseguro_updater_session', true);
-            $order->getPayment()->getMethodInstance()->proccessNotificatonResult($notification->getDocument());
+            $paymentMethodInstance->proccessNotificatonResult($notification->getDocument());
             Mage::unregister('is_pagseguro_updater_session');
 
             Mage::getSingleton('adminhtml/session')->addSuccess('Pedido atualizado com sucesso. Veja o último comentário para mais detalhes.');

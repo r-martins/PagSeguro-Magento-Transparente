@@ -92,13 +92,14 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
 
                 try
                 {
-                    $processedState = $payment->getMethodInstance()
-                                              ->processStatus((int)$responseXml->status);
-
                     //if nothing has changed... continue
-                    if ($processedState->getState() == $currentState) {
+                    if($paymentMethod->getTransactionStatus($transactionId) == (string) $responseXml->status)
+                    {
                         continue;
                     }
+
+                    $processedState = $payment->getMethodInstance()
+                                              ->processStatus((int)$responseXml->status);
 
                     $this->helper->writeLog(
                         sprintf(
