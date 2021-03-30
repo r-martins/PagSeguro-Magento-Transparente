@@ -37,7 +37,7 @@ class RicardoMartins_PagSeguro_Model_Carrier_Kiosk
 	}
 
 	/**
-	 * Enables shipping method only the specific registry is setted
+	 * Enables shipping method only if the specific registry is setted
      * @return Boolean
 	 **/
 	public function isAvailable()
