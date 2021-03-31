@@ -52,8 +52,11 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         }
 
         //assign addresses
-        $quote->getBillingAddress()->importCustomerAddress($customer->getDefaultBillingAddress());
-        $shippingAddress = $quote->getShippingAddress()->importCustomerAddress($customer->getDefaultShippingAddress());
+        $defaultBillingAddress = $customer->getDefaultBillingAddress();
+        $defaultShippingAddress = $customer->getDefaultShippingAddress() ?: $defaultBillingAddress;
+
+        $quote->getBillingAddress()->importCustomerAddress($defaultBillingAddress);
+        $shippingAddress = $quote->getShippingAddress()->importCustomerAddress($defaultShippingAddress);
 
         // collects and set shipping method
         if(!$quote->isVirtual())

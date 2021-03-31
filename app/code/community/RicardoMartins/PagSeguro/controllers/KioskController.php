@@ -70,6 +70,11 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
 
         $noSID = $pHelper->isNoSidUrlEnabled();
         $isSandbox = $pHelper->isSandbox() ? '1':'0';
+        $customerHasAddress = $customer->getId() && 
+                              (
+                                  $customer->getDefaultBillingAddress() ||
+                                  $customer->getDefaultShippingAddress()
+                              );
 
         $params = array(
             'reference' => $temporaryReference,
@@ -78,7 +83,7 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
             'itemQuantity1' => (int)$this->getRequest()->getParam('qty', 1),
             'itemDescription1' => substr($product->getName(), 0, 100),
             'itemAmount1' => number_format($product->getFinalPrice(), 2, '.', ''),
-            'shippingAddressRequired' => "false",
+            'shippingAddressRequired' => ($customerHasAddress && $product->isVirtual()) ? "false" : "true",
             'redirectURL' => $successUrl,
             'notificationURL' => Mage::getUrl(
                 'ricardomartins_pagseguro/notification',
