@@ -20,6 +20,7 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
         parent::__construct($request, $response, $invokeArgs);
     }
 
+    /** @OBSOLETE (?) */
     public function indexAction()
     {
         $paymentId = (int)$this->getRequest()->getParam('id');
@@ -59,8 +60,11 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
         return $this->_redirectReferer();
     }
 
-    /** @OBSOLETE Unnused (?) */
+    /** @noinspection PhpUnused */
     /**
+     * Used when clicking on Force Update on some credit card or transaction in the admin
+     * @return RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController
+     */
     public function transactionAction()
     {
         try {
@@ -133,5 +137,5 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
         }
 
         return $this->_redirectReferer();
-    }*/
+    }
 }
