@@ -179,7 +179,6 @@
 "YYYY","AAAA"
 "Year","Ano"
 "Month","Mês"
-"Not applicable","Não aplicável"
 "Pay with 2 cards","Pagar com 2 cartões"
 "Expiry Date","Validade"
 "How much do You want to pay with this card?","Qual valor gostaria de pagar com este cartão?"
@@ -196,3 +195,4 @@
 "invalid date format","data de validade inválida"
 "invalid security field","código de segurança inválido"
 "PagSeguro: Payment with two credit cards is only available in the application model. Authorize your account for free to enable it.","PagSeguro: Pagamento com dois cartões só está disponível no modelo de aplicação. Autorize sua conta gratuitamente."
+"Not applicable","Não aplicável"
