@@ -107,7 +107,8 @@ class RicardoMartins_PagSeguro_KioskController extends Mage_Core_Controller_Fron
             ->save();
 
 
-        $this->_redirectUrl('https://pagseguro.uol.com.br/v2/checkout/payment.html?code=' . $checkoutCode);
+        $sandbox = $isSandbox ? 'sandbox.' : '';
+        $this->_redirectUrl("https://{$sandbox}pagseguro.uol.com.br/v2/checkout/payment.html?code={$checkoutCode}");
 
     }
 

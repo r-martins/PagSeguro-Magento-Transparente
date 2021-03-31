@@ -1,19 +1,25 @@
 <?php
 
-class RicardoMartins_PagSeguro_Model_Carrier_Kiosk
-	extends Mage_Shipping_Model_Carrier_Abstract
+/**
+ * Class RicardoMartins_PagSeguro_Model_Carrier_Kiosk
+ *
+ * @author    Fillipe Dutra
+ * @copyright 2021 Magenteiro
+ */
+class RicardoMartins_PagSeguro_Model_Carrier_Kiosk extends Mage_Shipping_Model_Carrier_Abstract
 {
-	protected $_code = "rm_pagseguro";
-	
+    protected $_code = "rm_pagseguro";
+
     /**
-	 * Collects the rate based on shipping data informed on registry
+     * Collects the rate based on shipping data informed on registry
+     *
      * @param Mage_Shipping_Model_Rate_Request $request
+     *
      * @return Mage_Shipping_Model_Rate_Result
-	 **/
-	public function collectRates(Mage_Shipping_Model_Rate_Request $request)
-	{
-		if(!$this->isAvailable())
-        {
+     **/
+    public function collectRates(Mage_Shipping_Model_Rate_Request $request)
+    {
+        if (!$this->isAvailable()) {
             return false;
         }
 
@@ -36,14 +42,13 @@ class RicardoMartins_PagSeguro_Model_Carrier_Kiosk
 		return $result;
 	}
 
-	/**
-	 * Enables shipping method only if the specific registry is setted
+    /**
+     * Enables shipping method only if the specific registry is setted
+     *
      * @return Boolean
-	 **/
-	public function isAvailable()
-	{
-		return Mage::registry("rm_pagseguro_kiosk_order_creation_shipping_data")
-                    ? true
-                    : false;
-	}
+     **/
+    public function isAvailable()
+    {
+        return Mage::registry("rm_pagseguro_kiosk_order_creation_shipping_data") ? true : false;
+    }
 }
