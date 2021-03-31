@@ -39,6 +39,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON = 'payment/rm_pagseguro/placeorder_button';
     const XML_PATH_JSDELIVR_ENABLED                     = 'payment/rm_pagseguro/jsdelivr_enabled';
     const XML_PATH_JSDELIVR_MINIFY                      = 'payment/rm_pagseguro/jsdelivr_minify';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE  = 'payment/rm_pagseguro_cc/multicc_active';
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -214,6 +215,12 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function isDebugActive()
     {
         return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_DEBUG);
+    }
+
+    public function isMultiCcEnabled()
+    {
+        return Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE) 
+               && $this->getLicenseType() == 'app';
     }
 
     /**
@@ -482,8 +489,19 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        $paymentMethod = $order->getPayment()->getMethod();
-        if ($paymentMethod != 'rm_pagseguro_cc' || Mage::registry('is_pagseguro_updater_session')) {
+        $paymentMethod = $order->getPayment()->getMethodInstance();
+
+        if ($paymentMethod->getCode() != 'rm_pagseguro_cc') {
+            return false;
+        }
+        
+        if (Mage::registry('is_pagseguro_updater_session')) {
+            return false;
+        }
+        
+        if ($paymentMethod->getCode() == 'rm_pagseguro_cc' &&
+            $paymentMethod->isMultiCardPayment($order->getPayment())
+        ) {
             return false;
         }
 
@@ -588,7 +606,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $url = "https://ws.{$sandbox}pagseguro.uol.com.br/v3/transactions/{$transactionCode}/"
             . "?email={$email}&token={$token}";
         if ($isSandbox && $this->getLicenseType() == 'app') {
-            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionCode}/?public_key={$pk}&isSandbox=1";
+            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/"
+                . "{$transactionCode}/?public_key={$pk}&isSandbox=1";
         }
 
         return $this->quickGet($url);
@@ -616,6 +635,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         if (curl_errno($ch)) {
             return false;
         }
+
         curl_close($ch);
         return $response;
     }

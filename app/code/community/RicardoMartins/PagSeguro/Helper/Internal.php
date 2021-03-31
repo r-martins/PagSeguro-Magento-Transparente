@@ -34,7 +34,6 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
      */
     public function getCreditCardApiCallParams(Mage_Sales_Model_Order $order, $payment)
     {
-
         /** @var RicardoMartins_PagSeguro_Helper_Data $helper */
         $helper = Mage::helper('ricardomartins_pagseguro');
 
@@ -43,6 +42,24 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
         /** @var RicardoMartins_PagSeguro_Helper_Params $pHelper */
         $pHelper = Mage::helper('ricardomartins_pagseguro/params'); //params helper - helper auxiliar de parametrização
 
+        $creditCardToken = $helper->isMulticcEnabled() 
+                                ? $payment->getAdditionalInformation("credit_card_token")
+                                : $pHelper->getPaymentHash('credit_card_token');
+        $orderReference = $order->getIncrementId();
+        $extraAmount = $pHelper->getExtraAmount($order);
+
+        // update reference and values, if its multi card transaction
+        if ($ccIdx = $payment->getData("_current_card_index")) {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            $creditCardToken = $cardData["token"];
+            $orderReference = $order->getIncrementId() . "-cc" . $ccIdx;
+            $extraAmount = ($extraAmount = $pHelper->getExtraAmount($order))
+                                ? ($payment->getData("_current_card_total_multiplier") * $extraAmount)
+                                : 0.00;
+            $extraAmount += $pHelper->getMultiCcRoundedAmountError($order);
+            $extraAmount = number_format($extraAmount, 2, ".", "");
+        }
+
         $params = array(
         'email'                 => $helper->getMerchantEmail(),
             'token'             => $helper->getToken(),
@@ -50,9 +67,9 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'paymentMethod'     =>  'creditCard',
             'receiverEmail'     =>  $helper->getMerchantEmail(),
             'currency'          => 'BRL',
-            'creditCardToken'   => $pHelper->getPaymentHash('credit_card_token'),
-            'reference'         => $order->getIncrementId(),
-            'extraAmount'       => $pHelper->getExtraAmount($order),
+            'creditCardToken'   => $creditCardToken,
+            'reference'         => $orderReference,
+            'extraAmount'       => $extraAmount,
             'notificationURL'   => Mage::getUrl(
                 'ricardomartins_pagseguro/notification',
                 array('_secure' => true, '_nosid' => $noSID)
@@ -67,5 +84,4 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
 
         return $params;
     }
-
 }

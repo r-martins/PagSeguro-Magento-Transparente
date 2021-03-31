@@ -1,0 +1,22 @@
+<?php $coreHelper = Mage::helper('core'); ?>
+<strong><?php echo $this->escapeHtml($this->getMethod()->getTitle()) ?> (PagSeguro)</strong>
+<?php if($info = $this->getInfo()): ?>
+    <span><?php echo $this->isSandbox() ? "(Ambiente de Testes)" : ""; ?><br/>
+    
+    <?php if($cc1 = $this->getCc1Data()): ?>
+        <?php echo $this->isMultiCcPayment() ? "<br /><strong>Cartão 1:</strong><br />" : ""; ?>
+        Código da Transação: <?php echo $this->escapeHtml($this->formatTransactionId($cc1->getTransactionId()));?><br/>
+        Bandeira: <?php echo $this->escapeHtml(ucfirst($cc1->getBrand())); ?><br/>
+        Últimos 4 dígitos: <?php echo $this->escapeHtml($cc1->getLast4()); ?><br/>
+        Parcelas: <?php echo $this->escapeHtml($cc1->getInstallmentsQty());?>x <?php echo $coreHelper->formatCurrency($cc1->getInstallmentsValue()); ?><br/>
+    <?php endif; ?>
+
+    <?php if($cc2 = $this->getCc2Data()): ?>
+        <?php echo $this->isMultiCcPayment() ? "<br /><strong>Cartão 2:</strong><br />" : ""; ?>
+        Código da Transação: <?php echo $this->escapeHtml($this->formatTransactionId($cc2->getTransactionId()));?><br/>
+        Bandeira: <?php echo $this->escapeHtml(ucfirst($cc2->getBrand())); ?><br/>
+        Últimos 4 dígitos: <?php echo $this->escapeHtml($cc2->getLast4()); ?><br/>
+        Parcelas: <?php echo $this->escapeHtml($cc2->getInstallmentsQty());?>x <?php echo $coreHelper->formatCurrency($cc2->getInstallmentsValue()); ?><br/>
+    <?php endif; ?>
+
+<?php endif; ?>

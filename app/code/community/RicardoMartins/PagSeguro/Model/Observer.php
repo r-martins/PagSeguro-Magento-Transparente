@@ -1,12 +1,19 @@
 <?php
+/**
+ * Class RicardoMartins_PagSeguro_Model_Observer
+ *
+ * @author    Ricardo Martins <ricardo@magenteiro.com>
+ * @copyright 2021 Magenteiro
+ */
 class RicardoMartins_PagSeguro_Model_Observer
 {
     /**
      * Adiciona o bloco do direct payment logo após um dos forms do pagseguro ter sido inserido.
+     *
      * @param $observer
      *
      * @return $this
-     */
+     * @noinspection PhpUnused*/
     public function addDirectPaymentBlock($observer)
     {
         $pagseguroBlocks = array(
@@ -29,8 +36,10 @@ class RicardoMartins_PagSeguro_Model_Observer
 
     /**
      * Used to display notices and warnings regarding incompatibilities with the saved recurring product and Pagseguro
+     *
      * @param $observer
-     */
+     *
+     * @noinspection PhpUnused*/
     public static function validateRecurringProfile($observer)
     {
         $product = $observer->getProduct();
@@ -79,10 +88,11 @@ class RicardoMartins_PagSeguro_Model_Observer
     /**
      * This will create a new customer and update customer_id in the recurring profile if checkout is METHOD_REGISTER
      * This solves a Magento bug in recurring profiles
+     *
      * @param $observer
      *
      * @throws Exception
-     */
+     * @noinspection PhpUnused*/
     public function updateRecurringCustomerId($observer)
     {
         if (!$observer->getObject() || $observer->getObject()->getResourceName() != 'sales/recurring_profile') {
@@ -132,5 +142,26 @@ class RicardoMartins_PagSeguro_Model_Observer
         $data = array('customer_id' => $customerId);
         $observer->getObject()->setOrderInfo(array_merge($observer->getObject()->getOrderInfo(), $data));
         $observer->getObject()->setCustomerId($customerId);
+    }
+
+    /**
+     * Observes order cancelation to void open transactions
+     */
+    public function voidOrderTransactions($observer)
+    {
+        $order = $observer->getOrder();
+
+        if (!$order) {
+            return;
+        }
+
+        $methodInstance = $order->getPayment()->getMethodInstance();
+
+        // forces void action of the payment method, because its
+        // payment action is order, but it could have open transactions
+        if ($methodInstance
+            && $methodInstance->getCode() == "rm_pagseguro_cc") {
+            $methodInstance->void($order->getPayment());
+        }
     }
 }

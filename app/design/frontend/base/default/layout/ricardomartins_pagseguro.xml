@@ -17,4 +17,12 @@
             </action>
         </reference>
     </ricardomartins_pagseguro_test_standalonecc>
+    <default>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>pagseguro/rm_pagseguro.css</name>
+            </action>
+        </reference>
+    </default>
 </layout>

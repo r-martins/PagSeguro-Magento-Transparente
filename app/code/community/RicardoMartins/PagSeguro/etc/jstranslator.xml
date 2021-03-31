@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<jstranslator>  
+    <rm-pagseguro-js-msg-1 translate="message" module="ricardomartins_pagseguro">
+        <message>security field with invalid length</message>
+    </rm-pagseguro-js-msg-1>
+    <rm-pagseguro-js-msg-2 translate="message" module="ricardomartins_pagseguro">
+        <message>cvv is mandatory</message>
+    </rm-pagseguro-js-msg-2>
+    <rm-pagseguro-js-msg-3 translate="message" module="ricardomartins_pagseguro">
+        <message>invalid creditcard brand</message>
+    </rm-pagseguro-js-msg-3>
+    <rm-pagseguro-js-msg-4 translate="message" module="ricardomartins_pagseguro">
+        <message>creditcard number with invalid length</message>
+    </rm-pagseguro-js-msg-4>
+    <rm-pagseguro-js-msg-5 translate="message" module="ricardomartins_pagseguro">
+        <message>invalid date format</message>
+    </rm-pagseguro-js-msg-5>
+    <rm-pagseguro-js-msg-6 translate="message" module="ricardomartins_pagseguro">
+        <message>invalid security field</message>
+    </rm-pagseguro-js-msg-6>
+</jstranslator> 
