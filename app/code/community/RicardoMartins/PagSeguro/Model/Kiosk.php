@@ -1,4 +1,11 @@
 <?php
+
+/**
+ * Class RicardoMartins_PagSeguro_Model_Kiosk
+ *
+ * @author    Ricardo Martins <ricardo@magenteiro.com>
+ * @copyright 2021 Magenteiro
+ */
 class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
 {
     protected $_websiteId;
@@ -45,8 +52,7 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         $quote->setSendConfirmation(1);
 
         $productIds = array($this->getProductId());
-        foreach ($productIds as $id)
-        {
+        foreach ($productIds as $id) {
             $product = Mage::getModel('catalog/product')->load($id);
             $quote->addProduct($product, 1);
         }
@@ -59,8 +65,7 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
         $shippingAddress = $quote->getShippingAddress()->importCustomerAddress($defaultShippingAddress);
 
         // collects and set shipping method
-        if(!$quote->isVirtual())
-        {
+        if (!$quote->isVirtual()) {
             Mage::register("rm_pagseguro_kiosk_order_creation_shipping_data", $notificationXML->shipping);
             $shippingAddress->setCollectShippingRates(1)
                             ->collectShippingRates();
@@ -93,7 +98,6 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
      */
     protected function loadOrCreateCustomer($notificationXML)
     {
-
         //try to load typed customer email
         $customer = Mage::getModel('customer/customer')
             ->setWebsiteId($this->_websiteId)
@@ -132,10 +136,16 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
             $customer->setConfirmation(null);
             $customer->save();
         }
+
         $this->setCustomerId($customer->getId());
         return $customer;
     }
 
+    /**
+     * @param $temporaryReference
+     *
+     * @return $this|false
+     */
     public function loadByTemporaryReference($temporaryReference)
     {
         $collection = $this->getCollection()
@@ -145,9 +155,15 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
             $this->load($firstItem->getId());
             return $this;
         }
+
         return false;
     }
 
+    /**
+     * @param $orderId
+     *
+     * @return $this|false
+     */
     public function loadByOrderId($orderId)
     {
         $collection = $this->getCollection()
@@ -157,6 +173,7 @@ class RicardoMartins_PagSeguro_Model_Kiosk extends Mage_Core_Model_Abstract
             $this->load($firstItem->getId());
             return $this;
         }
+
         return false;
     }
 }
