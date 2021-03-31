@@ -48,6 +48,8 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
         $info['jsUrl'] = $helper->getModuleJsUrl(true);
         $info['retry_active'] = $helper->isRetryActive();
         $info['updater_active'] = Mage::getStoreConfigFlag('payment/rm_pagseguro/updater_enabled');
+        $info['multicc_active'] = Mage::getStoreConfigFlag('payment/rm_pagseguro_cc/multicc_active');
+        $info['send_status_change_email'] = Mage::getStoreConfigFlag('payment/rm_pagseguro/send_status_change_email');
 
         $modules = array_keys((array)Mage::getConfig()->getNode('modules')->children());
         $coreHelper = Mage::helper('core');
