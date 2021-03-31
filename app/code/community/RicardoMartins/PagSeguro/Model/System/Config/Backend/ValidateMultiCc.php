@@ -1,6 +1,12 @@
 <?php
 
-class RicardoMartins_PagSeguro_Model_System_Config_Backend_ValidateMultiCc 
+/**
+ * Class RicardoMartins_PagSeguro_Model_System_Config_Backend_ValidateMultiCc
+ *
+ * @author    Fillipe Dutra
+ * @copyright 2021 Magenteiro
+ */
+class RicardoMartins_PagSeguro_Model_System_Config_Backend_ValidateMultiCc
     extends Mage_Core_Model_Config_Data
 {
     /**
@@ -8,20 +14,18 @@ class RicardoMartins_PagSeguro_Model_System_Config_Backend_ValidateMultiCc
      */
     protected function _beforeSave()
     {
-        $helper = Mage::helper("ricardomartins_pagseguro");
         $key = $this->_getSavingConfigValue("pagseguropro/key");
         $sandboxKey = $this->_getSavingConfigValue("rm_pagseguro/sandbox_appkey");
         $isSandbox = $this->_getSavingConfigValue("rm_pagseguro/sandbox");
 
-        if( $this->getValue() &&
-            (
-                (!$isSandbox && strlen($key) <= 6) ||
-                ($isSandbox && strlen($sandboxKey) <= 6)
-            )
-        ) {
+        if ($this->getValue()
+            && ((!$isSandbox && strlen($key) <= 6)
+                || ($isSandbox && strlen($sandboxKey) <= 6))) {
             Mage::getSingleton('adminhtml/session')->addNotice(
-                __('PagSeguro: Payment with two credit cards is only '
-                . 'available in the application model. Authorize your account for free to enable it.')
+                __(
+                    'PagSeguro: Payment with two credit cards is only '
+                    . 'available in the application model. Authorize your account for free to enable it.'
+                )
             );
             $this->setValue(0);
         }
@@ -34,13 +38,12 @@ class RicardoMartins_PagSeguro_Model_System_Config_Backend_ValidateMultiCc
      * @param String $path
      * @return String
      */
-    private function _getSavingConfigValue($path)
+    protected function _getSavingConfigValue($path)
     {
         list($group, $field) = explode("/", $path);
         $allData = $this->_getData("groups");
 
-        if(isset($allData[$group]["fields"][$field]["value"]))
-        {
+        if (isset($allData[$group]["fields"][$field]["value"])) {
             return $allData[$group]["fields"][$field]["value"];
         }
 

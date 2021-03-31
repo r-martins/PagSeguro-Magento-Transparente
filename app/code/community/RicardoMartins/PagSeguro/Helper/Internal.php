@@ -46,19 +46,18 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
                                 ? $payment->getAdditionalInformation("credit_card_token")
                                 : $pHelper->getPaymentHash('credit_card_token');
         $orderReference = $order->getIncrementId();
-        $extraAmmount = $pHelper->getExtraAmount($order);
+        $extraAmount = $pHelper->getExtraAmount($order);
 
         // update reference and values, if its multi card transaction
-        if($ccIdx = $payment->getData("_current_card_index"))
-        {
+        if ($ccIdx = $payment->getData("_current_card_index")) {
             $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
             $creditCardToken = $cardData["token"];
             $orderReference = $order->getIncrementId() . "-cc" . $ccIdx;
-            $extraAmmount = ($extraAmmount = $pHelper->getExtraAmount($order))
-                                ? ($payment->getData("_current_card_total_multiplier") * $extraAmmount)
+            $extraAmount = ($extraAmount = $pHelper->getExtraAmount($order))
+                                ? ($payment->getData("_current_card_total_multiplier") * $extraAmount)
                                 : 0.00;
-            $extraAmmount += $pHelper->getMultiCcRoundedAmountError($order);
-            $extraAmmount = number_format($extraAmmount, 2, ".", "");
+            $extraAmount += $pHelper->getMultiCcRoundedAmountError($order);
+            $extraAmount = number_format($extraAmount, 2, ".", "");
         }
 
         $params = array(
@@ -70,7 +69,7 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'currency'          => 'BRL',
             'creditCardToken'   => $creditCardToken,
             'reference'         => $orderReference,
-            'extraAmount'       => $extraAmmount,
+            'extraAmount'       => $extraAmount,
             'notificationURL'   => Mage::getUrl(
                 'ricardomartins_pagseguro/notification',
                 array('_secure' => true, '_nosid' => $noSID)

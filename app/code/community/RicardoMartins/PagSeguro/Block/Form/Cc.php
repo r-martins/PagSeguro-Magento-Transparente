@@ -19,8 +19,7 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
         parent::_construct();
         $this->setTemplate('ricardomartins_pagseguro/form/cc.phtml');
 
-        if($this->helper("ricardomartins_pagseguro")->isMultiCcEnabled())
-        {
+        if ($this->helper("ricardomartins_pagseguro")->isMultiCcEnabled()) {
             $this->setTemplate('ricardomartins_pagseguro/form/multi-cc.phtml');
         }
     }
@@ -72,6 +71,11 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
 
     /**
      * Create card form block and retrieve its HTML
+     *
+     * @param       $cardIndex
+     * @param array $params
+     *
+     * @return mixed
      */
     public function createCardFieldsBlock($cardIndex, $params = array())
     {
@@ -93,8 +97,7 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
      */
     public function getGrandTotal()
     {
-        if(!$this->getData("grand_total"))
-        {
+        if (!$this->getData("grand_total")) {
             $this->setData("grand_total", $this->helper('checkout/cart')->getQuote()->getGrandTotal());
         }
 

@@ -54,22 +54,22 @@ class RicardoMartins_PagSeguro_NotificationController extends Mage_Core_Controll
             Mage::throwException('Falha ao processar retorno XML do PagSeguro.');
         }
 
-        try
-        {
-            $paymentNotification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $response));
+        try {
+            $paymentNotification = Mage::getModel(
+                "ricardomartins_pagseguro/payment_notification", array("document" => $response)
+            );
             $methodInstance = $paymentNotification->getOrder()->getPayment()->getMethodInstance();
 
             $processedResult = $methodInstance->proccessNotificatonResult($response);
 
-            if (false === $processedResult)
-            {
-                throw new Exception("Falha ao processar notificação do PagSeguro. Consulte os logs para mais detalhes.");
+            if (false === $processedResult) {
+                Mage::throwException(
+                    "Falha ao processar notificação do PagSeguro. Consulte os logs para mais detalhes."
+                );
             }
 
             $this->getResponse()->setBody('Notificação recebida para o pedido ' . $paymentNotification->getReference());
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             $this->getResponse()->setBody($e->getMessage());
             $this->getResponse()->setHttpResponseCode(500);
         }

@@ -496,9 +496,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
         
-        if
-        (
-            $paymentMethod->getCode() == 'rm_pagseguro_cc' && 
+        if ($paymentMethod->getCode() == 'rm_pagseguro_cc' &&
             $paymentMethod->isMultiCardPayment($order->getPayment())
         ) {
             return false;
@@ -605,7 +603,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $url = "https://ws.{$sandbox}pagseguro.uol.com.br/v3/transactions/{$transactionCode}/"
             . "?email={$email}&token={$token}";
         if ($isSandbox && $this->getLicenseType() == 'app') {
-            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/{$transactionCode}/?public_key={$pk}&isSandbox=1";
+            $url = "https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/transactions/"
+                . "{$transactionCode}/?public_key={$pk}&isSandbox=1";
         }
 
         return $this->quickGet($url);
@@ -633,6 +632,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         if (curl_errno($ch)) {
             return false;
         }
+
         curl_close($ch);
         return $response;
     }

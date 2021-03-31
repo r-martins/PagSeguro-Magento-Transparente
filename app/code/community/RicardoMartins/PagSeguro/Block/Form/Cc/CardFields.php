@@ -5,7 +5,7 @@
  *
  * @category    RicardoMartins
  * @package     RicardoMartins_PagSeguro
- * @author      Ricardo Martins
+ * @author      Fillipe Dutra
  * @copyright   Copyright (c) 2015 Ricardo Martins (http://r-martins.github.io/PagSeguro-Magento-Transparente/)
  * @license     https://opensource.org/licenses/MIT MIT License
  */
@@ -39,8 +39,7 @@ class RicardoMartins_PagSeguro_Block_Form_Cc_CardFields extends Mage_Core_Block_
      */
     public function getGrandTotal()
     {
-        if(!$this->getData("grand_total"))
-        {
+        if (!$this->getData("grand_total")) {
             $this->setData("grand_total", $this->helper('checkout/cart')->getQuote()->getGrandTotal());
         }
 

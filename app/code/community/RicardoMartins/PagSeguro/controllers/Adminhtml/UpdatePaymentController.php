@@ -59,18 +59,18 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
         return $this->_redirectReferer();
     }
 
+    /** @OBSOLETE Unnused (?) */
+    /**
     public function transactionAction()
     {
-        try
-        {
+        try {
             $transactionId = $this->getRequest()->getParam('transaction_id');
             $orderId = $this->getRequest()->getParam('order_id');
             
             // verifies if its a credit card payment
             $order = Mage::getModel('sales/order')->load($orderId);
 
-            if($order->getPayment()->getMethod() != "rm_pagseguro_cc")
-            {
+            if ($order->getPayment()->getMethod() != "rm_pagseguro_cc") {
                 Mage::throwException('Somente transações via cartão de crédito devem utilizar este método.');
             }
 
@@ -78,34 +78,44 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
             $helper = Mage::helper("ricardomartins_pagseguro");
             $response = $helper->getOrderStatusXML($transactionId, $helper->isSandbox());
 
-            $helper->writeLog(sprintf
-            (
-                "Retorno do Pagseguro para a consulta da transacao %s via controlador da administracao: %s",
-                $transactionId,
-                Mage::helper('core/string')->truncate(@iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $response), 400, '...(continua)'))
+            $helper->writeLog(
+                sprintf(
+                    "Retorno do Pagseguro para a consulta da transacao %s via controlador da administracao: %s",
+                    $transactionId, Mage::helper('core/string')->truncate(
+                    @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $response), 400, '...(continua)'
+                )
+                )
             );
 
             libxml_use_internal_errors(true);
             $xml = simplexml_load_string($response);
             if (!isset($xml->status)) {
-                Mage::getSingleton('adminhtml/session')->addError('Retorno inesperado do PagSeguro. Tente novamente mais tarde ou veja os logs para mais detalhes.');
-                $this->helper->writeLog('Retorno inesperado para atualização manual de pedido. Retorno: ' . var_export($response, true));
+                Mage::getSingleton('adminhtml/session')->addError(
+                    'Retorno inesperado do PagSeguro. Tente novamente mais tarde ou veja os logs para mais detalhes.'
+                );
+                $this->helper->writeLog(
+                    'Retorno inesperado para atualização manual de pedido. Retorno: ' . var_export($response, true)
+                );
                 return $this->_redirectReferer();
             }
 
             $notification = Mage::getModel("ricardomartins_pagseguro/payment_notification", array("document" => $xml));
 
-            if(!$notification->getStatus())
-            {
-                $helper->writeLog("Retorno inesperado para atualização manual de pedido. Retorno: " . var_export($notification->getDocument(), true));
-                Mage::throwException("Retorno inesperado do PagSeguro. Tente novamente mais tarde ou veja os logs para mais detalhes.");
+            if (!$notification->getStatus()) {
+                $helper->writeLog(
+                    "Retorno inesperado para atualização manual de pedido. Retorno: " . var_export(
+                        $notification->getDocument(), true
+                    )
+                );
+                Mage::throwException(
+                    "Retorno inesperado do PagSeguro. Tente novamente mais tarde ou veja os logs para mais detalhes."
+                );
             }
 
             $paymentMethodInstance = $order->getPayment()->getMethodInstance();
 
             // verifies if status changed
-            if($notification->getStatus() == $paymentMethodInstance->getTransactionStatus($transactionId))
-            {
+            if ($notification->getStatus() == $paymentMethodInstance->getTransactionStatus($transactionId)) {
                 Mage::throwException("A situação do pedido permanece a mesma. Nenhuma alteração foi realizada.");
             }
 
@@ -115,13 +125,13 @@ class RicardoMartins_PagSeguro_Adminhtml_UpdatePaymentController extends Mage_Ad
             $paymentMethodInstance->proccessNotificatonResult($notification->getDocument());
             Mage::unregister('is_pagseguro_updater_session');
 
-            Mage::getSingleton('adminhtml/session')->addSuccess('Pedido atualizado com sucesso. Veja o último comentário para mais detalhes.');
-        }
-        catch(Exception $e)
-        {
+            Mage::getSingleton('adminhtml/session')->addSuccess(
+                'Pedido atualizado com sucesso. Veja o último comentário para mais detalhes.'
+            );
+        } catch (Exception $e) {
             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
         }
 
         return $this->_redirectReferer();
-    }
+    }*/
 }

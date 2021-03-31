@@ -121,15 +121,13 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($order->getCustomer(), $payment);
         $phone = $this->_extractPhone($order->getBillingAddress()->getData($this->_getTelephoneAttribute()));
 
-        if($ccIdx = $payment->getData("_current_card_index"))
-        {
+        $holderName = $payment->getAdditionalInformation('credit_card_owner');
+        if ($ccIdx = $payment->getData("_current_card_index")) {
             $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
             $holderName = $cardData["owner"];
         }
-        else
-        {
-            $holderName = $this->removeDuplicatedSpaces($payment['additional_information']['credit_card_owner']);
-        }
+
+        $holderName = $this->removeDuplicatedSpaces($holderName);
 
         $return = array(
             'creditCardHolderName'      => $holderName,
