@@ -2,7 +2,7 @@
 /**
  * Class Updater - Performs automatic updates on pending orders
  *
- * @author    Ricardo Martins <ricardo@magenteiro.com>
+ * @author    Ricardo Martins <ricardo@magenteiro.com> and Fillipe Dutra
  * @copyright 2021 Magenteiro
  */
 class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Model_Abstract
@@ -40,8 +40,7 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
         Mage::register('is_pagseguro_updater_session', true);
 
         /** @var Mage_Sales_Model_Order_Payment $payment */
-        foreach ($payments as $payment)
-        {
+        foreach ($payments as $payment) {
             $currentNextUpdate = $payment->getAdditionalInformation('next_update');
             $now = Mage::getModel('core/date')->gmtDate('Y-m-d H:i:s');
 
@@ -50,39 +49,72 @@ class RicardoMartins_PagSeguro_Model_Updater extends RicardoMartins_PagSeguro_Mo
             $transactionCode = $payment->getAdditionalInformation('transaction_id');
             $order = Mage::getModel('sales/order')->load($payment->getParentId());
             $currentState = $order->getState();
+
             if (($currentNextUpdate && strtotime($currentNextUpdate) > strtotime($now)) || !$transactionCode) {
                 continue;
             }
-
+            
             $payment->setAdditionalInformation('next_update', $nextUpdate)->save();
-
             $isSandbox = strpos($order->getCustomerEmail(), '@sandbox.pagseguro') !== false;
-            $updatedXml = $this->helper->getOrderStatusXML($transactionCode, $isSandbox);
-            libxml_use_internal_errors(true);
-            $updatedXml = simplexml_load_string($updatedXml);
-            if (!isset($updatedXml->status)) {
-                continue;
+
+            $paymentMethod = $payment->getMethodInstance();
+            $transactionIds = array($transactionCode);
+
+            if ($paymentMethod->getCode() == "rm_pagseguro_cc"
+                && $paymentMethod->isMultiCardPayment($payment)) {
+                $transactionIds = array();
+                $payment->setOrder($order);
+
+                foreach ($paymentMethod->getOrderTransactions($payment) as $transaction) {
+                    $transactionIds[] = $transaction->getTxnId();
+                }
             }
-            $processedState = $payment->getMethodInstance()
-                                            ->processStatus((int)$updatedXml->status);
 
-            //if nothing has changed... continue
-            if ($processedState->getState() == $currentState) {
-                continue;
+            foreach ($transactionIds as $transactionId) {
+                $response = $this->helper->getOrderStatusXML($transactionId, $isSandbox);
+
+                $this->helper->writeLog(
+                    sprintf(
+                        "Retorno do Pagseguro para a consulta da transacao %s via updater: %s", $transactionId,
+                        Mage::helper('core/string')->truncate(
+                            @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $response), 400, '...(continua)'
+                        )
+                    )
+                );
+
+                libxml_use_internal_errors(true);
+                $responseXml = simplexml_load_string($response);
+                if (!isset($responseXml->status)) {
+                    continue;
+                }
+
+                try {
+                    //if nothing has changed... continue
+                    if ($paymentMethod->getTransactionStatus($transactionId) == (string)$responseXml->status) {
+                        continue;
+                    }
+
+                    $processedState = $payment->getMethodInstance()
+                                              ->processStatus((int)$responseXml->status);
+
+                    $this->helper->writeLog(
+                        sprintf(
+                            'Updater: Processando atualização da transacao %s - pedido %s (%s).', 
+                            $transactionId,
+                            $order->getIncrementId(),
+                            $processedState->getState()
+                        )
+                    );
+
+        //            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
+                    $paymentMethod->proccessNotificatonResult($responseXml);
+
+                    //see \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
+                    Mage::unregister('sales_order_invoice_save_after_event_triggered');
+                } catch (Exception $e) {
+                    $this->helper->writeLog('Nao foi possivel concluir a atualizacao. Erro: ' . $e->getMessage());
+                }
             }
-
-            $this->helper->writeLog(
-                sprintf(
-                    'Updater: Processando atualização do pedido %s (%s).', $order->getIncrementId(),
-                    $processedState->getState()
-                )
-            );
-
-//            \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
-            $this->proccessNotificatonResult($updatedXml);
-
-            //see \RicardoMartins_PagSeguro_Model_Abstract::proccessNotificatonResult
-            Mage::unregister('sales_order_invoice_save_after_event_triggered');
         }
 
     }

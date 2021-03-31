@@ -1,0 +1,60 @@
+<?php
+/** @var RicardoMartins_PagSeguro_Block_Form_Cc $this */
+$_code = $this->getMethodCode();
+$_helper = $this->helper('ricardomartins_pagseguro');
+$_iwdEnabled = $_helper->isIwdEnabled();
+?>
+
+<ul class="form-list rm-pagseguro-payment-form" id="payment_form_<?php echo $_code ?>" style="<?php echo (!$_iwdEnabled) ? 'display:none;' : ''; ?>">
+    <li class="multi-cc-switch-box">
+        <label class="switch">
+            <input type="checkbox" name="payment[use_two_cards]" id="<?php echo $_code; ?>_switch_use_two_cards" class="validate-rm-pagseguro-multi-cc-enabled" />
+            <span class="slider round"></span>
+        </label>
+        <label for="<?php echo $_code; ?>_switch_use_two_cards"><?php echo __('Pay with 2 cards')?></label>
+    </li>
+
+    <!-- first card form -->
+    <?php echo $this->createCardFieldsBlock(1)->toHtml(); ?>
+
+    <li class="multi-cc-button-box">
+        <div id="advice-validate-rm-pagseguro-multi-cc-enabled-<?php echo $_code; ?>_switch_use_two_cards" class="validation-advice" style="display:none;">
+            Por favor, preencha os dados dos dois cartões antes de concluir o pedido.
+        </div>
+        <button type="button" class="button" id="<?php echo $_code ?>_button_go_to_card_two_form" style="display: none;">
+            <span><span><?php echo $this->__("Go to second card") ?></span></span>
+        </button>
+    </li>
+
+    <!-- second card form -->
+    <?php echo $this->createCardFieldsBlock(2)->toHtml(); ?>
+
+    <!-- payment form footer -->
+    <?php echo $this->getChildHtml() ?>
+
+    <!-- sender hash -->
+    <input type="hidden" name="payment[ps_multicc_sender_hash]" id="rm_pagseguro_multicc_sender_hash" value="" />
+
+    <li>
+        <?php /* O selo do PagSeguro deve ser exibido obrigatoriamente. Você pode escolher outra imagem disponivel na pasta 'selo' */ ?>
+        <div class="selo-pagseguro"><img src="<?php echo $this->getSkinUrl('pagseguro/selo/selo04_200x60.gif');?>" alt="Pagamento processado pelo PagSeguro"/></div>
+    </li>
+	<?php if($_helper->isInfoBrlActive()) : ?>
+	<li>
+		<p class="info-brl">
+			<img src="<?php echo $this->getSkinUrl('pagseguro/selo/brflag.png'); ?>" alt="Bandeira do Brasil" style="float: left">
+			Esta compra está sendo feita no <strong>Brasil</strong>.
+		</p>
+	</li>
+	<?php endif;?>
+    <?php if($_helper->isSandbox()) : ?>
+    <li>
+        <p>&#9888; Transação de Teste - Sandbox Ativo</p>
+    </li>
+    <?php endif;?>
+</ul>
+<script type="text/javascript">
+//<![CDATA[
+    new RMPagSeguro_Multicc_Control("<?php echo $_code ?>", { grandTotal: <?php echo $this->getGrandTotal(); ?> });
+//]]
+</script>

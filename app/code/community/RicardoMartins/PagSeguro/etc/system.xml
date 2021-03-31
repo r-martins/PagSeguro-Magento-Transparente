@@ -33,7 +33,7 @@
                     <comment><![CDATA[Precisa de ajuda? - <a href="//r-martins.github.io/PagSeguro-Magento-Transparente" target="_blank">Site oficial do módulo</a> | <a href="//pagsegurotransparente.zendesk.com/hc/pt-br" target="_blank">Central de Ajuda</a>.<br/> Quer pagar menos taxas? <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/app.html" target="_blank"><strong>Autorize sua conta</strong></a> no modelo de aplicação e receba o módulo PRO gratuitamente no e-mail informado, com suporte a boleto e TEF.<br/>Se você tem taxas menores ainda, e desejar receber o módulo PRO com suporte a boleto e tef sem autorizar a aplicação, <a href="//r-martins.github.io/PagSeguro-Magento-Transparente/pro/" target="_blank">faça uma assinatura</a>.]]></comment>
                     <label>PagSeguro - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>110</sort_order>
+                    <sort_order>1110</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -68,7 +68,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[No modo de testes, os dados são enviados para sandbox do PagSeguro. Habilite o acesso à Sandbox <a href="https://pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">aqui</a>]]></comment>
+                            <comment><![CDATA[No modo de testes, os dados são enviados para sandbox do PagSeguro. Habilite o acesso à Sandbox <a href="//pagseguro.ricardomartins.net.br/sandbox.html" target="_blank">aqui</a>]]></comment>
                         </sandbox>
                         <sandbox_merchant_email translate="label">
                             <label>E-mail Sandbox</label>
@@ -138,11 +138,21 @@
                             <show_in_store>1</show_in_store>
                             <comment><![CDATA[Dispara o e-mail de fatura da loja ao receber a confirmação de pagamento do PagSeguro.]]></comment>
                         </send_invoice_email>
+                        <send_status_change_email>
+                            <label>Enviar e-mail mudança de status?</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>33</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Dispara o e-mail de mudança de status do pedido da loja ao receber notificações relevantes em relação ao pagamento da PagSeguro.]]></comment>
+                        </send_status_change_email>
                         <customer_cpf_attribute>
                             <label>CPF do cliente</label>
                             <frontend_type>select</frontend_type>
                             <source_model>ricardomartins_pagseguro/source_customer_cpf</source_model>
-                            <sort_order>33</sort_order>
+                            <sort_order>34</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
@@ -152,7 +162,7 @@
                             <label>Telefone do cliente</label>
                             <frontend_type>select</frontend_type>
                             <source_model>ricardomartins_pagseguro/source_customer_address_attributes</source_model>
-                            <sort_order>34</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
@@ -286,7 +296,7 @@
                 <rm_pagseguro_cc module="ricardomartins_pagseguro">
                     <label>PagSeguro - Cartão de Crédito - Ricardo Martins</label>
                     <frontend_type>text</frontend_type>
-                    <sort_order>111</sort_order>
+                    <sort_order>1120</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -456,14 +466,24 @@
                                 <allowspecific>1</allowspecific>
                             </depends>
                         </specificcountry>
+                        <multicc_active translate="label,comment" module="Payment">
+                            <label>Enable 2 cards payment</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <backend_model>ricardomartins_pagseguro/system_config_backend_validateMultiCc</backend_model>
+                            <sort_order>220</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Payment with 2 cards only works if the application mode is enabled.]]></comment>
+                        </multicc_active>
                     </fields>
                 </rm_pagseguro_cc>
-
                 <rm_pagseguro_kiosk module="ricardomartins_pagseguro">
                     <label>PagSeguro - Kiosk mode - Ricardo Martins (beta)</label>
                     <comment><![CDATA[Permite realizar um pedido inteiro através de um link único. Saiba mais <a href="//pagsegurotransparente.zendesk.com/hc/pt-br/sections/115000671771" target="_blank">aqui</a>. <br/><strong>Este é um recurso novo, ainda em fase de testes (beta) e pode sofrer alterações significativas nas próximas versões. Teste bem antes de usar.</strong>]]></comment>
                     <frontend_type>text</frontend_type>
-                    <sort_order>113</sort_order>
+                    <sort_order>1140</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
@@ -505,7 +525,7 @@
                     <label>PagSeguro - Pagamento Recorrente (beta) - Ricardo Martins</label>
                     <comment>Certifique-se de ler e entender as condições, requisitos e como utilizar a recorrência no Magento.</comment>
                     <frontend_type>text</frontend_type>
-                    <sort_order>114</sort_order>
+                    <sort_order>1150</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>

@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.11.1</version>
+            <version>3.12.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -57,7 +57,15 @@
                     </update_recurring_customer_id>
                 </observers>
             </core_abstract_save_before>
-
+            <order_cancel_after>
+                <observers>
+                    <rm_ps_void_order_transactions>
+                        <type>model</type>
+                        <class>ricardomartins_pagseguro/observer</class>
+                        <method>voidOrderTransactions</method>
+                    </rm_ps_void_order_transactions>
+                </observers>
+            </order_cancel_after>
         </events>
     </global>
     <frontend>
@@ -136,6 +144,15 @@
                 </observers>
             </admin_system_config_changed_section_payment>
         </events>
+        <translate>
+            <modules>
+                <ricardomartins_pagseguro>
+                    <files>
+                        <default>RicardoMartins_PagSeguro.csv</default>
+                    </files>
+                </ricardomartins_pagseguro>
+            </modules>
+        </translate>
     </adminhtml>
     <default>
         <payment>
@@ -177,6 +194,7 @@
                 <jsdelivr_enabled>1</jsdelivr_enabled>
                 <jsdelivr_minify>1</jsdelivr_minify>
                 <updater_enabled>0</updater_enabled>
+                <send_status_change_email>0</send_status_change_email>
             </rm_pagseguro>
             <rm_pagseguro_kiosk>
                 <active>0</active>

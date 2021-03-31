@@ -50,26 +50,26 @@ NOTE: Regarding styles - if we leave it this way, we'll move it to boxes.css
  */
 ?>
 <label for="<?php echo $this->getFieldId('month')?>" class="required"><em>*</em><?php echo $this->__('Date of Birth') ?></label>
-<div class="input-box customer-dob ps-cc-owner-dob">
+<div class="input-box customer-dob ps-cc-owner-dob" id="<?php echo $this->getFieldId('ps_cc_owner_dob')?>">
 <?php
     $this->setDateInput('d',
         '<div class="dob-day">
-             <input type="text" id="' . $this->getFieldId('day') . '" name="' . $this->getFieldName('day') . '" value="' . $this->getDay() . '" title="' . $this->__('Day') . '" class="input-text validate-custom" ' . $this->getFieldParams() . ' maxlength="2" />
-             <label for="' . $this->getFieldId('day') . '">' . $this->__('DD') . '</label>
+             <input type="tel" id="' . $this->getFieldId('day') . '" name="' . $this->getFieldName('day') . '" value="' . $this->getDay() . '" title="' . $this->__('Day') . '" class="input-text validate-custom" ' . $this->getFieldParams() . ' maxlength="2" />
+             <label for="' . $this->getFieldId('day') . '">' . $this->__('Day') . '</label>
          </div>'
     );
 
     $this->setDateInput('m',
         '<div class="dob-month">
-             <input type="text" id="' . $this->getFieldId('month') . '" name="' . $this->getFieldName('month') . '" value="' . $this->getMonth()  . '" title="' . $this->__('Month')  . '" class="input-text validate-custom" ' . $this->getFieldParams()  . ' maxlength="2"/>
-             <label for="' . $this->getFieldId('month') . '">' . $this->__('MM')  . '</label>
+             <input type="tel" id="' . $this->getFieldId('month') . '" name="' . $this->getFieldName('month') . '" value="' . $this->getMonth()  . '" title="' . $this->__('Month')  . '" class="input-text validate-custom" ' . $this->getFieldParams()  . ' maxlength="2"/>
+             <label for="' . $this->getFieldId('month') . '">' . $this->__('Month')  . '</label>
          </div>'
     );
 
     $this->setDateInput('y',
         '<div class="dob-year">
-             <input type="text" id="' . $this->getFieldId('year') . '" name="' . $this->getFieldName('year') . '" value="' . $this->getYear()  . '" title="' . $this->__('Year')  . '" class="input-text validate-custom" ' . $this->getFieldParams()  . ' maxlength="4"/>
-             <label for="' . $this->getFieldId('year') . '">' . $this->__('YYYY')  . '</label>
+             <input type="tel" id="' . $this->getFieldId('year') . '" name="' . $this->getFieldName('year') . '" value="' . $this->getYear()  . '" title="' . $this->__('Year')  . '" class="input-text validate-custom" ' . $this->getFieldParams()  . ' maxlength="4"/>
+             <label for="' . $this->getFieldId('year') . '">' . $this->__('Year')  . '</label>
          </div>'
     );
 ?>
@@ -82,6 +82,6 @@ NOTE: Regarding styles - if we leave it this way, we'll move it to boxes.css
 </div>
 <script type="text/javascript">
 //<![CDATA[
-    var ps_cc_owner_dob = new Varien.DOB('.ps-cc-owner-dob', 'true', '<?php echo $this->getDateFormat() ?>');
+    var ps_cc_owner_dob = new Varien.DOB('#<?php echo $this->getFieldId('ps_cc_owner_dob')?>', 'true', '<?php echo $this->getDateFormat() ?>');
 //]]>
 </script>
