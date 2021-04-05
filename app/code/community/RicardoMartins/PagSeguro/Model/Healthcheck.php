@@ -50,6 +50,10 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
         if (Mage::getStoreConfigFlag('payment/rm_pagseguro/sandbox') && $keyType == 'app') {
             $this->_errors[] = 'Ambiente de testes (sandbox) não disponível no modelo de aplicação.';
         }*/
+
+        if (Mage::getStoreConfigFlag('payment/rm_pagseguro/sandbox')) {
+            Mage::getSingleton('adminhtml/session')->addNotice('A SandBox PagSeguro está ativada. Ela costuma passar por diversas instabilidades e afetar o funcionamento do módulo. Ao testar, certifique-se que as chamadas feitas ao PagSeguro não encontraram problemas.');
+        }
     }
 
     protected function _checkVersions()
