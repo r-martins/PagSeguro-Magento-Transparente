@@ -75,7 +75,7 @@ class RicardoMartins_PagSeguro_Model_Recurring extends RicardoMartins_PagSeguro_
     {
         //general status (ACTIVE, EXPIRED, etc)
         $additionalInfo = $profile->getAdditionalInfo();
-        $additionalInfo = is_string($additionalInfo) ? Zend_Serializer::unserialize($profile->getAdditionalInfo())
+        $additionalInfo = is_string($additionalInfo) ? unserialize($profile->getAdditionalInfo())
             : $additionalInfo;
         $isSandbox = (isset($additionalInfo['isSandbox']) && $additionalInfo['isSandbox']);
         $currentStatus = $this->getPreApprovalDetails($profile->getReferenceId(), $isSandbox);
