@@ -1,7 +1,16 @@
 <?php
+
+/**
+ * Class RicardoMartins_PagSeguro_Model_Healthcheck
+ * Performs checks when saving pagseguro config to avoid common mistakes
+ *
+ * @author    Ricardo Martins <ricardo@magenteiro.com>
+ * @copyright 2021 Magenteiro
+ */
 class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstract
 {
     protected $_errors = array();
+    protected $_notices = array();
 
     /**
      * @param Varien_Event_Observer $observer
@@ -32,6 +41,12 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
             $msg .= '<br/>- '. implode("<br/>- ", $this->_errors);
             Mage::getSingleton('adminhtml/session')->addError($msg);
         }
+
+        if (count($this->_notices) > 0) {
+            $msg = 'Os seguintes avisos nas configurações do PagSeguro foram encontrados: ';
+            $msg .= '<br/>- '. implode("<br/>- ", $this->_notices);
+            Mage::getSingleton('adminhtml/session')->addNotice($msg);
+        }
     }
 
     protected function _checkToken()
@@ -52,7 +67,9 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
         }*/
 
         if (Mage::getStoreConfigFlag('payment/rm_pagseguro/sandbox')) {
-            Mage::getSingleton('adminhtml/session')->addNotice('A SandBox PagSeguro está ativada. Ela costuma passar por diversas instabilidades e afetar o funcionamento do módulo. Ao testar, certifique-se que as chamadas feitas ao PagSeguro não encontraram problemas.');
+            $this->_notices[] = 'A SandBox PagSeguro está ativada. Ela costuma passar por diversas instabilidades '
+                . 'e afetar o funcionamento do módulo. Ao testar, certifique-se que as chamadas feitas ao PagSeguro '
+                . 'não encontraram problemas.';
         }
     }
 
@@ -87,7 +104,8 @@ class RicardoMartins_PagSeguro_Model_Healthcheck extends Mage_Core_Model_Abstrac
     protected function _checkCurl()
     {
         if (!function_exists('curl_exec')) {
-            $this->_errors[] = 'Não foi possível usar o método curl_exec. Verifique se a biblioteca PHP libcurl está habilitada e instalada.';
+            $this->_errors[] = 'Não foi possível usar o método curl_exec. Verifique se a biblioteca PHP libcurl está '
+                . 'habilitada e instalada.';
         }
     }
 }
