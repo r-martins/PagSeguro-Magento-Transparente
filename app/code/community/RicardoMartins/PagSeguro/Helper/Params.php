@@ -694,7 +694,6 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      *
      * @return bool|string
      * @throws Mage_Core_Model_Store_Exception
-     * @throws Zend_Serializer_Exception
      */
     public function getPaymentHash($param=null)
     {
@@ -708,7 +707,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
            return false;
         }
 
-        $registry = Zend_Serializer::unserialize($registry);
+        $registry = unserialize($registry);
 
         if (null === $param) {
             return $registry;
