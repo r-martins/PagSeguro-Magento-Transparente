@@ -1313,6 +1313,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
 
         this._debug("Solicitando parcelas para o valor de " + this.getCardData("total").toFixed(2));
         this._clearInstallmentsOptions("Consultando demais parcelas na PagSeguro...");
+        this.setCardMetadata("installments_description", "Buscando parcelas na PagSeguro...");
         //this._insert1xInstallmentsOption();
 
         var params =
@@ -1486,6 +1487,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     {
         this._clearInstallmentsOptions("Falha ao obter demais parcelas junto ao pagseguro");
         this._insert1xInstallmentsOption();
+        this._updateInstallmentsMetadata();
         
         console.error('Somente uma parcela será exibida. Erro ao obter parcelas junto ao PagSeguro:');
         console.error(response);
