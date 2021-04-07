@@ -2103,12 +2103,19 @@ RMPagSeguro_Multicc_CardForm = Class.create
     },
 
     /**
-     * Money format
+     * Money format (in cents)
      * @param String field 
      * @return String 
      */
     _formatCurrency: function(value)
     {
+        // ensures that the floating point representation 
+        // will be converted into an integer
+        if(typeof value === "number")
+        {
+            value = value.toFixed(0);
+        }
+
         if(typeof value !== "string")
         {
             value = value.toString();
@@ -2222,7 +2229,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
     _validateTotal: function(value, elm)
     {
         var total = (value != "")
-                ? parseFloat(value.replace(",", ".").replace(/^\s+|\s+$/g,''))
+                ? parseFloat(value.replaceAll(".", "").replace(",", ".").replace(/^\s+|\s+$/g,''))
                 : 0;
 
         if(total <= 0)
