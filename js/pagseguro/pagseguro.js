@@ -1311,14 +1311,14 @@ RMPagSeguro_Multicc_CardForm = Class.create
             return;
         }
 
-        this._debug("Solicitando parcelas para o valor de " + this.getCardData("total"));
+        this._debug("Solicitando parcelas para o valor de " + this.getCardData("total").toFixed(2));
         this._clearInstallmentsOptions("Consultando demais parcelas na PagSeguro...");
         //this._insert1xInstallmentsOption();
 
         var params =
         {
             brand: this.getCardData("brand"),
-            amount: this.getCardData("total"),
+            amount: this.getCardData("total").toFixed(2),
             success: this._populateInstallments.bind(this),
             error: this._populateSafeInstallments.bind(this)
         };
@@ -1417,13 +1417,13 @@ RMPagSeguro_Multicc_CardForm = Class.create
         // redundant verification, beacause of the possibility of callback
         // crossover on PagSeguro lib
         if( remoteInstallments.length > 0 &&
-            this.getCardData("total") != remoteInstallments[0].totalAmount
+            this.getCardData("total").toFixed(2) != remoteInstallments[0].totalAmount
         ) {
             this._debug("Valor das parcelas difere do total do cartão: " + remoteInstallments[0].totalAmount + " | " + this.getCardData("total"));
             return;
         }
 
-        this._debug("Preenchendo as parcelas para o valor de " + this.getCardData("total"));
+        this._debug("Preenchendo as parcelas para o valor de " + this.getCardData("total").toFixed(2));
 
         
         var maxInstallments = this.config.installment_limit;
