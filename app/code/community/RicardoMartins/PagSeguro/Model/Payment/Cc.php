@@ -523,9 +523,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     /**
      * Iterates through objects associated with the order to find and 
      * refund successfully order transactions stored in memory
-     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param Varien_Object $payment
+     * @return Mage_Payment_Model_Abstract
      */
-    public function void($payment)
+    public function void(Varien_Object $payment)
     {
         foreach ($this->getOrderTransactions($payment) as $transaction) {
             $this->_consultOrderTransactionStatus($payment, $transaction);
@@ -546,6 +547,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 $payment->getOrder()->addStatusHistoryComment($e->getMessage());
             }
         }
+
+        return $this;
     }
 
     /**
