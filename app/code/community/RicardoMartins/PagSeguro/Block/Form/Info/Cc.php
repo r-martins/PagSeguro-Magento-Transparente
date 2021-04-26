@@ -166,7 +166,8 @@ class RicardoMartins_PagSeguro_Block_Form_Info_Cc extends Mage_Payment_Block_Inf
      */
     protected function _useNewInfoFormat()
     {
-        return $this->getInfo()->getAdditionalInformation("cc1") != null;
+        $additionalInfo = $this->getInfo()->getAdditionalInformation();
+        return isset($additionalInfo["use_two_cards"]);
     }
 
     /**
