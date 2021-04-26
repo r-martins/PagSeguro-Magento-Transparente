@@ -523,9 +523,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     /**
      * Iterates through objects associated with the order to find and 
      * refund successfully order transactions stored in memory
-     * @param Mage_Sales_Model_Order_Payment $payment
+     * @param Varien_Object $payment
+     * @return Mage_Payment_Model_Abstract
      */
-    public function void($payment)
+    public function void(Varien_Object $payment)
     {
         foreach ($this->getOrderTransactions($payment) as $transaction) {
             $this->_consultOrderTransactionStatus($payment, $transaction);
@@ -546,6 +547,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
                 $payment->getOrder()->addStatusHistoryComment($e->getMessage());
             }
         }
+
+        return $this;
     }
 
     /**
@@ -1093,7 +1096,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             self::PS_TRANSACTION_STATUS_AVAILABLE,
         );
 
-        if ($this->isMultiCardPayment($payment) &&
+        $isMultiCard = $this->isMultiCardPayment($payment);
+        if ($isMultiCard &&
             $notification && 
             in_array($notification->getStatus(), $confirmedStatus)
         ) {
@@ -1117,20 +1121,22 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         if ($notification) {
             $last4 = $payment->getCcLast4();
             
-            $cc1Data = $payment->getAdditionalInformation("cc1");
+            if ($isMultiCard) {
+                $cc1Data = $payment->getAdditionalInformation("cc1");
 
-            if ($cc1Data
-                && isset($cc1Data["transaction_id"])
-                && $cc1Data["transaction_id"] == $notification->getTransactionId()) {
-                $last4 = $cc1Data["last4"];
-            }
+                if ($cc1Data
+                    && isset($cc1Data["transaction_id"])
+                    && $cc1Data["transaction_id"] == $notification->getTransactionId()) {
+                    $last4 = isset($cc1Data["last4"]) ? $cc1Data["last4"] : "";
+                }
 
-            $cc2Data = $payment->getAdditionalInformation("cc2");
+                $cc2Data = $payment->getAdditionalInformation("cc2");
 
-            if ($cc2Data
-                && isset($cc2Data["transaction_id"])
-                && $cc2Data["transaction_id"] == $notification->getTransactionId()) {
-                $last4 = $cc2Data["last4"];
+                if ($cc2Data
+                    && isset($cc2Data["transaction_id"])
+                    && $cc2Data["transaction_id"] == $notification->getTransactionId()) {
+                    $last4 = isset($cc2Data["last4"]) ? $cc2Data["last4"] : "";
+                }
             }
 
             $processedState->setMessage(sprintf("[Cartão de final %s] %s", $last4, $processedState->getMessage()));
