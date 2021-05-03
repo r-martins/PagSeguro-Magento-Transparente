@@ -581,7 +581,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
      *
      * @return mixed
      */
-    private function _getCustomerCpfValue($order, $payment)
+    protected function _getCustomerCpfValue($order, $payment)
     {
         $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
 
@@ -595,23 +595,20 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $attrName = end($cpfAttributeCnf);
         $cpf = '';
         if ($entity && $attrName) {
-            if (!$order->getCustomerIsGuest()) {
-                $address = ($entity == 'customer') ? $order->getShippingAddress() : $order->getBillingAddress();
-                $cpf = $address->getData($attrName);
+            $address = ($entity == 'customer') ? $order->getShippingAddress() : $order->getBillingAddress();
+            $cpf = $address->getData($attrName);
 
-                //if fail,try to get cpf from customer entity
-                if (!$cpf) {
-                    $customer = $order->getCustomer();
-                    $cpf = $customer->getData($attrName);
-                }
+            //if fail,try to get cpf from customer entity
+            if (!$cpf && !$order->getCustomerIsGuest()) {
+                $customer = $order->getCustomer();
+                $cpf = $customer->getData($attrName);
             }
 
             //for guest orders...
-            if (!$cpf && $order->getCustomerIsGuest()) {
+            if (!$cpf) {
                 $cpf = $order->getData($entity . '_' . $attrName);
             }
         }
-
 
         $cpfObj = new Varien_Object(array('cpf'=>$cpf));
 
