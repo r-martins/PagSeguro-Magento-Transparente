@@ -113,7 +113,7 @@ $_helper = $this->helper('ricardomartins_pagseguro');
     <?php echo $this->getDobBlockHtml() ?>
 </li>
 <?php endif ?>
-<?php if($_helper->isCpfVisible()):?>
+<?php if($this->isCpfVisible()):?>
 <li data-field-profile="default" data-card-index="<?php echo $this->getCardIndex() ?>" style="display: none;">
     <label for="<?php echo $this->getElementId("owner_document") ?>" class="required"><em>*</em><?php echo $this->__('Credit Card Owner\'s CPF') ?></label>
     <div class="input-box">

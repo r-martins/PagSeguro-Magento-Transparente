@@ -114,8 +114,11 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     public function getCreditCardHolderParams(Mage_Sales_Model_Order $order, $payment)
     {
         $digits = new Zend_Filter_Digits();
+        $cpf = $digits->filter($this->_getCustomerCpfValue($order, $payment));
 
-        $cpf = $this->_getCustomerCpfValue($order, $payment);
+        if (strlen($cpf) > 11) {
+            $cpf = $digits->filter($this->_getCcFormCpfValue($payment));
+        }
 
         //data
         $creditCardHolderBirthDate = $this->_getCustomerCcDobValue($order->getCustomer(), $payment);
@@ -132,7 +135,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $return = array(
             'creditCardHolderName'      => $holderName,
             'creditCardHolderBirthDate' => $creditCardHolderBirthDate,
-            'creditCardHolderCPF'       => $digits->filter($cpf),
+            'creditCardHolderCPF'       => $cpf,
             'creditCardHolderAreaCode'  => $phone['area'],
             'creditCardHolderPhone'     => $phone['number'],
         );
@@ -582,22 +585,9 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
     {
         $customerCpfAttribute = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
 
-        if (empty($customerCpfAttribute)) //Asked with payment data
-        {
-            if($ccIdx = $payment->getData("_current_card_index"))
-            {
-                $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
-                if (is_array($cardData) && isset($cardData["owner_doc"]))
-                {
-                    return $cardData["owner_doc"];
-                }
-            }
-            else
-            {
-                if (isset($payment['additional_information'][$payment->getMethod() . '_cpf'])) {
-                    return $payment['additional_information'][$payment->getMethod() . '_cpf'];
-                }
-            }
+        // Asked with payment data
+        if (empty($customerCpfAttribute)) {
+            return $this->_getCcFormCpfValue($payment);
         }
 
         $cpfAttributeCnf = explode('|', $customerCpfAttribute);
@@ -636,6 +626,32 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         );
 
         return $cpfObj->getCpf();
+    }
+
+    /**
+     * Returns the value of holder's CPF fulfilled on credit
+     * card form
+     * @param Mage_Payment_Model_Info $payment
+     * @return string
+     */
+    protected function _getCcFormCpfValue($payment)
+    {
+        // multi cc form
+        if ($ccIdx = $payment->getData("_current_card_index")) {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            if (is_array($cardData) && isset($cardData["owner_doc"])) {
+                return $cardData["owner_doc"];
+            }
+        }
+
+        // legacy form
+        $additionalInformation = $payment->getAdditionalInformation();
+
+        if (isset($additionalInformation[$payment->getMethod() . '_cpf'])) {
+            return $additionalInformation[$payment->getMethod() . '_cpf'];
+        }
+
+        return "";
     }
 
 

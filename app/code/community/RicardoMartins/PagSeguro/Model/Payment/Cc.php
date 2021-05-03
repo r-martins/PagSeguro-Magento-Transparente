@@ -110,7 +110,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $info->setAdditionalInformation('credit_card_owner', $data->getPsCcOwner());
 
         //cpf
-        if (Mage::helper('ricardomartins_pagseguro')->isCpfVisible()) {
+        if ($data->getData($this->getCode() . '_cpf')) {
             $info->setAdditionalInformation($this->getCode() . '_cpf', $data->getData($this->getCode() . '_cpf'));
         }
 

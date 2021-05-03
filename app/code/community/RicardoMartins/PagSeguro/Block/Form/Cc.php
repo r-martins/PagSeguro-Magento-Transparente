@@ -103,4 +103,63 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
 
         return $this->getData("grand_total");
     }
+
+    /**
+     * Checks if must show owner document field on form
+     * @return bool
+     */
+    public function isCpfVisible()
+    {
+        $configIsVisible = $this->helper("ricardomartins_pagseguro")->isCpfVisible();
+
+        if (!$configIsVisible) {
+            $digits = new Zend_Filter_Digits();
+            $cpf = $digits->filter($this->getCurrentCustomerDocument());
+
+            if (strlen($cpf) > 11) {
+                return true;
+            }
+        }
+
+        return $configIsVisible;
+    }
+
+    /**
+     * Retrieves the current owner document on checkout
+     * @return string
+     */
+    public function getCurrentCustomerDocument()
+    {
+        $cpfAttConf = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
+
+        if (!$cpfAttConf) {
+            return $this->getInfoData($this->getMethodCode() . "_cpf");
+        }
+
+        $cpfAttConfArray = explode('|', $cpfAttConf);
+        $entity = reset($cpfAttConfArray);
+        $attrName = end($cpfAttConfArray);
+        
+        $quote = $this->getMethod()->getInfoInstance()->getQuote();
+
+        if ($entity && $attrName) {
+            $address = ($entity == 'customer') ? $quote->getShippingAddress() : $quote->getBillingAddress();
+            $cpf = $address->getData($attrName);
+
+            // if fail,try to get cpf from customer entity
+            if (!$cpf) {
+                $customer = $quote->getCustomer();
+                $cpf = $customer->getData($attrName);
+            }
+
+            //for guest orders...
+            if (!$cpf) {
+                $cpf = $quote->getData($entity . '_' . $attrName);
+            }
+
+            return $cpf;
+        }
+
+        return "";
+    }
 }

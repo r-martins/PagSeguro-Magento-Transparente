@@ -87,7 +87,7 @@ $multiCcEnabled = Mage::helper('ricardomartins_pagseguro')->isMultiCcEnabled();
             <?php echo $_dob->toHtml() ?>
         </li>
     <?php endif ?>
-    <?php if(Mage::helper('ricardomartins_pagseguro')->isCpfVisible()):?>
+    <?php if($this->isCpfVisible()):?>
         <li id="<?php echo $_code ?>_cpf_div">
             <label for="<?php echo $_code ?>_cpf" class="required"><em>*</em><?php echo $this->__('Credit Card Owner\'s CPF') ?></label>
             <div class="input-box">

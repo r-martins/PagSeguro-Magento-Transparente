@@ -83,6 +83,41 @@ class RicardoMartins_PagSeguro_Block_Form_Cc_CardFields extends Mage_Core_Block_
     }
 
     /**
+     * Checks if must show owner document field on form
+     * @return bool
+     */
+    public function isCpfVisible()
+    {
+        $configIsVisible = $this->helper("ricardomartins_pagseguro")->isCpfVisible();
+
+        if (!$configIsVisible) {
+            $digits = new Zend_Filter_Digits();
+            $cpf = $digits->filter($this->getCurrentCustomerDocument());
+
+            if (strlen($cpf) > 11) {
+                return true;
+            }
+        }
+
+        return $configIsVisible;
+    }
+
+    /**
+     * Retrieves the current owner document on checkout
+     * @return string
+     */
+    protected function getCurrentCustomerDocument()
+    {
+        $cpfAttConf = Mage::getStoreConfig('payment/rm_pagseguro/customer_cpf_attribute');
+
+        if (!$cpfAttConf) {
+            return $this->getInfoData("owner_document");
+        }
+        
+        return $this->getParentFormBlock()->getCurrentCustomerDocument();
+    }
+
+    /**
      * Get payment method code from parent block
      * @return string
      */
