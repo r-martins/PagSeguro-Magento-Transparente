@@ -156,7 +156,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o CPF do cliente, selecione aqui. Caso contrário escolha "Solicitar junto com os outros dados do pagamento".]]></comment>
+                            <comment><![CDATA[Caso sua loja utilize um atributo personalizado para o CPF do cliente, selecione aqui. Caso contrário escolha "Solicitar junto com os outros dados do pagamento". Caso um CNPJ seja informado no campo mapeado o CPF sempre será solicitado para pagamento com cartão.]]></comment>
                         </customer_cpf_attribute>
                         <address_telephone_attribute>
                             <label>Telefone do cliente</label>
