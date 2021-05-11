@@ -6,7 +6,9 @@
  * @author    Fillipe Dutra
  * @copyright 2021 Magenteiro
  */
-class RicardoMartins_PagSeguro_Model_Carrier_Kiosk extends Mage_Shipping_Model_Carrier_Abstract
+class RicardoMartins_PagSeguro_Model_Carrier_Kiosk
+    extends Mage_Shipping_Model_Carrier_Abstract
+    implements Mage_Shipping_Model_Carrier_Interface
 {
     protected $_code = "rm_pagseguro";
 
@@ -50,5 +52,25 @@ class RicardoMartins_PagSeguro_Model_Carrier_Kiosk extends Mage_Shipping_Model_C
     public function isAvailable()
     {
         return Mage::registry("rm_pagseguro_kiosk_order_creation_shipping_data") ? true : false;
+    }
+
+    /**
+     * Get allowed shipping methods
+     *
+     * @return array
+     */
+    public function getAllowedMethods()
+    {
+        return array();
+    }
+
+    /**
+     * Check if carrier has shipping tracking option available
+     *
+     * @return boolean
+     */
+    public function isTrackingAvailable()
+    {
+        return false;
     }
 }
