@@ -507,8 +507,18 @@ RMPagSeguro_Multicc_Control = Class.create
             checkbox.checked 
                 ? this._enableMultiCc() 
                 : this._disableMultiCc();
+            checkbox.siblings("label.switch").each(function(element) {
+                element.toggleClassName("on");
+            });
             
         }).bind(this));
+
+        // swtich labels click event
+        multiCcSwitch.siblings("label").each(function(element) {
+            element.observe("click", function() {
+                multiCcSwitch.click();
+            })
+        });
 
         // {go to card 2 form} button
         this._getGoToCard2FormButton().observe('click', (function()
