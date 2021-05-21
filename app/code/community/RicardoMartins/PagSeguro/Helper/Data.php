@@ -39,6 +39,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON = 'payment/rm_pagseguro/placeorder_button';
     const XML_PATH_JSDELIVR_ENABLED                     = 'payment/rm_pagseguro/jsdelivr_enabled';
     const XML_PATH_JSDELIVR_MINIFY                      = 'payment/rm_pagseguro/jsdelivr_minify';
+    const XML_PATH_STC_MIRROR                      = 'payment/rm_pagseguro/stc_mirror';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE  = 'payment/rm_pagseguro_cc/multicc_active';
 
     /**
@@ -203,6 +204,14 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     {
         if ($this->isSandbox()) {
             return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_SANDBOX_JS_URL);
+        }
+
+        // we can serve static files from a better CDN. You can always disable this option in the module settings
+        if ($this->isStcMirrorEnabled()) {
+            return str_replace(
+                'stc.pagseguro.uol.com.br', 'stcpagseguro.ricardomartins.net.br',
+                Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_JS_URL)
+            );
         }
 
         return Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_JS_URL);
@@ -445,7 +454,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
                 Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS),
             'installment_limit' => (int)Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT),
             'placeorder_button' => Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON),
-            'loader_url' => Mage::getDesign()->getSkinUrl('pagseguro/ajax-loader.gif', array('_secure'=>true))
+            'loader_url' => Mage::getDesign()->getSkinUrl('pagseguro/ajax-loader.gif', array('_secure'=>true)),
+            'stc_mirror' => $this->isStcMirrorEnabled()
         );
         return json_encode($config);
     }
@@ -638,5 +648,14 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
 
         curl_close($ch);
         return $response;
+    }
+
+    /**
+     * Checks if we should deliver static content from secondary CDN
+     * @return bool
+     */
+    public function isStcMirrorEnabled()
+    {
+        return $this->getLicenseType() == 'app' && Mage::getStoreConfigFlag(self::XML_PATH_STC_MIRROR);
     }
 }

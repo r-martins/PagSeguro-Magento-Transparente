@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.12.4</version>
+            <version>3.12.5</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -193,6 +193,7 @@
                 <exception_request_validate>onestepcheckout/ajax/savePaymentMethod</exception_request_validate>
                 <jsdelivr_enabled>1</jsdelivr_enabled>
                 <jsdelivr_minify>1</jsdelivr_minify>
+                <stc_mirror>1</stc_mirror>
                 <updater_enabled>0</updater_enabled>
                 <send_status_change_email>0</send_status_change_email>
             </rm_pagseguro>

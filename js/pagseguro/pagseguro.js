@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.8.2
+ * @version 3.12.5
  */
 
 RMPagSeguro = Class.create({
@@ -240,11 +240,15 @@ RMPagSeguro = Class.create({
         var ccNum = $$('input[name="payment[ps_cc_number]"]').first().value.replace(/\D/g,'');
         var currentBin = ccNum.substring(0, 6);
         var flag = RMPagSeguroObj.config.flag; //tamanho da bandeira
+        var urlPrefix = 'https://stc.pagseguro.uol.com.br/';
+        if(this.config.stc_mirror){
+            urlPrefix = 'https://stcpagseguro.ricardomartins.net.br/';
+        }
 
         if(ccNum.length >= 6){
             if (typeof RMPagSeguroObj.cardBin != "undefined" && currentBin == RMPagSeguroObj.cardBin) {
                 if(typeof RMPagSeguroObj.brand != "undefined"){
-                    $('card-brand').innerHTML = '<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + RMPagSeguroObj.brand.name + '.png" alt="' + RMPagSeguroObj.brand.name + '" title="' + RMPagSeguroObj.brand.name + '"/>';
+                    $('card-brand').innerHTML = '<img src="' + urlPrefix + 'public/img/payment-methods-flags/' +flag + '/' + RMPagSeguroObj.brand.name + '.png" alt="' + RMPagSeguroObj.brand.name + '" title="' + RMPagSeguroObj.brand.name + '"/>';
                 }
                 return;
             }
@@ -256,7 +260,7 @@ RMPagSeguro = Class.create({
                     $('card-brand').innerHTML = psresponse.brand.name;
                     if(RMPagSeguroObj.config.flag != ''){
 
-                        $('card-brand').innerHTML = '<img src="https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>';
+                        $('card-brand').innerHTML = '<img src="' + urlPrefix + 'public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>';
                     }
                     $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*!/g,'');
                 },
@@ -1745,7 +1749,11 @@ RMPagSeguro_Multicc_CardForm = Class.create
     {
         if(newBrand)
         {
-            var imageUrl = "https://stc.pagseguro.uol.com.br/public/img/payment-methods-flags/68x30/" + newBrand + ".png";
+            var urlPrefix = 'https://stc.pagseguro.uol.com.br/';
+            if (this.config.stc_mirror) {
+                urlPrefix = 'https://stcpagseguro.ricardomartins.net.br/';
+            }
+            var imageUrl = urlPrefix + "/public/img/payment-methods-flags/68x30/" + newBrand + ".png";
             this._getFieldElement("number").setStyle({ "background-image": "url('" + imageUrl + "')" });
             this._getFieldElement("brand").setValue(newBrand);
         }
