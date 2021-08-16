@@ -20,7 +20,7 @@
 <script type="text/javascript" src="../assets/js/layout.core.js"></script>
 <script src="../assets/js/CloudZoom.js?1.0.1489"></script>
 	
-    <title>Download Wizard</title>
+    <title>Autorizar Aplicação Ricardo Martins PagSeguro</title>
 	<link rel="stylesheet" href="../assets/css/style.css?1.0.1489">
 	<script src="../assets/js/script.js?1.0.1489"></script>
     <meta charset="utf-8">
@@ -281,49 +281,178 @@ zE(function() {
 	
 		<div class="data-control-id-2133718 bd-stretchtobottom-2 bd-stretch-to-bottom" data-control-selector=".bd-content-12"><div class="data-control-id-369417 bd-content-12 ">
     
-    <div class="data-control-id-2447777 bd-htmlcontent-15 bd-margins" 
- data-page-id="page.31">
-    <section class="data-control-id-2447808 bd-section-90 bd-tagstyles" id="section90" data-section-title="Section">
+    <div class="data-control-id-2595694 bd-htmlcontent-29 bd-margins" 
+ data-page-id="page.39">
+    <div class="bd-containereffect-49 container-effect container data-control-id-2595750"><section class="data-control-id-2595748 bd-section-101 bd-tagstyles " id="section96" data-section-title="Section">
     <div class="bd-container-inner bd-margins clearfix">
-        <h1 class="data-control-id-2447854 bd-textblock-306 bd-content-element">
-    Escolha sua plataforma para começar
+        <h1 class="data-control-id-2595751 bd-textblock-402 bd-content-element">
+    Autorize a aplicação Ricardo Martins PagSeguro
 </h1>
     </div>
-</section>
+</section></div>
 	
-		<div class="bd-containereffect-21 container-effect container data-control-id-2447890"><div class="data-control-id-2447865 bd-layoutcontainer-51  bd-columns bd-no-margins">
-    <div class="bd-container-inner">
-        <div class="container-fluid">
-            <div class="row 
- bd-row-flex 
- bd-row-align-middle">
-                <div class="data-control-id-2447885 bd-columnwrapper-159 
- col-sm-4">
-    <div class="bd-layoutcolumn-159 bd-column" ><div class="bd-vertical-align-wrapper"><a class="bd-imagelink-113  bd-own-margins data-control-id-2447888"  href="download.html">
-<img class="data-control-id-2447886 bd-imagestyles" src="../assets/images/17bac6bb1d304079c965b2c4f312343e_m1.png"
- alt="Magento 1">
-</a></div></div>
+		<div class="bd-containereffect-48 container-effect container data-control-id-2595736">
+<h3 class="data-control-id-2595734 bd-textblock-401  bd-content-element">
+    Após preencher as informações abaixo, você será redirecionado(a) para o site do PagSeguro, onde poderá logar em sua conta e autorizar a nossa aplicação.
+</h3>
 </div>
 	
-		<div class="data-control-id-2447880 bd-columnwrapper-158 
- col-sm-4">
-    <div class="bd-layoutcolumn-158 bd-column" ><div class="bd-vertical-align-wrapper"><a class="bd-imagelink-112  bd-own-margins data-control-id-2447883"  href="magento2.html">
-<img class="data-control-id-2447881 bd-imagestyles" src="../assets/images/216046ac8aa70cbb5e0fcb1f965fc74b_m2.png"
- alt="Magento 2">
-</a></div></div>
+		<div class="bd-containereffect-47 container-effect container data-control-id-2595733">
+<p class="data-control-id-2595731 bd-textblock-400  bd-content-element">
+    O modelo de recebimento e suas taxas substituirão as taxas e condições que você tem acordado junto ao PagSeguro apenas nas transações realizadas por nossa aplicação.
+</p>
 </div>
 	
-		<div class="data-control-id-2447875 bd-columnwrapper-156 
- col-sm-4">
-    <div class="bd-layoutcolumn-156 bd-column" ><div class="bd-vertical-align-wrapper"><a class="bd-imagelink-111  bd-own-margins data-control-id-2447878"  href="woocommerce.html">
-<img class="data-control-id-2447876 bd-imagestyles" src="../assets/images/03703443143fa46fb5270f395b18b55e_woo_logo.png"
- alt="WooCommerce">
-</a></div></div>
-</div>
-            </div>
-        </div>
+		<section class="data-control-id-2595719 bd-section-100 bd-tagstyles" id="section82" data-section-title="Section">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2595730 bd-customhtml-27 bd-tagstyles">
+    <div class="bd-container-inner bd-content-element">
+        <form id="formAppNew" target="_blank" method="POST" action="https://v7.test/app/new" accept-charset="ISO-8859-1">
+						<table class="table table-stripped table-bordered">
+							<tbody>
+							<tr>
+								<th>
+									Seu nome:
+								</th>
+								<td>
+                                  <input type="text" maxlength="30" size="30" id="name" name="name">
+
+								</td>
+							</tr>
+							<tr>
+								<th>
+									Telefone:
+								</th>
+								<td>
+                                  <input type="tel" maxlenght="30" size="30" id="phone" name="phone">
+								</td>
+							</tr>
+							<tr>
+								<th>* E-mail do responsável:</th>
+								<td>
+                                  <input type="email" size="30" id="email" name="email">
+                                  <small id="email-suggest"></small>
+<small>O e-mail do lojista será pedido no próximo passo, caso não esteja logado no PagSeguro.</small>
+								</td>
+							</tr>
+							<tr>
+								<th>* URL da Loja:
+								</th>
+								<td>
+                                  <input type="url" size="30" id="url" name="url">
+									<small>Essa informação não influencia o funcionamento do módulo. Lembre-se de colocar http:// ou https:// na URL.</small></td>
+							</tr>
+							<tr>
+								<th>* Modelo de recebimento:
+								</th>
+								<td>
+									<select name="app_type" id="app_type" onchange="checkInvite()">
+                                      <!-- <option value="pagseguro-02">Recebimento em 2 dias: 4,99%</option> -->
+										<option value="pagseguro" selected="">Recebimento em 14 dias: 4,15%</option>
+										<option value="pagseguro-30">Recebimento em 30 dias: 3,15%</option>
+                                      <option value="pagseguro-transparente-invisible">Invisível Antecipado (Exige convite)</option>
+                                      <option value="pagseguro-transparente-invisible-fluxo">Invisível no Fluxo (Exige convite)</option>
+                                      <option value="pagseguro-flex-01">Flex 01 (Exige convite)</option>
+									</select><br></td>
+							</tr>
+                              <tr id="inviteRow">
+								<th>
+									Código do Convite:
+								</th>
+								<td>
+                                  <input type="text" size="30" id="invite_code" name="invite_code"> *
+									<br>
+                                  <small>As <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/360035615752" target="_blank">aplicações invisíveis</a> são restritas à convidados no momento.</small></td>
+							</tr>
+
+							<tr>
+								<td colspan="2">
+                                  <input type="button" onclick="validateAndSubmit();" value="Avançar" class="btn btn-cta-primary"></td></tr></tbody></table></form>
+<script type="text/javascript">
+    if(document.URL.search('local') > 0 || document.URL.search('127.0.0.1') > 0){
+    document.getElementById("formAppNew").action = "https://v7.test/app/new";
+    }else{
+      document.getElementById("formAppNew").action = "https://ws.ricardomartins.net.br/pspro/v7/app/new";
+    }
+var validateAndSubmit = function(){
+    var email = document.getElementById("email").value;
+    var url = document.getElementById("url").value;
+    var inviteCode = document.getElementById("invite_code").value;
+    var appType = document.getElementById("app_type").value;
+    if(!validateEmail(email)){alert('Email inválido.'); return false;}
+    if(!validateUrl(url)){alert('URL inválido.'); return false;}
+    if(appType.indexOf('pagseguro-transparente-invisible') >= 0 && inviteCode == ''){alert('Informe o código de convite.'); return false;}
+    document.getElementById("formAppNew").submit();
+}
+var validateEmail = function(email) {
+    var re = new RegExp('(([^<>()[\\]\\\\.,;:\\s@'+'"]+(\\.[^<>()[\\]\\\\.,;:\\s@'+'"]+)*)|(".+"))@'+'((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))');
+    return re.test(email);
+}
+var validateUrl = function(url) {
+    var re = new RegExp("^(?:(?:https?|ftp):\\/\\/)(?:\\S+(?::\\S*)?@'+')?(?:(?!10(?:\\.\\d{1,3}){3})(?!127(?:\\.\\d{1,3}){3})(?!169\\.254(?:\\.\\d{1,3}){2})(?!192\\.168(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))(?::\\d{2,5})?(?:\\/[^\\s]*)?$","i");
+    return re.test(url);
+}
+
+var getUrlVars = function(sParam)
+{
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++) 
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) 
+        {
+            return sParameterName[1];
+        }
+    }
+}
+
+var checkInvite = function()
+{
+ 	 var appType = document.getElementById("app_type").value;
+   	 var inviteRow = document.getElementById("inviteRow");
+  
+  if(jQuery('#app_type').prop('selectedIndex') > 1){
+   	jQuery(inviteRow).show(); 
+  }else{
+       	jQuery(inviteRow).hide();
+  }
+}
+var appVar = getUrlVars('app');
+if(appVar != undefined){
+ jQuery('#app_type').val(appVar); 
+ jQuery('#name').focus();
+}
+</script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/mailcheck/mailcheck/src/mailcheck.min.js"></script>
+<script>
+  var superStringDistance = function(string1, string2) {
+  console.log(string1,string2);
+}
+	var domains = ['gmail.com', 'hotmail.com', 'globo.com', 'live.com', 'uol.com.br', 'bol.com.br', 'terra.com.br', 'msn.com', 'ig.com.br'];
+  var secondLevelDomains = ['hotmail', 'outlook', 'yahoo']
+  var topLevelDomains = ["com", "com.br", "net.br"];
+  jQuery('#email').on('blur', function() {
+  jQuery(this).mailcheck({
+    domains: domains,                       // optional
+    secondLevelDomains: secondLevelDomains, // optional
+    topLevelDomains: topLevelDomains,       // optional
+    //    distanceFunction: superStringDistance,  // optional
+    suggested: function(element, suggestion) {
+      jQuery('#email-suggest').html('Você quis dizer <em>' + suggestion.full + '</em>? Se estiver correto é só prosseguir. <br/>').css('color', '#e63f3f');
+      ga('send', 'event', 'Form Autorizar', 'E-mail errado sugerido', suggestion.domain);
+    },
+    empty: function(element) {
+		jQuery('#email-suggest').html('');
+    }
+  });
+});
+</script>
     </div>
-</div></div>
+</div>
+    </div>
+</section>
 </div>
 </div></div>
 	
