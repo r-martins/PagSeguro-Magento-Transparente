@@ -2,7 +2,7 @@
 
 # Módulo PagSeguro Transparente para Magento 1.x / OpenMage LTS
 ## Com descontos nas taxas oficiais - O mais usado do Brasil
-![Screenshot do módulo](https://user-images.githubusercontent.com/191149/125230947-2c329000-e31d-11eb-8009-d12405f28cd5.png)
+<img src="https://user-images.githubusercontent.com/191149/131599879-b508ef34-8af4-453e-9b2d-3547e1a3e903.jpg" title="Screenshot do módulo com recurso de 2 cartões ativado e usando Fire Checkout" width="85%"/>
 
 
 ## Principais Recursos
@@ -20,6 +20,7 @@
 * [Uso de CDN próprio para maior performance (opcional)](https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/360061203711-Uso-de-CDN-pr%C3%B3prio-para-entrega-de-arquivos-est%C3%A1ticos) <sup>1</sup>
 * [Mapeamento de atributos existentes (CPF, Endereço, etc)](https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/208727606-Como-configuro-os-campos-de-endere%C3%A7o-corretamente-)
 * Restrição por grupos de clientes e/ou países
+* Compatível com módulos OneStepCheckout mais conhecidos (Fire Checkout, One Step Checkout Inovarti, IWD, e outros)
 * Suporte gratuito e eficiente
 * Maior taxa de conversão
 * Mobile friendly
@@ -52,4 +53,4 @@ Caso seu problema não esteja listado na central de ajuda e realmente se tratar 
 https://github.com/r-martins/PagSeguro-Magento-Transparente/issues.
 
 ### Autor
-Ricardo Martins / [Magenteiro.com](https://www.magenteiro.com/?___store=default) / [Contribuidores especiais](https://github.com/r-martins/PagSeguro-Magento-Transparente/pulls?utf8=%E2%9C%93&q=is%3Apr+is%3Amerged)
+Ricardo Martins / [Magenteiro.com](https://www.magenteiro.com/?___store=default) / [Contribuidores especiais](https://github.com/r-martins/PagSeguro-Magento-Transparente/graphs/contributors)
