@@ -87,6 +87,19 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         {
             $payment->setAdditionalInformation('transaction_status', $notification->getStatus());
         }
+        
+        if ($gatewayData = $notification->getGatewayData()) {
+            $payment->setAdditionalInformation('gateway_data', $gatewayData);
+            if (strpos($notification->getReference(), '-cc') !== false) {
+                $ccIdx = $notification->getCcIdx();
+                $currentInfo = $payment->getAdditionalInformation('cc' . $ccIdx);
+                $currentInfo = (!is_array($currentInfo)) ? array() : $currentInfo;
+                $gatewayData = array('gateway_data' => $gatewayData);
+                $payment->setAdditionalInformation('cc' . $ccIdx, array_merge($currentInfo, $gatewayData));
+                $payment->unsAdditionalInformation('gateway_data');
+            }
+        }
+        
 
         // process order based on returned status
         switch($notification->getStatus())

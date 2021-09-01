@@ -379,4 +379,33 @@ class RicardoMartins_PagSeguro_Model_Payment_Notification
         
         return strval($this->_xmlDocument);
     }
+    
+    public function getGatewayData()
+    {
+        $gData = $this->_getNodes('gatewaySystem');
+        if ($gData && $gData[0]) {
+            $data = array();
+            foreach ($gData[0] as $k => $v) {
+                $data[$k] = (string) $v;
+            }
+            return $data;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Returns the Credit card index or 1 is this is not a multi-cc notification (based on reference number)
+     * @return int
+     */
+    public function getCcIdx()
+    {
+        $reference = $this->getReference();
+        $ccStrPos = stripos($reference, '-cc');
+        if (!$ccStrPos) {
+            return 1;
+        }
+        
+        return (int)substr($reference, -1);
+    }
 }

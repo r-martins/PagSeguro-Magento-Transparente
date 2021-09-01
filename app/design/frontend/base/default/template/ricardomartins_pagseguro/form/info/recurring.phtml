@@ -6,6 +6,6 @@
     Últimos 4 dígitos: <?php echo $this->escapeHtml($info->getCcLast4());?>
     <?php if(isset($additional['installment_quantity']) && isset($additional['installment_value'])):?>
         <br/>
-        Parcelas: <?php echo $this->escapeHtml($additional['installment_quantity']);?>x <?php echo Mage::helper('core')->formatCurrency($additional['installment_value']);?>
+        Parcelas: <?php echo $this->escapeHtml($additional['installment_quantity']);?>x R$ <?php echo number_format($additional['installment_value'], 2, ',', '.');?>
     <?php endif;?>
 <?php endif; ?>

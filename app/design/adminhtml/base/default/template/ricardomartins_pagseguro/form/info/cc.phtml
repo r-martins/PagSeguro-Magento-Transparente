@@ -23,15 +23,23 @@
     Últimos 4 dígitos: <?php echo $this->escapeHtml($info->getCcLast4());?>
     <?php if(isset($additional['installment_quantity']) && isset($additional['installment_value'])):?>
         <br/>
-        Parcelas: <?php echo $this->escapeHtml($additional['installment_quantity']);?>x <?php echo Mage::helper('core')->formatCurrency($additional['installment_value']);?>
+        Parcelas: <?php echo $this->escapeHtml($additional['installment_quantity']);?>x R$ <?php echo number_format($additional['installment_value'], 2, ',', '.');?>
     <?php endif;?>
     <?php if(isset($additional['net_amount']) && isset($additional['fee_amount'])):?>
         <br/>
-        Taxa PagSeguro: <?php echo  Mage::helper('core')->formatCurrency($additional['fee_amount']);?>
+        Taxa PagSeguro: R$ <?php echo number_format($additional['fee_amount'], 2, ',', '.');?>
         <br/>
-        Total líquido a receber: <?php echo  Mage::helper('core')->formatCurrency($additional['net_amount']);?>
+        Total líquido a receber: R$ <?php echo  number_format($additional['net_amount'], 2, ',', '.');?>
         <br/>
     <?php endif;?>
+    <?php if(isset($additional['gateway_data']) && $gatewayData = $additional['gateway_data']) :?>
+          <a href="javascript: void(0);" onclick="$('ps-gatewayinfo').toggle()">Exibir/ocultar detalhes da captura/gateway</a><br/>
+          <div id="ps-gatewayinfo" style="font-size: 0.9em; display: none;">
+              <?php foreach($gatewayData as $name => $value) {
+                  echo $name . ': ' . $value . '<br/>';
+              }?>
+          </div>
+    <?php endif; ?>
     <?php if(Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/pagseguro_update') && isset($additional['transaction_id'])): ?>
         <br/>
         <button class="scalable psupdate" title="Forçar atualização" onclick="if(confirm('Você tem certeza?'))setLocation('<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/updatePayment/index', array('id'=>$info->getId()))?>')"><span><span>Forçar atualização</span></span></button>
