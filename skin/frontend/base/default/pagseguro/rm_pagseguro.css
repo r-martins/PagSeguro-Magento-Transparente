@@ -38,6 +38,12 @@
     opacity: 0;
     width: 0;
     height: 0;
+    border: 0;
+}
+
+.rm-pagseguro-payment-form .multi-cc-switch-box .switch input[type="checkbox"]:checked{ /*Firecheckout hacks*/
+    box-shadow: none !important;
+    opacity: 0 !important;
 }
 .rm-pagseguro-payment-form .multi-cc-switch-box .slider
 {
