@@ -9,6 +9,11 @@ $installer = $this;
 $installer->startSetup();
 $tableName = $installer->getTable('ricardomartins_pagseguro/kiosk');
 
+$tableExists = $installer->getConnection()->isTableExists($tableName);
+if ($tableExists) {
+    return $installer->endSetup();
+}
+
 $kioskTable = $installer->getConnection()->newTable($tableName)
     ->addColumn('temporary_order_id', Varien_Db_Ddl_Table::TYPE_INTEGER, 8, array(
         'identity' => true,
