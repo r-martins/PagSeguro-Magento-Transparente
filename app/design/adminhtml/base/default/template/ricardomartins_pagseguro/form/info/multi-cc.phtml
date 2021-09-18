@@ -25,7 +25,7 @@
                   echo $name . ': ' . $value . '<br/>';
               }?>
           </div>
-        <?endif; ?>
+        <?php endif; ?>
     <?php endif; ?>
 
     <?php if($this->isForceUpdateEnabled() && $cc1->getTransactionId()): ?>
@@ -60,7 +60,7 @@
                   echo $name . ': ' . $value . '<br/>';
               }?>
           </div>
-        <?endif; ?>
+        <?php endif; ?>
 
         <?php if($this->isForceUpdateEnabled() && $cc1->getTransactionId()): ?>
             <br />
