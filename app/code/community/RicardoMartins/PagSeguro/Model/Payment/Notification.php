@@ -408,4 +408,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Notification
         
         return (int)substr($reference, -1);
     }
+    
+    public function getPaymentMethodType()
+    {
+        return isset($this->_xmlDocument->paymentMethod->type) ? $this->_xmlDocument->paymentMethod->type : null;
+    }
 }

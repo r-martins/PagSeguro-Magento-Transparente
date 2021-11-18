@@ -298,7 +298,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     ter sido retornada e sem que haja nenhuma disputa aberta.'
                 );
                 $return->setIsCustomerNotified(false);
-                $return->setStateChanged(false);
+                $isPix = $notification->getPaymentMethodType() == '11';
+                $return->setState(Mage_Sales_Model_Order::STATE_PROCESSING);
+                $return->setStateChanged($isPix);
                 $return->setIsTransactionPending(false);
                 break;
             case self::PS_TRANSACTION_STATUS_CONTESTED:
