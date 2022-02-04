@@ -441,9 +441,11 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <tooltip>Use . como separador decimal se necessário.</tooltip>
+                            <tooltip><![CDATA[
+                            Esta configuração permite especificar qual um valor mínimo de parcela onde o vendedor (você) assume os juros. Ao colocar o valor 10 neste campo, um pedido de R$ 100 poderá ser parcelado em até 10x sem juros.
+                            ]]></tooltip>
                             <validate>validate-number validate-not-negative-number</validate>
-                            <comment><![CDATA[Ao especificar um valor, as configurações de promoções feitas em seu painel PagSeguro serão ignoradas.]]></comment>
+                            <comment><![CDATA[Ao especificar um valor, as configurações de promoções feitas em seu painel PagSeguro serão ignoradas. <a href="//bit.ly/34927gh" target="_blank">Saiba mais.</a>]]></comment>
                         </installment_free_interest_minimum_amt>
                         <installments_product>
                             <label>Exibir parcelas na página de produto?</label>

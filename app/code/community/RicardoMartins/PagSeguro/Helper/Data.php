@@ -661,4 +661,17 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return $this->getLicenseType() == 'app' && Mage::getStoreConfigFlag(self::XML_PATH_STC_MIRROR);
     }
+
+    public function getMaxInstallmentsNoInterest($amount)
+    {
+        $freeAmt = Mage::getStoreConfig(
+            self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT
+        );
+        $selectedMaxInstallmentNoInterest = $freeAmt === 0 ? : '';
+        if ($freeAmt > 0) {
+            $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
+            $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
+        }
+        return $selectedMaxInstallmentNoInterest;
+    }
 }

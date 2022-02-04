@@ -8,6 +8,7 @@ $_maxInstallments = (int)Mage::getStoreConfig(
 $_installmentsFreeOnly = (int)Mage::getStoreConfig(
     RicardoMartins_PagSeguro_Helper_Data::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_INTEREST_FREE_ONLY
 );
+$_maxInstallmentNoInterest = $_helper->getMaxInstallmentsNoInterest($_price);
 ?>
 
 <div id="rmpagseguro_parcelas_box">
@@ -28,9 +29,12 @@ $_installmentsFreeOnly = (int)Mage::getStoreConfig(
 
     })
     var updateInstallments = function() {
+        var maxInstallmentNoInterest = "<?php echo $_maxInstallmentNoInterest?>";
+        
         PagSeguroDirectPayment.getInstallments({
             amount: <?php echo $_price?>,
             brand: 'visa',
+            maxInstallmentNoInterest: maxInstallmentNoInterest,
             success: function (response) {
                 var responseVisa = response.installments.visa;
                 var maxInstallmentsConfig = <?php echo $_maxInstallments ?>;

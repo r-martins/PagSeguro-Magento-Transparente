@@ -1251,7 +1251,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             null, 'pagseguro.log', true
         );
         
-        $selectedMaxInstallmentNoInterest = $this->getMaxInstallmentsNoInterest($amount);
+        $selectedMaxInstallmentNoInterest = $this->_helper->getMaxInstallmentsNoInterest($amount);
         
         $installmentValue = $this->getInstallmentValue(
             $amount, $payment->getCcType(), $payment->getAdditionalInformation('installment_quantity'),
@@ -1268,16 +1268,4 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
     }
     
-    public function getMaxInstallmentsNoInterest($amount)
-    {
-        $freeAmt = Mage::getStoreConfig(
-            RicardoMartins_PagSeguro_Helper_Data::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT
-        );
-        $selectedMaxInstallmentNoInterest = $freeAmt === 0 ? : '';
-        if ($freeAmt > 0) {
-            $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
-            $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
-        }
-        return $selectedMaxInstallmentNoInterest;
-    }
 }
