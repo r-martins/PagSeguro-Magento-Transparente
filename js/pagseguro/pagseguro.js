@@ -2,7 +2,7 @@
  * PagSeguro Transparente para Magento
  * @author Ricardo Martins <ricardo@ricardomartins.net.br>
  * @link https://github.com/r-martins/PagSeguro-Magento-Transparente
- * @version 3.12.5
+ * @version 3.15.0
  */
 
 RMPagSeguro = Class.create({
@@ -66,6 +66,7 @@ RMPagSeguro = Class.create({
         return true;
     },
 
+    //used when multicc is DISABLED
     getInstallments: function(grandTotal, selectedInstallment){
         var brandName = "";
         if(typeof RMPagSeguroObj.brand == "undefined"){
@@ -76,15 +77,21 @@ RMPagSeguro = Class.create({
             return;
         }
         this.grandTotal = grandTotal;
-        brandName = RMPagSeguroObj.brand.name;
 
+        brandName = RMPagSeguroObj.brand.name;
         var parcelsDrop = $('rm_pagseguro_cc_cc_installments');
         if(!selectedInstallment && parcelsDrop.value != ""){
             selectedInstallment = parcelsDrop.value.split('|').first();
         }
+        var maxInstallmentNoInterest = RMPagSeguroObj.config.installment_free_interest_minimum_amt === "0" ? 0 : "";
+        if (RMPagSeguroObj.config.installment_free_interest_minimum_amt > 0) {
+            maxInstallmentNoInterest = grandTotal / RMPagSeguroObj.config.installment_free_interest_minimum_amt;
+            maxInstallmentNoInterest = Math.floor(maxInstallmentNoInterest);
+        }
         PagSeguroDirectPayment.getInstallments({
             amount: grandTotal,
             brand: brandName,
+            maxInstallmentNoInterest: maxInstallmentNoInterest,
             success: function(response) {
                 for(installment in response.installments) break;
 //                       console.log(response.installments);
@@ -1320,12 +1327,19 @@ RMPagSeguro_Multicc_CardForm = Class.create
         this.setCardMetadata("installments_description", "Buscando parcelas na PagSeguro...");
         //this._insert1xInstallmentsOption();
 
+        var maxInstallmentNoInterest = this.config.installment_free_interest_minimum_amt === "0" ? 0 : "";
+        if (this.config.installment_free_interest_minimum_amt > 0) {
+            maxInstallmentNoInterest = this.getCardData("total").toFixed(2) / this.config.installment_free_interest_minimum_amt;
+            maxInstallmentNoInterest = Math.floor(maxInstallmentNoInterest);
+        }
+
         var params =
         {
             brand: this.getCardData("brand"),
             amount: this.getCardData("total").toFixed(2),
             success: this._populateInstallments.bind(this),
-            error: this._populateSafeInstallments.bind(this)
+            error: this._populateSafeInstallments.bind(this),
+            maxInstallmentNoInterest: maxInstallmentNoInterest
         };
 
         this.parentObj.queuePSCall("getInstallments", params);

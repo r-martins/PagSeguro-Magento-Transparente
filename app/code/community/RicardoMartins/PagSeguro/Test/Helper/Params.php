@@ -18,6 +18,12 @@ class RicardoMartins_PagSeguro_Test_Helper_Params extends EcomDev_PHPUnit_Test_C
 
     }
 
+    
+    public function testGetMaxInstallmentsNoInterest()
+    {
+        $cc = Mage::getModel('ricardomartins_pagseguro/payment_cc');
+        $this->assertEquals('1','2');
+    }
     //@TODO Improve it
     protected function getItemData1()
     {

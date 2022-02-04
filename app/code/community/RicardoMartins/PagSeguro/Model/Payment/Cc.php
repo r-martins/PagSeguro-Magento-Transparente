@@ -326,7 +326,7 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         
         // call API
         $returnXml = $this->callApi($params, $payment);
-
+        
         // creates Magento transactions
         $transaction = $this->_createOrderTransaction($payment, $amount, $ccIdx, $returnXml);
 
@@ -1199,8 +1199,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $maxInstallmentNoInterest = null
     ) {
         $amount = number_format($amount, 2, '.', '');
+        $sandbox = $this->_helper->isSandbox() ? 'sandbox.' : '';
         $sessionId = $this->_helper->getSessionId();
-        $url = "https://pagseguro.uol.com.br/checkout/v2/installments.json?sessionId=$sessionId&amount=$amount";
+        $url = "https://{$sandbox}pagseguro.uol.com.br/checkout/v2/installments.json?sessionId=$sessionId&amount=$amount";
         $url .= "&creditCardBrand=$creditCardBrand";
         $url .= ($maxInstallmentNoInterest) ? "&maxInstallmentNoInterest=$maxInstallmentNoInterest" : "";
 
@@ -1249,8 +1250,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             . 'As parcelas serão recalculadas e uma nova tentativa será realizada.',
             null, 'pagseguro.log', true
         );
-
-        $selectedMaxInstallmentNoInterest = null; //not implemented
+        
+        $selectedMaxInstallmentNoInterest = $this->getMaxInstallmentsNoInterest($amount);
+        
         $installmentValue = $this->getInstallmentValue(
             $amount, $payment->getCcType(), $payment->getAdditionalInformation('installment_quantity'),
             $selectedMaxInstallmentNoInterest
@@ -1264,5 +1266,18 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
+    }
+    
+    public function getMaxInstallmentsNoInterest($amount)
+    {
+        $freeAmt = Mage::getStoreConfig(
+            RicardoMartins_PagSeguro_Helper_Data::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT
+        );
+        $selectedMaxInstallmentNoInterest = $freeAmt === 0 ? : '';
+        if ($freeAmt > 0) {
+            $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
+            $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
+        }
+        return $selectedMaxInstallmentNoInterest;
     }
 }
