@@ -35,6 +35,8 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT  = 'payment/rm_pagseguro_cc/installment_limit';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_INTEREST_FREE_ONLY =
         'payment/rm_pagseguro_cc/installments_product_interestfree_only';
+    const XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT =
+        'payment/rm_pagseguro_cc/installment_free_interest_minimum_amt';
     const XML_PATH_PAYMENT_PAGSEGURO_NOTIFICATION_URL_NOSID= 'payment/rm_pagseguro/notification_url_nosid';
     const XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON = 'payment/rm_pagseguro/placeorder_button';
     const XML_PATH_JSDELIVR_ENABLED                     = 'payment/rm_pagseguro/jsdelivr_enabled';
@@ -453,6 +455,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             'force_installments_selection' =>
                 Mage::getStoreConfigFlag(self::XML_PATH_PAYMENT_PAGSEGURO_CC_FORCE_INSTALLMENTS),
             'installment_limit' => (int)Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_LIMIT),
+            'installment_free_interest_minimum_amt' => Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT),
             'placeorder_button' => Mage::getStoreConfig(self::XML_PATH_PAYMENT_PAGSEGURO_PLACEORDER_BUTTON),
             'loader_url' => Mage::getDesign()->getSkinUrl('pagseguro/ajax-loader.gif', array('_secure'=>true)),
             'stc_mirror' => $this->isStcMirrorEnabled()
@@ -657,5 +660,18 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     public function isStcMirrorEnabled()
     {
         return $this->getLicenseType() == 'app' && Mage::getStoreConfigFlag(self::XML_PATH_STC_MIRROR);
+    }
+
+    public function getMaxInstallmentsNoInterest($amount)
+    {
+        $freeAmt = Mage::getStoreConfig(
+            self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT
+        );
+        $selectedMaxInstallmentNoInterest = $freeAmt === 0 ? : '';
+        if ($freeAmt > 0) {
+            $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
+            $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
+        }
+        return $selectedMaxInstallmentNoInterest;
     }
 }

@@ -432,8 +432,21 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Limita o número de parcelas. A configuração de juros é sempre feita no seu painel PagSeguro.]]></comment>
+                            <comment><![CDATA[Limita o número de parcelas.]]></comment>
                         </installment_limit>
+                        <installment_free_interest_minimum_amt>
+                            <label>Valor de parcela mínima sem juros</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip><![CDATA[
+                            Esta configuração permite especificar qual um valor mínimo de parcela onde o vendedor (você) assume os juros. Ao colocar o valor 10 neste campo, um pedido de R$ 100 poderá ser parcelado em até 10x sem juros.
+                            ]]></tooltip>
+                            <validate>validate-number validate-not-negative-number</validate>
+                            <comment><![CDATA[Ao especificar um valor, as configurações de promoções feitas em seu painel PagSeguro serão ignoradas. <a href="//bit.ly/34927gh" target="_blank">Saiba mais.</a>]]></comment>
+                        </installment_free_interest_minimum_amt>
                         <installments_product>
                             <label>Exibir parcelas na página de produto?</label>
                             <sort_order>120</sort_order>
