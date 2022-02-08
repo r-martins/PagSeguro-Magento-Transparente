@@ -432,7 +432,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Limita o número de parcelas. A configuração de juros é sempre feita no seu painel PagSeguro.]]></comment>
+                            <comment><![CDATA[Limita o número de parcelas.]]></comment>
                         </installment_limit>
                         <installment_free_interest_minimum_amt>
                             <label>Valor de parcela mínima sem juros</label>
