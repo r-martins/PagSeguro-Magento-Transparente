@@ -442,10 +442,10 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <tooltip><![CDATA[
-                            Esta configuração permite especificar qual um valor mínimo de parcela onde o vendedor (você) assume os juros. Ao colocar o valor 10 neste campo, um pedido de R$ 100 poderá ser parcelado em até 10x sem juros.
+                            Esta configuração permite especificar qual um valor mínimo de parcela onde o vendedor (você) assume os juros. Ao colocar o valor 50 neste campo, um pedido de R$ 500 poderá ser parcelado em até 5x de R$50 sem juros.
                             ]]></tooltip>
                             <validate>validate-number validate-not-negative-number</validate>
-                            <comment><![CDATA[Ao especificar um valor, as configurações de promoções feitas em seu painel PagSeguro serão ignoradas. <a href="//bit.ly/34927gh" target="_blank">Saiba mais.</a>]]></comment>
+                            <comment><![CDATA[Ao especificar um valor, você <strong>DEVE</strong> desativar ou remover qualquer <a href="//minhaconta.pagseguro.uol.com.br/meu-negocio/promocoes-salvas" target="_blank">promoção salva no seu painel PagSeguro</a>. <a href="//bit.ly/34927gh" target="_blank">Saiba mais.</a>]]></comment>
                         </installment_free_interest_minimum_amt>
                         <installments_product>
                             <label>Exibir parcelas na página de produto?</label>
