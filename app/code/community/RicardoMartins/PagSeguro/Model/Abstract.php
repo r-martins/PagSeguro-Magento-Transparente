@@ -727,6 +727,13 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
 
         if($orderCancellation->getShouldCancel())
         {
+            // checks if the order state is 'Pending Payment' and changes it
+            // so that the order can be cancelled
+            if ($order->getState() == Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW)
+            {
+                $order->setState(Mage_Sales_Model_Order::STATE_NEW);
+            }
+            
             $order->cancel();
         }
     }
