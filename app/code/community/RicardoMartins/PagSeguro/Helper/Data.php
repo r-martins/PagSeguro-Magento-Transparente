@@ -667,11 +667,14 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $freeAmt = Mage::getStoreConfig(
             self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT
         );
-        $selectedMaxInstallmentNoInterest = $freeAmt === 0 ? : '';
-        if ($freeAmt > 0) {
-            $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
-            $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
+        
+        if (!$freeAmt || $freeAmt <= 0) {
+            return false;
         }
-        return $selectedMaxInstallmentNoInterest;
+        
+        $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
+        $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
+        
+        return ($selectedMaxInstallmentNoInterest > 1) ? $selectedMaxInstallmentNoInterest : false; //prevents 0 or 1
     }
 }

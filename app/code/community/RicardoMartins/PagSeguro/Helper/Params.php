@@ -159,7 +159,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
                 isset($cardData["installments_qty"]) && 
                 isset($cardData["installments_value"]) )
             {
-                return array
+                $return = array
                 (
                     'installmentQuantity' => $cardData["installments_qty"],
                     'installmentValue'    => $cardData["installments_value"],
@@ -170,7 +170,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         {
             if ($payment->getAdditionalInformation('installment_quantity')
                 && $payment->getAdditionalInformation('installment_value')) {
-                return array
+                $return = array
                 (
                     'installmentQuantity'   => $payment->getAdditionalInformation('installment_quantity'),
                     'installmentValue'      => number_format(
@@ -180,11 +180,12 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             }
         }
 
-        return array
-        (
-            'installmentQuantity'   => '1',
-            'installmentValue'      => number_format($order->getGrandTotal(), 2, '.', ''),
-        );
+        $maxInstallmentsNoInterest = Mage::helper('ricardomartins_pagseguro')
+            ->getMaxInstallmentsNoInterest($order->getGrandTotal());
+        
+        if ($maxInstallmentsNoInterest !== false) {
+            $return['noInterestInstallmentQuantity'] = $maxInstallmentsNoInterest;
+        }
 
         return $return;
     }

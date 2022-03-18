@@ -87,6 +87,7 @@ RMPagSeguro = Class.create({
         if (RMPagSeguroObj.config.installment_free_interest_minimum_amt > 0) {
             maxInstallmentNoInterest = grandTotal / RMPagSeguroObj.config.installment_free_interest_minimum_amt;
             maxInstallmentNoInterest = Math.floor(maxInstallmentNoInterest);
+            maxInstallmentNoInterest = (maxInstallmentNoInterest > 1) ? maxInstallmentNoInterest : '';
         }
         PagSeguroDirectPayment.getInstallments({
             amount: grandTotal,
@@ -1331,6 +1332,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         if (this.config.installment_free_interest_minimum_amt > 0) {
             maxInstallmentNoInterest = this.getCardData("total").toFixed(2) / this.config.installment_free_interest_minimum_amt;
             maxInstallmentNoInterest = Math.floor(maxInstallmentNoInterest);
+            maxInstallmentNoInterest = (maxInstallmentNoInterest > 1) ? maxInstallmentNoInterest : '';
         }
 
         var params =
