@@ -327,10 +327,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         // call API
         $returnXml = $this->callApi($params, $payment);
         
-        // creates Magento transactions
-        $transaction = $this->_createOrderTransaction($payment, $amount, $ccIdx, $returnXml);
-
         try {
+            // creates Magento transactions
+            $transaction = $this->_createOrderTransaction($payment, $amount, $ccIdx, $returnXml);
             $this->proccessNotificatonResult($returnXml);
         } catch (Mage_Core_Exception $e) {
             //retry if error is related to installment value
@@ -1252,20 +1251,52 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         );
         
         $selectedMaxInstallmentNoInterest = $this->_helper->getMaxInstallmentsNoInterest($amount);
+        $installmentsQty = $payment->getAdditionalInformation('installment_quantity');
+        $ccType = $payment->getCcType();
+        $ccIdx = $payment->getData("_current_card_index");
+
+        // if it's a multi card transaction, updates the card data used on consult
+        if ($ccIdx) {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            
+            if (is_array($cardData)) {
+                $installmentsQty = isset($cardData["installments_qty"]) ? $cardData["installments_qty"] : '';
+                $ccType = isset($cardData["brand"]) ? $cardData["brand"] : '';
+            }
+        }
         
         $installmentValue = $this->getInstallmentValue(
-            $amount, $payment->getCcType(), $payment->getAdditionalInformation('installment_quantity'),
+            $amount,
+            $ccType,
+            $installmentsQty,
             $selectedMaxInstallmentNoInterest
         );
+
+        // if it's a multi card transaction, updates the installments value for the card
+        if ($ccIdx) {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            
+            if (is_array($cardData) && isset($cardData["installments_value"])) {
+                $cardData["installments_value"] = $installmentValue;
+                $payment->setAdditionalInformation("cc" . $ccIdx, $cardData);
+            }
+        }
+
         $payment->setAdditionalInformation('installment_value', $installmentValue);
         $payment->setAdditionalInformation('retried_installments', true);
         Mage::unregister('sales_order_invoice_save_after_event_triggered');
 
         try {
-            $this->order($payment, $amount);
+            // if its a multi card transaction, resets the total amount so that the calculations
+            // can be done again on the _order action
+            if ($ccIdx) {
+                $amount = $payment->getOrder()->getGrandTotal();
+            }
+
+            $this->_order($payment, $amount, $ccIdx ? $ccIdx : 1);
+
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
     }
-    
 }
