@@ -667,7 +667,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         $freeAmt = Mage::getStoreConfig(
             self::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_FREE_INTEREST_MINIMUM_AMT
         );
-        if ($freeAmt === null) {
+        if (!$freeAmt) {
             return false;
         }
         
