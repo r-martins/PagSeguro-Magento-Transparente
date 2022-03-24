@@ -56,6 +56,9 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
         $info['installments_product_interestfree_only'] = Mage::getStoreConfigFlag(
             'payment/rm_pagseguro_cc/installments_product_interestfree_only'
         );
+        $info['installments_free_min_amt'] = Mage::getStoreConfig(
+            'payment/rm_pagseguro_cc/installment_free_interest_minimum_amt'
+        );
         $info['send_status_change_email'] = Mage::getStoreConfigFlag('payment/rm_pagseguro/send_status_change_email');
 
         $modules = array_keys((array)Mage::getConfig()->getNode('modules')->children());

@@ -316,10 +316,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         $order = $payment->getOrder();
 
         if ($this->isMultiCardPayment($payment)) {
-            $carData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
             $payment->setData("_current_card_index", $ccIdx);
-            $payment->setData("_current_card_total_multiplier", ($carData["total"] / $amount));
-            $amount = (float) $carData["total"];
+            $payment->setData("_current_card_total_multiplier", ($cardData["total"] / $amount));
+            $amount = (float) $cardData["total"];
         }
 
         $params = Mage::helper('ricardomartins_pagseguro/internal')->getCreditCardApiCallParams($order, $payment);
@@ -327,16 +327,15 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         // call API
         $returnXml = $this->callApi($params, $payment);
         
-        // creates Magento transactions
-        $transaction = $this->_createOrderTransaction($payment, $amount, $ccIdx, $returnXml);
-
         try {
+            // creates Magento transactions
+            $transaction = $this->_createOrderTransaction($payment, $amount, $ccIdx, $returnXml);
             $this->proccessNotificatonResult($returnXml);
         } catch (Mage_Core_Exception $e) {
             //retry if error is related to installment value
             if ($this->getIsInvalidInstallmentValueError()
                 && !$payment->getAdditionalInformation(
-                    'retried_installments'
+                    'retried_installments_' . $ccIdx
                 )) {
                 return $this->recalculateInstallmentsAndPlaceOrder($payment, $amount);
             }
@@ -435,11 +434,11 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         }
         
         // update references to transactions on card data
-        $carData = $payment->getAdditionalInformation("cc" . $ccIdx);
-        $carData["transaction_id"] = $transaction ? $transaction->getTxnId() : "";
-        $payment->setAdditionalInformation("cc" . $ccIdx, $carData);
+        $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+        $cardData["transaction_id"] = $transaction ? $transaction->getTxnId() : "";
+        $payment->setAdditionalInformation("cc" . $ccIdx, $cardData);
 
-        $payment->setAdditionalInformation("transaction_id", $carData["transaction_id"]); // legacy flag
+        $payment->setAdditionalInformation("transaction_id", $cardData["transaction_id"]); // legacy flag
 
         $transaction->setAdditionalInformation(
             Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $transactionDetails
@@ -1239,12 +1238,15 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
      */
     public function recalculateInstallmentsAndPlaceOrder($payment, $amount)
     {
+        $ccIdx = $payment->getData("_current_card_index");
+        $retriedInstallmentsFlag = 'retried_installments_' . ($ccIdx ? $ccIdx : 1);
+
         //avoid being fired twice due to error.
-        if ($payment->getAdditionalInformation('retried_installments')) {
+        if ($payment->getAdditionalInformation($retriedInstallmentsFlag)) {
             return;
         }
 
-        $payment->setAdditionalInformation('retried_installments', true);
+        $payment->setAdditionalInformation($retriedInstallmentsFlag, true);
         Mage::log(
             'Houve uma inconsistência no valor dar parcelas. '
             . 'As parcelas serão recalculadas e uma nova tentativa será realizada.',
@@ -1252,20 +1254,51 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         );
         
         $selectedMaxInstallmentNoInterest = $this->_helper->getMaxInstallmentsNoInterest($amount);
+        $installmentsQty = $payment->getAdditionalInformation('installment_quantity');
+        $ccType = $payment->getCcType();
         
-        $installmentValue = $this->getInstallmentValue(
-            $amount, $payment->getCcType(), $payment->getAdditionalInformation('installment_quantity'),
+        // if it's a multi card transaction, updates the card data used on consult
+        if ($ccIdx) {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            
+            if (is_array($cardData)) {
+                $installmentsQty = isset($cardData["installments_qty"]) ? $cardData["installments_qty"] : '';
+                $ccType = isset($cardData["brand"]) ? $cardData["brand"] : '';
+            }
+        }
+        
+        $installmentValue = number_format($this->getInstallmentValue(
+            $amount,
+            $ccType,
+            $installmentsQty,
             $selectedMaxInstallmentNoInterest
-        );
+        ), 2, '.', '');
+
+        // if it's a multi card transaction, updates the installments value for the card
+        if ($ccIdx) {
+            $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
+            
+            if (is_array($cardData) && isset($cardData["installments_value"])) {
+                $cardData["installments_value"] = $installmentValue;
+                $payment->setAdditionalInformation("cc" . $ccIdx, $cardData);
+            }
+        }
+
         $payment->setAdditionalInformation('installment_value', $installmentValue);
-        $payment->setAdditionalInformation('retried_installments', true);
+        $payment->setAdditionalInformation($retriedInstallmentsFlag, true);
         Mage::unregister('sales_order_invoice_save_after_event_triggered');
 
         try {
-            $this->order($payment, $amount);
+            // if its a multi card transaction, resets the total amount so that the calculations
+            // can be done again on the _order action
+            if ($ccIdx) {
+                $amount = $payment->getOrder()->getGrandTotal();
+            }
+
+            $this->_order($payment, $amount, $ccIdx ? $ccIdx : 1);
+
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
     }
-    
 }
