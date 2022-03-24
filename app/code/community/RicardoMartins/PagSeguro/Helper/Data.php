@@ -671,16 +671,9 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
             return false;
         }
         
-        if ($freeAmt <= 0) {
-            return 1;
-        }
+        $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
+        $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
         
-        $selectedMaxInstallmentNoInterest = 1;
-        if ($freeAmt > 0) {
-            $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
-            $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
-        }
-        
-        return ($selectedMaxInstallmentNoInterest > 1) ? $selectedMaxInstallmentNoInterest : false; //prevents 0
+        return ($selectedMaxInstallmentNoInterest > 1) ? $selectedMaxInstallmentNoInterest : false; //prevents 0 or 1
     }
 }
