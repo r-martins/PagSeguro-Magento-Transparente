@@ -135,6 +135,12 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
     protected function _getCompilerState()
     {
         $compiler = Mage::getModel('compiler/process');
+        if (!$compiler) {
+            return array(
+              'status' => 'Unavailable',  
+              'state' => 'Unavailable'
+            );
+        }
         $compilerConfig = MAGENTO_ROOT . '/includes/config.php';
 
         if (file_exists($compilerConfig) && !(defined('COMPILER_INCLUDE_PATH') || defined('COMPILER_COLLECT_PATH'))) {
