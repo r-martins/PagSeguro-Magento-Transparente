@@ -194,7 +194,7 @@
                 <jsdelivr_enabled>1</jsdelivr_enabled>
                 <jsdelivr_minify>1</jsdelivr_minify>
                 <stc_mirror>1</stc_mirror>
-                <updater_enabled>0</updater_enabled>
+                <updater_enabled>1</updater_enabled>
                 <send_status_change_email>0</send_status_change_email>
             </rm_pagseguro>
             <rm_pagseguro_kiosk>

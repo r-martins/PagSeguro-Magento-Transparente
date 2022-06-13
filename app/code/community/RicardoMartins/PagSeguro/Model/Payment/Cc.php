@@ -315,6 +315,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     {
         $order = $payment->getOrder();
 
+        $order->setState(Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW, true);
+
         if ($this->isMultiCardPayment($payment)) {
             $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
             $payment->setData("_current_card_index", $ccIdx);
