@@ -164,6 +164,7 @@
                 <active>0</active>
                 <title>Cartão de Crédito - via PagSeguro UOL</title>
                 <order_status>pending</order_status>
+                <paid_status>paid</paid_status>
                 <allowspecific>0</allowspecific>
                 <flag>42x20</flag>
                 <payment_action>order</payment_action>
