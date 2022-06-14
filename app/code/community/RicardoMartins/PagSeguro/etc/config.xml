@@ -174,17 +174,21 @@
                 <!--<specificcountry>BR</specificcountry>-->
                 <group_restriction>0</group_restriction>
                 <info_brl>1</info_brl>
-                <total_installments>0</total_installments>
+                <owner_dob_attribute>dob</owner_dob_attribute>
+                <show_total>1</show_total>
+                <installment_limit>1</installment_limit>
                 <force_installments_selection>0</force_installments_selection>
                 <installments_product>0</installments_product>
                 <sort_order>1</sort_order>
             </rm_pagseguro_cc>
             <rm_pagseguro>
-                <customer_cpf_attribute>taxvat</customer_cpf_attribute>
+                <customer_cpf_attribute>customer|taxvat</customer_cpf_attribute>
                 <address_telephone_attribute>telephone</address_telephone_attribute>
                 <address_street_attribute>street_1</address_street_attribute>
                 <address_number_attribute>street_2</address_number_attribute>
-                <address_neighborhood_attribute>street_2</address_neighborhood_attribute>
+                <address_complement_attribute>street_3</address_complement_attribute>
+                <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
+                <notification_url_nosid>1</notification_url_nosid>
                 <ws_url>https://ws.pagseguro.uol.com.br/v2/</ws_url>
                 <ws_url_app>https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/</ws_url_app>
                 <js_url>https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</js_url>
