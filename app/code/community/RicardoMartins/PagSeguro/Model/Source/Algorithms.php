@@ -16,7 +16,8 @@ class RicardoMartins_PagSeguro_Model_Source_Algorithms
     {
         $options = array(
             array('value' => 'md5',    'label' => 'MD5'),
-            array('value' => 'sha256', 'label' => 'SHA256')
+            array('value' => 'sha256', 'label' => 'SHA256'),
+            array('value' => 'sha512', 'label' => 'SHA512'),
         );
 
         return $options;
