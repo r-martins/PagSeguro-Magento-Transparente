@@ -183,7 +183,7 @@
             </rm_pagseguro_cc>
             <rm_pagseguro>
                 <customer_cpf_attribute>customer|taxvat</customer_cpf_attribute>
-                <address_telephone_attribute>telephone</address_telephone_attribute>
+                <address_telephone_attribute>fax</address_telephone_attribute>
                 <address_street_attribute>street_1</address_street_attribute>
                 <address_number_attribute>street_2</address_number_attribute>
                 <address_complement_attribute>street_3</address_complement_attribute>
