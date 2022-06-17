@@ -724,7 +724,13 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
         $registry = ($isAdmin)?$registry->get('PsPayment'):$registry->getData('PsPayment');
 
         if (!$registry) {
-           return false;
+            $session = Mage::getSingleton('api/session');
+
+            if (!$session->isLoggedIn()) {
+                return false;
+            }
+
+            $registry = $session->getData('PsPayment');
         }
 
         $registry = unserialize($registry);

@@ -75,6 +75,12 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             $data = new Varien_Object($data);
         }
 
+        $session = Mage::getSingleton('api/session');
+
+        if ($session->isLoggedIn()) {
+            $session->setData('PsPayment', serialize($data->getData('PsPayment')));
+        }
+
         $info = $this->getInfoInstance();
 
         $info->setAdditionalInformation('sender_hash', $this->_pHelper->getPaymentHash('sender_hash'));
