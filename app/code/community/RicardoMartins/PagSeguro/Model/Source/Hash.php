@@ -17,7 +17,7 @@ class RicardoMartins_PagSeguro_Model_Source_Hash
     public function toOptionArray()
     {
         $options = array();
-        if (!$this->_isHashable()) {
+        if ($this->_noHashable()) {
             $options[] = array('value'=>0, 'label'=>'Não suportado no seu ambiente.');
             return $options;
         }
@@ -32,7 +32,7 @@ class RicardoMartins_PagSeguro_Model_Source_Hash
      */
     public function toArray()
     {
-        if (!$this->_isHashable()) {
+        if ($this->_noHashable()) {
             return array(
                 0 => Mage::helper('adminhtml')->__('No')
             );
@@ -44,11 +44,11 @@ class RicardoMartins_PagSeguro_Model_Source_Hash
     /**
      * @return bool
      */
-    private function _isHashable()
+    private function _noHashable()
     {
-        return function_exists('hash')
-            && in_array('sha512',hash_algos())
-            && in_array('sha256',hash_algos())
-            && in_array('md5',hash_algos());
+        return !function_exists('hash')
+            || !in_array('sha512',hash_algos())
+            || !in_array('sha256',hash_algos())
+            || !in_array('md5',hash_algos());
     }
 }
