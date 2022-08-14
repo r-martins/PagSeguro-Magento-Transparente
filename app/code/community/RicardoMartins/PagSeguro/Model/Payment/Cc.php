@@ -1309,4 +1309,9 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             Mage::throwException($e->getMessage());
         }
     }
+
+    public function getInstructions()
+    {
+        return trim($this->getConfigData('instructions'));
+    }
 }
