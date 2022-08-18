@@ -11,7 +11,9 @@
  */
 class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro_Model_Abstract
 {
-    protected $_code = 'rm_pagseguro_cc';
+    const CODE = 'rm_pagseguro_cc';
+
+    protected $_code = self::CODE;
     protected $_formBlockType = 'ricardomartins_pagseguro/form_cc';
     protected $_infoBlockType = 'ricardomartins_pagseguro/form_info_cc';
     protected $_isGateway = true;
