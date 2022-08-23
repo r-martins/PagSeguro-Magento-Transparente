@@ -43,6 +43,7 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_JSDELIVR_MINIFY                      = 'payment/rm_pagseguro/jsdelivr_minify';
     const XML_PATH_STC_MIRROR                      = 'payment/rm_pagseguro/stc_mirror';
     const XML_PATH_PAYMENT_PAGSEGURO_CC_MULTICC_ACTIVE  = 'payment/rm_pagseguro_cc/multicc_active';
+    const MAX_ALLOWED_NOINTERESTINSTALLMENTQUANTITY = 18; //PagSeguro limitation
 
     /**
      * Returns session ID from PagSeguro that will be used on JavaScript methods.
@@ -673,6 +674,12 @@ class RicardoMartins_PagSeguro_Helper_Data extends Mage_Core_Helper_Abstract
         
         $selectedMaxInstallmentNoInterest = $amount / $freeAmt;
         $selectedMaxInstallmentNoInterest = (int)floor($selectedMaxInstallmentNoInterest);
+        
+        //prevents internal server error from PagSeguro when receiving a value > 18
+        $selectedMaxInstallmentNoInterest = min(
+            $selectedMaxInstallmentNoInterest,
+            self::MAX_ALLOWED_NOINTERESTINSTALLMENTQUANTITY
+        );
         
         return ($selectedMaxInstallmentNoInterest > 1) ? $selectedMaxInstallmentNoInterest : false; //prevents 0 or 1
     }
