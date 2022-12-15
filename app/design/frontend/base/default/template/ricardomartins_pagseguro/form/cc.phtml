@@ -98,7 +98,7 @@ $multiCcEnabled = Mage::helper('ricardomartins_pagseguro')->isMultiCcEnabled();
         <li id="<?php echo $_code ?>_cpf_div">
             <label for="<?php echo $_code ?>_cpf" class="required"><em>*</em><?php echo $this->__('Credit Card Owner\'s CPF') ?></label>
             <div class="input-box">
-                <input type="text" id="<?php echo $_code ?>_cpf" name="payment[<?php echo $_code?>_cpf]" title="<?php echo $this->__('Credit Card Owner\'s CPF') ?>" class="input-text required-entry validate-digits" value="" maxlength="11"/>
+                <input type="text" id="<?php echo $_code ?>_cpf" name="payment[<?php echo $_code?>_cpf]" title="<?php echo $this->__('Credit Card Owner\'s CPF') ?>" class="input-text required-entry validate-digits validate-rm-pagseguro-customer-document" value="" maxlength="11"/>
             </div>
         </li>
     <?php endif ?>

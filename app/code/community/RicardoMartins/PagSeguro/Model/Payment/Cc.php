@@ -188,7 +188,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
             "installments_value" => $installmentsValue,
         );
 
-        if (empty(Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute'))) {
+        $ownerDobAttr = Mage::getStoreConfig('payment/rm_pagseguro_cc/owner_dob_attribute');
+        if (empty($ownerDobAttr)) {
             $dob = str_pad($formData->getData("ps_multicc{$cardIndex}_dob_day"), 2, "0", STR_PAD_LEFT) . "/" . 
                    str_pad($formData->getData("ps_multicc{$cardIndex}_dob_month"), 2, "0", STR_PAD_LEFT) . "/" .
                    $formData->getData("ps_multicc{$cardIndex}_dob_year");
