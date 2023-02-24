@@ -136,16 +136,12 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
             $order->setState
             (
                 $processedState->getState(),
-                $order->getState() != $processedState->getState(), //only use default status for state when changing
+                true,
                 // the order state
                 $message,
                 $processedState->getIsCustomerNotified()
             );
             
-            //add only the history message, because its not added above when $status=false
-            if ($order->getState() == $processedState->getState()){
-                $order->addStatusHistoryComment($message);
-            }
         }
         else
         {
