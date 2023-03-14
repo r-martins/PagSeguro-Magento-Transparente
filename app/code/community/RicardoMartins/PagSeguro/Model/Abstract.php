@@ -87,7 +87,7 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         {
             $payment->setAdditionalInformation('transaction_status', $notification->getStatus());
         }
-        
+
         if ($gatewayData = $notification->getGatewayData()) {
             $payment->setAdditionalInformation('gateway_data', $gatewayData);
             if (strpos($notification->getReference(), '-cc') !== false) {
@@ -99,7 +99,6 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                 $payment->unsAdditionalInformation('gateway_data');
             }
         }
-        
 
         // process order based on returned status
         switch($notification->getStatus())
@@ -432,19 +431,28 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         if (false === $xml) {
             switch($response){
                 case 'Unauthorized':
-                    $helper->writeLog(
-                        'Token/email não autorizado pelo PagSeguro. Verifique suas configurações no painel.'
-                    );
+                    $message = 'Token/email não autorizado pelo PagSeguro. Verifique suas configurações no painel.';
+                    $helper->writeLog($message);
                     break;
                 case 'Forbidden':
-                    $helper->writeLog(
-                        'Acesso não autorizado à Api Pagseguro. Verifique se você tem permissão para
-                         usar este serviço. Retorno: ' . var_export($response, true)
-                    );
+                    $message = 'Acesso não autorizado à Api Pagseguro. Verifique se você tem permissão para
+                         usar este serviço.' ;
+                    $helper->writeLog("{$message} Retorno: " . var_export($response, true));
                     break;
                 default:
-                    $helper->writeLog('Retorno inesperado do PagSeguro. Retorno: ' . $response);
+                    $message = 'Retorno inesperado do PagSeguro.';
+                    $helper->writeLog("{$message} Retorno: " . $response);
             }
+
+            try {
+                if ($type === 'transactions/refunds') {
+                    $order = $payment->getOrder();
+                    $order->addStatusHistoryComment("Reembolso não realizado. Mensagem: {$message}")
+                        ->setIsCustomerNotified(false);
+                    $transactionCode = isset($params['transactionCode']) ? $params['transactionCode'] : "";
+                    $this->notifyMerchant($order->getIncrementId(),$transactionCode,$message);
+                }
+            } catch (\Exception $e) {}
 
             Mage::throwException(
                 'Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.'
@@ -960,6 +968,34 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
         }
     }
 
+    /**
+     * @param $incrementId
+     * @param $pagseguroTransactionCode
+     * @param $message
+     * @return void
+     */
+    protected function notifyMerchant($incrementId,$pagseguroTransactionCode,$message)
+    {
+        $merchantName = Mage::getStoreConfig('trans_email/ident_sales/name');
+        $merchantEmail = Mage::getStoreConfig('trans_email/ident_sales/email');
+        $senderName = Mage::getStoreConfig('trans_email/ident_general/name');
+        $senderEmail = Mage::getStoreConfig('trans_email/ident_general/email');
+
+        $emailTemplate = Mage::getModel('core/email_template');
+        $emailTemplate->loadDefault('ricardomartins_pagseguro_email_template');
+
+        $vars = array();
+        $vars['merchant_name'] = $merchantName;
+        $vars['increment_id'] = $incrementId;
+        $vars['pagseguro_transaction_code'] = $pagseguroTransactionCode;
+        $vars['message'] = $message;
+
+        $emailTemplate->getProcessedTemplate($vars);
+        $emailTemplate->setSenderName($senderName);
+        $emailTemplate->setSenderEmail($senderEmail);
+
+        $emailTemplate->send($merchantEmail, $merchantName, $vars);
+    }
 }
 
 

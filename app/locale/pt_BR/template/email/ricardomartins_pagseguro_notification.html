@@ -1,0 +1,27 @@
+<!--@subject {{var store.getFrontendName()}}: O reembolso para o pedido #{{var increment_id}} falhou @-->
+<!--@vars
+{"var increment_id":"Order Id",
+"var pagseguro_transaction_code":"PagSeguro Transaction Code",
+"var message":"Message"}
+@-->
+<!--@styles
+@-->
+
+{{template config_path="design/email/header"}}
+{{inlinecss file="email-inline.css"}}
+<table>
+    <tr>
+        <td><p>Houve um problema ao processar o reembolso do pedido abaixo.</p></td>
+    </tr>
+    <tr>
+        <td><p>Pedido: {{var increment_id}}</p></td>
+    </tr>
+    <tr>
+        <td><p>Código da transação: {{var pagseguro_transaction_code}}</p></td>
+    </tr>
+    <tr>
+        <td><p>Mensagem retornada: {{var message}}</p></td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer"}}

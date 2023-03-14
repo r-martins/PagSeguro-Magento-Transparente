@@ -67,6 +67,15 @@
                 </observers>
             </order_cancel_after>
         </events>
+        <template>
+            <email>
+                <ricardomartins_pagseguro_email_template translate="label" module="ricardomartins_pagseguro">
+                    <label>PagSeguro Notification Email</label>
+                    <file>ricardomartins_pagseguro_notification.html</file>
+                    <type>html</type>
+                </ricardomartins_pagseguro_email_template>
+            </email>
+        </template>
     </global>
     <frontend>
         <routers>
