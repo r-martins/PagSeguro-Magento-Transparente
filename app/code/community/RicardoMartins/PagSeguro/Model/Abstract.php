@@ -452,7 +452,9 @@ class RicardoMartins_PagSeguro_Model_Abstract extends Mage_Payment_Model_Method_
                     $transactionCode = isset($params['transactionCode']) ? $params['transactionCode'] : "";
                     $this->notifyMerchant($order->getIncrementId(),$transactionCode,$message);
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                $helper->writeLog('Erro ao realizar notificação de erro de reembolso: ' . $e->getMessage());
+            }
 
             Mage::throwException(
                 'Houve uma falha ao processar seu pedido/pagamento. Por favor entre em contato conosco.'

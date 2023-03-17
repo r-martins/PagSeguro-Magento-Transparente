@@ -11,13 +11,16 @@
 {{inlinecss file="email-inline.css"}}
 <table>
     <tr>
-        <td><p>Houve um problema ao processar o reembolso do pedido abaixo.</p></td>
+        <td>
+            <p>Houve um problema ao processar o reembolso do pedido abaixo.</p>
+            <p>Certifique-se de tomar as medidas necessárias para concluir o reembolso manualmente.</p>
+        </td>
     </tr>
     <tr>
         <td><p>Pedido: {{var increment_id}}</p></td>
     </tr>
     <tr>
-        <td><p>Código da transação: {{var pagseguro_transaction_code}}</p></td>
+        <td><p>Código da transação: {{var pagseguro_transaction_code}} (<a href="https://pagseguro.uol.com.br/transaction/details.jhtml?code={{var pagseguro_transaction_code}}">Ver no PagSeguro</a>)</p></td>
     </tr>
     <tr>
         <td><p>Mensagem retornada: {{var message}}</p></td>
