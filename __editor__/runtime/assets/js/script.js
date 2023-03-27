@@ -2047,6 +2047,135 @@ jQuery(function () {
 });
 })(window._$, window._$);
 (function (jQuery, $) {
+jQuery(function ($) {
+    'use strict';
+
+    window.tabCollapseResize = function () {
+        $('.tabbable').each(function () {
+            var tabbable = $(this);
+            // var tabMenu = tabbable.children('.nav-tabs');
+            var tabMenu = tabbable.find('.nav-tabs');
+            var tabs = tabMenu.children('li');
+            var tabContent = tabbable.find('.tab-content');
+            var panels = tabContent.find('.tab-pane');
+
+            if (!tabs.filter('.active').length) {
+                tabs.first().addClass('active');
+                panels.removeClass('active').first().addClass('active');
+            }
+
+            if (!tabbable.data('responsive')) {
+                if (tabContent.children('.accordion').length) {
+                    tabContent.children('.accordion').children().first().unwrap();
+                }
+                tabContent.find('.accordion-item').remove();
+                panels.each(function () {
+                    var wrapper = $(this).children('.accordion-wrap');
+                    if (wrapper.children().length) {
+                        wrapper.children().first().unwrap();
+                    } else {
+                        wrapper.remove();
+                    }
+                });
+                return;
+            }
+
+            var cls = tabMenu.parent().siblings('.accordion').children('.accordion-content').attr('class');
+            var wrapper = tabContent.find('.accordion-wrap');
+            if (wrapper.length) {
+                tabContent.find('.accordion-wrap').toggleClass(cls, tabContent.find('.accordion-item:visible').length > 0);
+                return;
+            }
+
+            var accordion = tabbable.find('.accordion');
+
+            accordion.show();
+            var accordionTpl = accordion.clone();
+            accordion.hide();
+
+            var itemTpl = accordion.find('.accordion-item').clone();
+            var contentTpl = accordion.find('.accordion-content').clone();
+            accordionTpl.empty();
+
+            tabs.each(function () {
+                var tab = $(this);
+                var tablink = tab.find('[data-toggle="tab"]');
+                var currentId = tablink.attr('href');
+                var panel = panels.filter(currentId);
+
+                var collapseLink = $('<a></a>');
+                collapseLink.html(tablink.html());
+                collapseLink.attr('data-toggle', 'collapse');
+                collapseLink.attr('data-target', currentId);
+
+                panel.before(itemTpl.clone().append(collapseLink));
+                panel.wrapInner(contentTpl.clone().addClass('accordion-wrap').toggleClass(cls, collapseLink.is(':visible')));
+
+                panel.addClass('collapse');
+                if (panel.is('.active')) {
+                    panel.addClass('in');
+                    collapseLink.addClass('active');
+                }
+
+                /* Collapse */
+
+                panel.on('show.bs.collapse', function () {
+                    var actives = panels.filter('.in');
+                    panels.filter('.collapsing:not(.active)').addClass('bd-collapsing');
+                    if (actives && actives.length) {
+                        var activesData = actives.data('bs.collapse');
+                        if (!activesData || !activesData.transitioning) {
+                            actives.collapse('hide');
+                            if (!activesData) actives.data('bs.collapse', null);
+                        }
+                    }
+                    panel.css('display', 'block');
+
+                    collapseLink.addClass('active');
+                });
+
+                panel.on('shown.bs.collapse', function () {
+                    tab.addClass('active');
+                    panel.addClass('active');
+
+                    panel.css('display', '');
+                    panel.filter('.bd-collapsing').removeClass('bd-collapsing').collapse('hide');
+                });
+
+                panel.on('hide.bs.collapse', function () {
+                    collapseLink.removeClass('active');
+                });
+
+                panel.on('hidden.bs.collapse', function () {
+                    tab.removeClass('active');
+                    panel.removeClass('active');
+                    panel.css('height', '');
+                });
+
+                /* Tabs */
+
+                tablink.on('show.bs.tab', function () {
+                    panels.removeClass('in');
+                    tabContent.find('.accordion > .accordion-item > a').removeClass('active');
+
+                    panel.css('height', '');
+                    panel.addClass('in');
+                    collapseLink.addClass('active');
+                });
+            });
+
+            tabContent.wrapInner(accordionTpl);
+        });
+    };
+
+    $(window).on('resize', function (e, param) {
+        window.tabCollapseResize();
+    });
+
+    window.tabCollapseResize();
+});
+})(window._$, window._$);
+(function (jQuery, $) {
 
 /*!
  * jQuery Cookie Plugin v1.4.0
