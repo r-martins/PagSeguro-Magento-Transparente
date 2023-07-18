@@ -9,11 +9,12 @@ $_installmentsFreeOnly = (int)Mage::getStoreConfig(
     RicardoMartins_PagSeguro_Helper_Data::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_INTEREST_FREE_ONLY
 );
 $_maxInstallmentNoInterest = $_helper->getMaxInstallmentsNoInterest($_price);
+
 ?>
 
 <div id="rmpagseguro_parcelas_box">
     <p id="rmpagseguro_parcelas_loading">Carregando parcelas...</p>
-    <p id="pseguro_parcelas" style="display: none;">Parcele em até <span id="installments"></span>x de R$<span id="installment_value"></span> (Total R$<span id="installment_total"></span>) com PagSeguro UOL.</p>
+    <p id="pseguro_parcelas" style="display: none;"><?= $this->_messageToHTML() ?></p>
 </div>
 
 <script type="text/javascript">
@@ -30,7 +31,7 @@ $_maxInstallmentNoInterest = $_helper->getMaxInstallmentsNoInterest($_price);
     })
     var updateInstallments = function() {
         var maxInstallmentNoInterest = "<?php echo $_maxInstallmentNoInterest?>";
-        
+
         PagSeguroDirectPayment.getInstallments({
             amount: <?php echo $_price?>,
             brand: 'visa',
@@ -50,16 +51,22 @@ $_maxInstallmentNoInterest = $_helper->getMaxInstallmentsNoInterest($_price);
                 if(maxInstallmentsConfig > 0 && maxInstallmentsConfig < responseVisa.length && maxInstallmentsConfig < installment.quantity){
                     installment = responseVisa[maxInstallmentsConfig - 1];
                 }
-                $('installments').innerHTML = installment.quantity.toString();
-                $('installment_value').innerHTML = installment.installmentAmount.toFixed(2).toString().replace('.', ',');
-                $('installment_total').innerHTML = installment.totalAmount.toFixed(2).toString().replace('.', ',');
-                if(installment.interestFree){
-                    $('installment_total').innerHTML += ' sem juros';
+                if ($('installments')) {
+                    $('installments').innerHTML = installment.quantity.toString();
+                }
+                if ($('installments_value')) {
+                    $('installment_value').innerHTML = installment.installmentAmount.toFixed(2).toString().replace('.', ',');
+                }
+                if ($('installments_total')) {
+                    $('installment_total').innerHTML = installment.totalAmount.toFixed(2).toString().replace('.', ',');
+                    if (installment.interestFree) {
+                        $('installment_total').innerHTML += ' sem juros';
+                    }
                 }
                 $('pseguro_parcelas').setStyle({display: ''});
                 $('rmpagseguro_parcelas_loading').setStyle({display: 'none'});
-            }
-        })
+                    }
+                })
     };
 // ]]>
 </script>
