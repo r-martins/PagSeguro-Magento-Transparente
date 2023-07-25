@@ -65,13 +65,14 @@ class RicardoMartins_PagSeguro_Block_Product_Installments extends Mage_Core_Bloc
      * Converte a messagem especificada em XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_PRODUCT_MESSAGE
      * para exibição na página de produtos
      */
-    public function _messageToHTML()
+    public function messageToHTML()
     {
         $variables = array(
             "num_parcelas" => "installments", /** Número de parcelas. Ex.: 12 */
             "valor_parcela" => "installment_value", /** Preço da parcela do produto */
             "valor_total" => "installment_total" /** Preço total do produto (com o valor dos juros incluso, caso haja) */
         );
+        
         $message = Mage::getStoreConfig(
             RicardoMartins_PagSeguro_Helper_Data::XML_PATH_PAYMENT_PAGSEGURO_CC_INSTALLMENT_PRODUCT_MESSAGE
         );
@@ -80,6 +81,10 @@ class RicardoMartins_PagSeguro_Block_Product_Installments extends Mage_Core_Bloc
             $message = str_replace("{".$variable."}", "<span id='$id'></span>", $message);
         }
 
+        //remove potential javascript code, preserving php < 7.4 compatibility
+        $message = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', "", $message);
+        
+        
         return $message;
     }
 }

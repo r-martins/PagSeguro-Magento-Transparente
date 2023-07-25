@@ -1,4 +1,6 @@
 <?php
+/** @var @var \RicardoMartins_PagSeguro_Block_Product_Installments $this */
+/** @var RicardoMartins_PagSeguro_Helper_Data $_helper */
 $_helper = Mage::helper('ricardomartins_pagseguro');
 $_ajaxSessionIdUrl = Mage::getUrl('pseguro/ajax/getSessionId', array('_secure' => true));
 $_price = $this->getPrice();
@@ -14,7 +16,7 @@ $_maxInstallmentNoInterest = $_helper->getMaxInstallmentsNoInterest($_price);
 
 <div id="rmpagseguro_parcelas_box">
     <p id="rmpagseguro_parcelas_loading">Carregando parcelas...</p>
-    <p id="pseguro_parcelas" style="display: none;"><?= $this->_messageToHTML() ?></p>
+    <p id="pseguro_parcelas" style="display: none;"><?php echo $this->messageToHTML() ?></p>
 </div>
 
 <script type="text/javascript">
@@ -51,13 +53,14 @@ $_maxInstallmentNoInterest = $_helper->getMaxInstallmentsNoInterest($_price);
                 if(maxInstallmentsConfig > 0 && maxInstallmentsConfig < responseVisa.length && maxInstallmentsConfig < installment.quantity){
                     installment = responseVisa[maxInstallmentsConfig - 1];
                 }
+                // debugger;
                 if ($('installments')) {
                     $('installments').innerHTML = installment.quantity.toString();
                 }
-                if ($('installments_value')) {
+                if ($('installment_value')) {
                     $('installment_value').innerHTML = installment.installmentAmount.toFixed(2).toString().replace('.', ',');
                 }
-                if ($('installments_total')) {
+                if ($('installment_total')) {
                     $('installment_total').innerHTML = installment.totalAmount.toFixed(2).toString().replace('.', ',');
                     if (installment.interestFree) {
                         $('installment_total').innerHTML += ' sem juros';
