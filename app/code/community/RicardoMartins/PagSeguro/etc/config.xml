@@ -183,7 +183,6 @@
                 <!--<specificcountry>BR</specificcountry>-->
                 <group_restriction>0</group_restriction>
                 <info_brl>1</info_brl>
-                <owner_dob_attribute>dob</owner_dob_attribute>
                 <show_total>1</show_total>
                 <installment_limit>1</installment_limit>
                 <force_installments_selection>0</force_installments_selection>
@@ -234,7 +233,6 @@
                 <sort_order>40</sort_order>
                 <group_restriction>0</group_restriction>
                 <info_brl>1</info_brl>
-                <owner_dob_attribute>dob</owner_dob_attribute>
             </rm_pagseguro_recurring>
             <!--Para referencia-->
             <!--<paypal_express>

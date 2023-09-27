@@ -476,7 +476,7 @@ class RicardoMartins_PagSeguro_Helper_Params extends Mage_Core_Helper_Abstract
             $phone = substr($phone, 1, strlen($phone));
         }
 
-        $originalPhone = $phone;
+        $originalPhone = $phone = substr($phone, -11);
 
         $phone = preg_replace('/^(\d{2})(\d{7,9})$/', '$1-$2', $phone);
 
