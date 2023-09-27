@@ -467,9 +467,23 @@
                             <tooltip>Pode deixar sua página de produtos mais lenta.</tooltip>
                             <comment><![CDATA[É exibido o parcelamento máximo com base no cartão VISA, de acordo com suas configurações no PagSeguro. Saiba mais <a href="//pagsegurotransparente.zendesk.com/hc/pt-br/articles/360027562792" target="_blank">aqui</a>.]]></comment>
                         </installments_product>
+                        <installments_product_message>
+                            <label>Mensagem das parcelas na página de produto</label>
+                            <sort_order>130</sort_order>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <frontend_type>textarea</frontend_type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <tooltip>Ex.: Parcele em até {num_parcelas}x de R${valor_parcela} (Total R${valor_total}) com PagSeguro UOL.</tooltip>
+                            <comment><![CDATA[A mensagem acima pode ser personalizada com as seguintes variáveis: <p class='note'><b>{num_parcelas}</b>: Número de parcelas. Ex.: 12</p><p class='note'><b>{valor_parcela}</b>: Preço da parcela do produto</p><p class='note'><b>{valor_total}</b>: Preço total do produto (com o valor dos juros incluso, caso haja)</p>]]></comment>
+                            <depends>
+                                <installments_product>1</installments_product>
+                            </depends>
+                        </installments_product_message>
                         <installments_product_interestfree_only>
                             <label>Exibir somente parcelas sem juros?</label>
-                            <sort_order>130</sort_order>
+                            <sort_order>140</sort_order>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <frontend_type>select</frontend_type>
                             <show_in_default>1</show_in_default>

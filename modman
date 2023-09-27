@@ -10,3 +10,4 @@ js/pagseguro/pagseguro.js js/pagseguro/pagseguro.js
 js/pagseguro/card.js js/pagseguro/card.js
 app/design/adminhtml/default/default/layout/ricardomartins_pagseguro/* app/design/adminhtml/default/default/layout/ricardomartins_pagseguro/
 app/design/adminhtml/default/default/template/ricardomartins_pagseguro/* app/design/adminhtml/default/default/template/ricardomartins_pagseguro/
+app/locale/pt_BR/template/email/ricardomartins_pagseguro_notification.html app/locale/pt_BR/template/email/ricardomartins_pagseguro_notification.html

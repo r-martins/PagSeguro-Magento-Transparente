@@ -2,7 +2,7 @@
 <config>
     <modules>
         <RicardoMartins_PagSeguro>
-            <version>3.15.6</version>
+            <version>3.17.0</version>
         </RicardoMartins_PagSeguro>
     </modules>
     <global>
@@ -67,6 +67,15 @@
                 </observers>
             </order_cancel_after>
         </events>
+        <template>
+            <email>
+                <ricardomartins_pagseguro_email_template translate="label" module="ricardomartins_pagseguro">
+                    <label>PagSeguro Notification Email</label>
+                    <file>ricardomartins_pagseguro_notification.html</file>
+                    <type>html</type>
+                </ricardomartins_pagseguro_email_template>
+            </email>
+        </template>
     </global>
     <frontend>
         <routers>
@@ -179,6 +188,7 @@
                 <installment_limit>1</installment_limit>
                 <force_installments_selection>0</force_installments_selection>
                 <installments_product>0</installments_product>
+                <installments_product_message>Parcele em até {num_parcelas}x de R${valor_parcela} (Total R${valor_total}) com PagSeguro UOL.</installments_product_message>
                 <sort_order>1</sort_order>
             </rm_pagseguro_cc>
             <rm_pagseguro>
