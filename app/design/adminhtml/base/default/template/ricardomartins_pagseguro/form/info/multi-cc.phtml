@@ -17,6 +17,9 @@
         <?php endif; ?>
         Bandeira: <?php echo $this->escapeHtml(ucfirst($cc1->getBrand())); ?><br/>
         Últimos 4 dígitos: <?php echo $this->escapeHtml($cc1->getLast4()); ?><br/>
+        <?php if ($cc1->getOwner()):?>
+            Titular: <?php echo mb_strtoupper($this->escapeHtml($cc1->getOwner())); ?><br/>
+        <?php endif;?>
         Parcelas: <?php echo $this->escapeHtml($cc1->getInstallmentsQty());?>x R$ <?php echo number_format($cc1->getInstallmentsValue(), 2, ',', '.'); ?><br/>
         <?php if($gatewayData = $cc1->getGatewayData()) :?>
           <a href="javascript: void(0);" onclick="$('cc1-gatewayinfo').toggle()">Exibir/ocultar detalhes da captura/gateway</a><br/>
@@ -52,6 +55,9 @@
         <?php endif; ?>
         Bandeira: <?php echo $this->escapeHtml(ucfirst($cc2->getBrand())); ?><br/>
         Últimos 4 dígitos: <?php echo $this->escapeHtml($cc2->getLast4()); ?><br/>
+        <?php if ($cc2->getOwner()):?>
+            Titular: <?php echo mb_strtoupper($this->escapeHtml($cc2->getOwner())); ?><br/>
+        <?php endif;?>
         Parcelas: <?php echo $this->escapeHtml($cc2->getInstallmentsQty());?>x <?php echo $coreHelper->formatCurrency($cc2->getInstallmentsValue()); ?><br/>
         <?php if($gatewayData = $cc2->getGatewayData()) :?>
             <a href="javascript: void(0);" onclick="$('cc2-gatewayinfo').toggle()">Exibir/ocultar detalhes da captura/gateway</a><br/>
