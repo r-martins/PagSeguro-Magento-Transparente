@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+    <link href="../../assets/images/79a796baabc12867c00db907bf01d8b7_logo2019integracoesicon396x396.png" rel="icon" type="image/x-icon" />
+	<script>
+    var themeHasJQuery = !!window.jQuery;
+</script>
+<script type="text/javascript" src="../../assets/js/jquery.js?1.0.1901"></script>
+<script>
+    window._$ = jQuery.noConflict(themeHasJQuery);
+</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../../assets/css/bootstrap.css?1.0.1901" media="screen" />
+<script type="text/javascript" src="../../assets/js/bootstrap.min.js?1.0.1901"></script>
+<!--[if lte IE 9]>
+<link rel="stylesheet" href="../../assets/css/layout.ie.css?1.0.1901">
+<script src="../../assets/js/layout.ie.js?1.0.1901"></script>
+<![endif]-->
+<link class="data-control-id-9" href='//fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="../../assets/js/layout.core.js"></script>
+<script src="../../assets/js/CloudZoom.js?1.0.1901"></script>
+	
+    <title>Magento 2 e PagSeguro - Instalação em 3 passos</title>
+	<link rel="stylesheet" href="../../assets/css/style.css?1.0.1901">
+	<script src="../../assets/js/script.js?1.0.1901"></script>
+    <meta charset="utf-8">
+    
+    <!-- Start cookieyes banner --> <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/61b96aa96b1c5b93b2c02576/script.js"></script> <!-- End cookieyes banner -->
+
+<link class="" href='//fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
+
+
+<!-- Start of pagsegurotransparente Zendesk Widget script -->
+<script>/*<![CDATA[*/window.zEmbed||function(e,t){var n,o,d,i,s,a=[],r=document.createElement("iframe");window.zEmbed=function(){a.push(arguments)},window.zE=window.zE||window.zEmbed,r.src="javascript:false",r.title="",r.role="presentation",(r.frameElement||r).style.cssText="display: none",d=document.getElementsByTagName("script"),d=d[d.length-1],d.parentNode.insertBefore(r,d),i=r.contentWindow,s=i.document;try{o=s}catch(c){n=document.domain,r.src='javascript:var d=document.open();d.domain="'+n+'";void(0);',o=s}o.open()._l=function(){var o=this.createElement("script");n&&(this.domain=n),o.id="js-iframe-async",o.src=e,this.t=+new Date,this.zendeskHost=t,this.zEQueue=a,this.body.appendChild(o)},o.write('<body onload="document._l();">'),o.close()}("//assets.zendesk.com/embeddable_framework/main.js","pagsegurotransparente.zendesk.com");/*]]>*/
+zE(function() {
+	zE.setLocale('pt-BR');
+});</script>
+<!-- End of pagsegurotransparente Zendesk Widget script -->
+
+<!-- Google Analytics -->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RX1N5F90DX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-RX1N5F90DX');
+</script>
+
+<!-- End Google Analytics -->
+    
+ <meta name="description" content="Passo a passo para instalar e configurar o módulo PagSeguro em sua loja Magento 2.">
+<meta property="og:image" content="https://i.imgur.com/EpjlGAk.jpg">
+<meta property="og:title" content="Módulo PagSeguro para Magento 2 - Instalação Passo a passo">
+    
+</head>
+<body class="data-control-id-31 bootstrap bd-body-7  bd-pagebackground bd-margins">
+    <header class="data-control-id-936270 bd-headerarea-1 bd-margins">
+        <section class="data-control-id-2153708 bd-section-15 bd-tagstyles" id="logoheader" data-section-title="2 Columns">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2153742 bd-layoutcontainer-11 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row ">
+                <div class="data-control-id-2153747 bd-columnwrapper-17 
+ col-sm-6">
+    <div class="bd-layoutcolumn-17 bd-column" ><div class="bd-vertical-align-wrapper"><img class="bd-imagelink-6 bd-own-margins bd-imagestyles   data-control-id-2153772"  src="../../assets/images/40040297a02db889bde7fe0cd7431d7d_pagbankintegracoes.png"
+ alt="Módulos PagSeguro/PagBank (Não oficial)"></div></div>
+</div>
+	
+		<div class="data-control-id-2153752 bd-columnwrapper-19 
+ col-sm-6">
+    <div class="bd-layoutcolumn-19 bd-column" ><div class="bd-vertical-align-wrapper">
+    
+    <nav class="data-control-id-2143725 bd-hmenu-3"  data-responsive-menu="true" data-responsive-levels="expand on click" data-responsive-type="" data-offcanvas-delay="0ms" data-offcanvas-duration="700ms" data-offcanvas-timing-function="ease">
+        
+            <div class="data-control-id-2322712 bd-menuoverlay-10 bd-menu-overlay"></div>
+            <div class="data-control-id-2143724 bd-responsivemenu-2 collapse-button">
+    <div class="bd-container-inner">
+        <div class="bd-menuitem-2 data-control-id-2200914">
+            <a  data-toggle="collapse"
+                data-target=".bd-hmenu-3 .collapse-button + .navbar-collapse"
+                href="#" onclick="return false;">
+                    <span>Menu</span>
+            </a>
+        </div>
+    </div>
+</div>
+            <div class="navbar-collapse collapse ">
+            
+            <div class="data-control-id-2143713 bd-horizontalmenu-1 clearfix">
+                <div class="bd-container-inner">
+                    
+                    
+                    <ul class="data-control-id-2143924 bd-menu-1 nav nav-pills nav-center">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+                        
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../index.html" >Início</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../demo.html" >Demo</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../Vantagens.html" >Vantagens</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../faq.html" >Suporte</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../compare.html" >Taxas</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../magento1.html" >Magento 1</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a 
+ class="active" href="../magento2.html" >Magento 2</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../woocommerce.html" >Woocommerce</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2143925 bd-menuitem-7
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../doar-com-pagseguro.html" >DoarBox</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                    </ul>
+                    
+                    
+                </div>
+            </div>
+            
+            <div class="bd-menu-close-icon">
+    <a href="#" class="bd-icon data-control-id-2322705 bd-icon-99"></a>
+</div>
+        
+            </div>
+    </nav></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+</header>
+	
+		<div class="data-control-id-2133718 bd-stretchtobottom-2 bd-stretch-to-bottom" data-control-selector=".bd-content-12"><div class="data-control-id-369417 bd-content-12 ">
+    
+    <div class="data-control-id-2916251 bd-htmlcontent-37 bd-margins" 
+ data-page-id="page.50">
+    <section class="data-control-id-2916763 bd-section-126 bd-page-width bd-tagstyles " id="section49" data-section-title="Section">
+    <div class="bd-container-inner bd-margins clearfix">
+        <h1 class="data-control-id-2916766 bd-textblock-469 bd-content-element">
+    Comece agora a usar o PagSeguro no seu Magento 2
+</h1>
+    </div>
+</section>
+	
+		<div class="bd-containereffect-13 container-effect container data-control-id-2916751"><div class="data-control-id-2916749 bd-spacer-13  clearfix"></div></div>
+	
+		<section class="data-control-id-2916714 bd-section-125 bd-page-width bd-tagstyles " id="passo1" data-section-title="passo1">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2916719 bd-layoutcontainer-59 bd-page-width  bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row ">
+                <div class="data-control-id-2916747 bd-columnwrapper-165 
+ col-sm-1">
+    <div class="bd-layoutcolumn-165 bd-column" ><div class="bd-vertical-align-wrapper"><h1 class="data-control-id-2916748 bd-textblock-465 bd-content-element">
+    1.
+</h1></div></div>
+</div>
+	
+		<div class="data-control-id-2916743 bd-columnwrapper-163 
+ col-sm-4">
+    <div class="bd-layoutcolumn-163 bd-column" ><div class="bd-vertical-align-wrapper"><h2 class="data-control-id-2916745 bd-textblock-463 bd-content-element">
+    Autorizar aplicação
+</h2>
+	
+		<p class="data-control-id-2916744 bd-textblock-447 bd-content-element">
+    Escolha quanto quer pagar ao PagSeguro nas transações aprovadas realizadas com o módulo e em quantos dias quer receber.<br><br><br>As taxas são menores que as taxas padrões do PagSeguro devido a uma parceria e só são válidas para transações realizadas com o módulo. As tarifas ao lado substituem qualquer negociação anterior e são válidas somente para transações realizadas com o módulo.&nbsp;<br><br><br>Após autorizar a aplicação, salve a chave exibida. Ela também será enviada pra você no e-mail informado ao lado.
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2916729 bd-columnwrapper-162 
+ col-sm-6">
+    <div class="bd-layoutcolumn-162 bd-column" ><div class="bd-vertical-align-wrapper"><div class="data-control-id-2916741 bd-customhtml-44 bd-tagstyles">
+    <div class="bd-container-inner bd-content-element">
+        <form id="formAppNew" target="_blank" method="POST" action="https://v7.test/app/new" accept-charset="ISO-8859-1">
+    <table class="table table-stripped table-bordered">
+        <tbody>
+        <tr>
+            <th>
+                Seu nome:
+            </th>
+            <td>
+                <input type="text" maxlength="30" size="30" id="name" name="name">
+
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Telefone:
+            </th>
+            <td>
+                <input type="tel" maxlenght="30" size="30" id="phone" name="phone">
+            </td>
+        </tr>
+        <tr>
+            <th>* E-mail do responsável:</th>
+            <td>
+                <input type="email" size="30" id="email" name="email">
+                <small id="email-suggest"></small>
+                <small>O e-mail do lojista será pedido no próximo passo, caso não esteja logado no PagSeguro.</small>
+            </td>
+        </tr>
+        <tr>
+            <th>* URL da Loja:
+            </th>
+            <td>
+                <input type="url" size="30" id="url" name="url">
+                <small>Essa informação não influencia o funcionamento do módulo. Lembre-se de colocar http:// ou
+                    https:// na URL.</small></td>
+        </tr>
+        <tr>
+            <th>* Modelo de recebimento:
+            </th>
+            <td>
+                <select name="app_type" id="app_type" onchange="checkInvite()">
+                    <!-- <option value="pagseguro-02">Recebimento em 2 dias: 4,99%</option> -->
+                    <option value="pagseguro" selected="">Recebimento em 14 dias: 4,15%</option>
+                    <option value="pagseguro-30">Recebimento em 30 dias: 3,15%</option>
+                    <option value="pagseguro-transparente-invisible">Invisível Antecipado (Exige convite)</option>
+                    <option value="pagseguro-transparente-invisible-fluxo">Invisível no Fluxo (Exige convite)</option>
+                    <option value="pagseguro-flex-01">Flex 01 (Exige convite)</option>
+                </select><br></td>
+        </tr>
+        <tr id="inviteRow">
+            <th>
+                Código do Convite:
+            </th>
+            <td>
+                <input type="text" size="30" id="invite_code" name="invite_code"> *
+                <br>
+                <small>As <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/360035615752" target="_blank">aplicações invisíveis</a> são restritas à convidados no momento.</small>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2">
+              <p>Ao continuar você e o titular da conta concordam com os <a href="/terms.html" target="_blank" draggable="false">Termos de Uso e Privacidade</a> de nossa aplicação.</p>
+                <input type="button" onclick="validateAndSubmit();" value="Avançar" class="btn btn-cta-primary"></td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+    if (document.URL.search('local') > 0 || document.URL.search('127.0.0.1') > 0) {
+        document.getElementById("formAppNew").action = "https://v7.test/app/new";
+    } else {
+        document.getElementById("formAppNew").action = "https://ws.ricardomartins.net.br/pspro/v7/app/new";
+    }
+    var validateAndSubmit = function () {
+        var email = document.getElementById("email").value;
+        var url = document.getElementById("url").value;
+        var inviteCode = document.getElementById("invite_code").value;
+        var appType = document.getElementById("app_type").value;
+        if (!validateEmail(email)) {
+            alert('Email inválido.');
+            return false;
+        }
+        if (!validateUrl(url)) {
+            alert('URL inválido.');
+            return false;
+        }
+        if (appType.indexOf('pagseguro-transparente-invisible') >= 0 && inviteCode == '') {
+            alert('Informe o código de convite.');
+            return false;
+        }
+      
+      	setCookie('appType', appType, 10);
+        document.getElementById("formAppNew").submit();
+    }
+    
+    var setCookie = function(cname, cvalue, exmin) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exmin*60*1000));
+      let expires = "expires="+ d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+    var validateEmail = function (email) {
+        var re = new RegExp('(([^<>()[\\]\\\\.,;:\\s@' + '"]+(\\.[^<>()[\\]\\\\.,;:\\s@' + '"]+)*)|(".+"))@' + '((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))');
+        return re.test(email);
+    }
+    var validateUrl = function (url) {
+        var re = new RegExp("^(?:(?:https?|ftp):\\/\\/)(?:\\S+(?::\\S*)?@'+')?(?:(?!10(?:\\.\\d{1,3}){3})(?!127(?:\\.\\d{1,3}){3})(?!169\\.254(?:\\.\\d{1,3}){2})(?!192\\.168(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))(?::\\d{2,5})?(?:\\/[^\\s]*)?$", "i");
+        return re.test(url);
+    }
+
+    var getUrlVars = function (sParam) {
+        var sPageURL = window.location.search.substring(1);
+        var sURLVariables = sPageURL.split('&');
+        for (var i = 0; i < sURLVariables.length; i++) {
+            var sParameterName = sURLVariables[i].split('=');
+            if (sParameterName[0] == sParam) {
+                return sParameterName[1];
+            }
+        }
+    }
+
+    var checkInvite = function () {
+        var appType = document.getElementById("app_type").value;
+        var inviteRow = document.getElementById("inviteRow");
+
+        if (jQuery('#app_type').prop('selectedIndex') > 1) {
+            jQuery(inviteRow).show();
+        } else {
+            jQuery(inviteRow).hide();
+        }
+    }
+    var appVar = getUrlVars('app');
+    if (appVar != undefined) {
+        jQuery('#app_type').val(appVar);
+        jQuery('#name').focus();
+    }
+</script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/mailcheck/mailcheck/src/mailcheck.min.js" defer=""></script>
+<script>
+    var superStringDistance = function (string1, string2) {
+        console.log(string1, string2);
+    }
+    var domains = ['gmail.com', 'hotmail.com', 'globo.com', 'live.com', 'uol.com.br', 'bol.com.br', 'terra.com.br', 'msn.com', 'ig.com.br'];
+    var secondLevelDomains = ['hotmail', 'outlook', 'yahoo']
+    var topLevelDomains = ["com", "com.br", "net.br"];
+    jQuery('#email').on('blur', function () {
+        jQuery(this).mailcheck({
+            domains: domains,                       // optional
+            secondLevelDomains: secondLevelDomains, // optional
+            topLevelDomains: topLevelDomains,       // optional
+            //    distanceFunction: superStringDistance,  // optional
+            suggested: function (element, suggestion) {
+                jQuery('#email-suggest').html('Você quis dizer <em>' + suggestion.full + '</em>? Se estiver correto é só prosseguir. <br/>').css('color', '#e63f3f');
+                ga('send', 'event', 'Form Autorizar', 'E-mail errado sugerido', suggestion.domain);
+            },
+            empty: function (element) {
+                jQuery('#email-suggest').html('');
+            }
+        });
+    });
+</script>
+    </div>
+</div>
+	
+		<p class="data-control-id-2916730 bd-textblock-442 bd-content-element">
+    Você será redirecionado para o PagSeguro. Faça login <u>com a conta principal</u> para autorizar nossa aplicação.
+</p></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<section class="data-control-id-2916661 bd-section-124 bd-page-width bd-tagstyles " id="section52" data-section-title="Section">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="bd-separator-60 bd-page-width  data-control-id-2916700 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<section class="data-control-id-2916415 bd-section-122 bd-page-width bd-tagstyles " id="passo2" data-section-title="passo2">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2916420 bd-layoutcontainer-40 bd-page-width  bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row ">
+                <div class="data-control-id-2916648 bd-columnwrapper-150 
+ col-sm-1">
+    <div class="bd-layoutcolumn-150 bd-column" ><div class="bd-vertical-align-wrapper"><h1 class="data-control-id-2916649 bd-textblock-431 bd-content-element">
+    2.
+</h1></div></div>
+</div>
+	
+		<div class="data-control-id-2916623 bd-columnwrapper-149 
+ col-sm-4">
+    <div class="bd-layoutcolumn-149 bd-column" ><div class="bd-vertical-align-wrapper"><h2 class="data-control-id-2916646 bd-textblock-425 bd-content-element">
+    Instalar o módulo
+</h2>
+	
+		<p class="data-control-id-2916645 bd-textblock-419 bd-content-element">
+    Este ainda é um módulo em fase beta, porém funcional.<br>Fique à vontade para reportar problemas ou dúvidas no processo de instalação.
+</p>
+	
+		<p class="data-control-id-2916644 bd-textblock-417 bd-content-element">
+    Pré-requisitos
+</p>
+	
+		<div class="data-control-id-2916643 bd-customhtml-43 bd-tagstyles">
+    <div class="bd-container-inner bd-content-element">
+        <ul>
+  <li><span style="background-color: rgba(0, 0, 0, 0);"><b>Magento 2.3.7+ ou 2.4.x</b></span><br></li>
+  <li>PHP 7.4 ou superior</li><li>Acesso ao SSH (Terminal)/FTP do ambiente Magento</li><li>Extensão cURL do PHP Habilitada</li>
+</ul>
+    </div>
+</div>
+	
+		<span class="bd-iconlink-27 bd-own-margins bd-icon-155 bd-icon data-control-id-2916632"></span>
+	
+		<p class="data-control-id-2916624 bd-textblock-416 bd-content-element">
+    Antes de instalar qualquer módulo, lembre-se de fazer backup dos arquivos e base de sua loja e/ou utilizar um ambiente de testes.
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2916430 bd-columnwrapper-148 
+ col-sm-6">
+    <div class="bd-layoutcolumn-148 bd-column" ><div class="bd-vertical-align-wrapper"><div class="bd-textgroup-14 data-control-id-2916621 bd-block"  >
+    <div class="bd-container-inner">
+        <div class="media">
+            
+ <img class="bd-imagelink-124 bd-own-margins bd-imagestyles pull-left bd-media-xs media-object data-control-id-2916596"  src="../../assets/images/7a2f469184c00fbe0e16f51e04527fa9_commandline.png">
+            <div class="media-body">
+                
+                    <h4 class="bd-blockheader bd-tagstyles media-heading data-control-id-2916608 bd-content-element"  >Instalando via Composer (recomendável)</h4>
+                
+                <div class="bd-blockcontent bd-tagstyles data-control-id-2916620 bd-content-element" >
+                    Acesse o <strong>SSH</strong> do seu servidor e na raíz da sua instalação digite:
+<br><br>
+<code>composer require ricardomartins/pagseguro</code>&nbsp;<br><small>ou</small><br>
+<code>composer require ricardomartins/pagseguro --ignore-platform-reqs —no-plugins</code>
+<br><small>para ignorar problemas de compatibilidade de outros módulos ou do sistema</small>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+	
+		<p class="data-control-id-2916592 bd-textblock-380 bd-content-element">
+    Caso lhe seja solicitado um Username e Password após digitar o comando acima, utilize suas chaves do <a href="https://marketplace.magento.com/customer/accessKeys/">Marketplace Magento</a>, como mostrado <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/4405351641101">neste artigo</a>.
+</p>
+	
+		<div class="data-control-id-2916565 bd-blockwidget-10 bd-block-18 bd-own-margins">
+    <div class="data-control-id-2917800 bd-blockheader bd-tagstyles bd-no-margins">
+        <h4>Limpe os caches e atualize</h4>
+    </div>
+    <div class="data-control-id-2917764 bd-blockcontent bd-tagstyles">
+        <code>bin/magento setup:upgrade</code>
+<br>
+<code>bin/magento setup:di:compile</code>
+    </div>
+</div>
+	
+		<p class="data-control-id-2916563 bd-textblock-309 bd-content-element">
+    Se preferir, assista o <a href="https://www.youtube.com/watch?v=DQJ3W9Qfn58" target="_blank">vídeo com o passo a passo</a> da instalação.
+</p>
+	
+		<div class="bd-separator-58 data-control-id-2916562 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+	
+		<div class="bd-textgroup-13 data-control-id-2916525 bd-block"  >
+    <div class="bd-container-inner">
+        <div class="media">
+            
+ <img class="bd-imagelink-122 bd-own-margins bd-imagestyles pull-left bd-media-xs media-object data-control-id-2916500"  src="../../assets/images/62fccb1e738f84088853d65497725567_ftpprotocol.png">
+            <div class="media-body">
+                
+                    <h4 class="bd-blockheader bd-tagstyles media-heading data-control-id-2916512 bd-content-element"  >Instalando manualmente</h4>
+                
+                <div class="bd-blockcontent bd-tagstyles data-control-id-2916524 bd-content-element" >
+                    Se desejar realizar a instalação manual via FTP, siga&nbsp;<a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/articles/360031292751-Magento-2-Como-fazer-a-instala%C3%A7%C3%A3o-manual-do-m%C3%B3dulo-" draggable="false">estas instruções</a>.
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+	
+		<div class="bd-separator-56 data-control-id-2916496 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+	
+		<div class="bd-textgroup-12 data-control-id-2916459 bd-block"  >
+    <div class="bd-container-inner">
+        <div class="media">
+            
+ <img class="bd-imagelink-120 bd-own-margins bd-imagestyles pull-left bd-media-xs media-object data-control-id-2916434"  src="../../assets/images/a2909946392c1d2ed2e7c31b99f311c8_magento.jpg">
+            <div class="media-body">
+                
+                    <h4 class="bd-blockheader bd-tagstyles media-heading data-control-id-2916446 bd-content-element"  >Instalando via Marketplace</h4>
+                
+                <div class="bd-blockcontent bd-tagstyles data-control-id-2916458 bd-content-element" >
+                    <a href="https://marketplace.magento.com/ricardomartins-pagseguro.html" target="_blank" class="bd-button" draggable="false">Instalar via Marketplace</a><br>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<section class="data-control-id-2916362 bd-section-121 bd-page-width bd-tagstyles " id="section32" data-section-title="Section">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="bd-separator-54 bd-page-width  data-control-id-2916401 bd-separator-center bd-separator-content-center clearfix" >
+    <div class="bd-container-inner">
+        <div class="bd-separator-inner">
+            
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<section class="data-control-id-2916277 bd-section-120 bd-page-width bd-tagstyles " id="passo3" data-section-title="passo3">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2916282 bd-layoutcontainer-34 bd-page-width  bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row ">
+                <div class="data-control-id-2916349 bd-columnwrapper-144 
+ col-sm-1">
+    <div class="bd-layoutcolumn-144 bd-column" ><div class="bd-vertical-align-wrapper"><h1 class="data-control-id-2916350 bd-textblock-308 bd-content-element">
+    3.
+</h1></div></div>
+</div>
+	
+		<div class="data-control-id-2916345 bd-columnwrapper-140 
+ col-sm-4">
+    <div class="bd-layoutcolumn-140 bd-column" ><div class="bd-vertical-align-wrapper"><h2 class="data-control-id-2916347 bd-textblock-301 bd-content-element">
+    Configurar o módulo
+</h2>
+	
+		<p class="data-control-id-2916346 bd-textblock-264 bd-content-element">
+    Estamos quase lá. Agora é só configurar e ativar o módulo no Magento.
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2916292 bd-columnwrapper-139 
+ col-sm-6">
+    <div class="bd-layoutcolumn-139 bd-column" ><div class="bd-vertical-align-wrapper"><div class="data-control-id-2916317 bd-blockwidget-9 bd-block-17 bd-own-margins">
+    <div class="data-control-id-2917728 bd-blockheader bd-tagstyles bd-no-margins">
+        <h4>Na área administrativa da loja...</h4>
+    </div>
+    <div class="data-control-id-2917692 bd-blockcontent bd-tagstyles">
+        
+    </div>
+</div>
+	
+		<div class="data-control-id-2916315 bd-customhtml-42 bd-tagstyles">
+    <div class="bd-container-inner bd-content-element">
+        <ol>
+  <li>Vá até as configurações da loja em Loja &gt; Configurações</li><li>Altere a quantidade de linhas de endereço de cliente em Cliente&gt;Configurações&gt;Opções de Nome e Endereço &gt; Número de linhas, mude o valor para 4, e salve as configurações.</li><li>Navegue até Vendas &gt; Formas de Pagamento</li>
+  <li>Localize as configurações do módulo identificado como “PagSeguro - General Settings - Ricardo Martins” e configure os campos como mostrado abaixo:</li>
+</ol>
+    </div>
+</div>
+	
+		<p class="data-control-id-2916304 bd-textblock-263 bd-content-element">
+    <b>
+    E-mail</b>: e-mail da conta PagSeguro<br><b>Public Key</b>: chave do módulo informado no passo 1 e também enviada para o e-mail informado no primeiro passo
+</p>
+	
+		<div class="data-control-id-2916303 bd-customhtml-41 bd-tagstyles">
+    <div class="bd-container-inner bd-content-element">
+        <ol start="5">
+  <li>Descendo um pouco mais você encontrará outro grupo de configurações relacionados apenas ao Cartão de crédito pagseguro (PagSeguro - Credit Card - Ricardo Martins)</li>
+  <li>Habilite o meio de pagamento cartão de crédito e configure outras opções e recursos à gosto.</li><li>Salve as configurações e limpe o cache da loja.</li>
+</ol>
+    </div>
+</div></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<section class="data-control-id-2916263 bd-section-118 bd-tagstyles" id="section41" data-section-title="Section">
+    <div class="bd-container-inner bd-margins clearfix">
+        <h1 class="data-control-id-2916265 bd-textblock-262 bd-content-element">
+    Pronto! Agora é só começar a vender!
+</h1>
+	
+		<p class="data-control-id-2916264 bd-textblock-261 bd-content-element">
+    Dúvidas? <a href="https://pagsegurotransparente.zendesk.com/hc/pt-br/requests/new">Entre em contato</a> comigo na central de ajuda.
+</p>
+    </div>
+</section>
+</div>
+</div></div>
+	
+		<div data-smooth-scroll data-animation-time="250" class="data-control-id-520690 bd-smoothscroll-3"><a href="#" class="data-control-id-2787 bd-backtotop-1 ">
+    <span class="bd-icon-67 bd-icon data-control-id-2786"></span>
+</a></div>
+	
+		<footer class="data-control-id-936277 bd-footerarea-1 bd-margins">
+        <section class="data-control-id-2268076 bd-section-13 bd-tagstyles" id="section13" data-section-title="Section">
+    <div class="bd-container-inner bd-margins clearfix">
+        <img class="bd-imagelink-26 bd-own-margins bd-imagestyles   data-control-id-2268212"  src="../../assets/images/5f3dd3f15a436fc50c055a83a656670f_sitepagseguro.png">
+	
+		<a 
+ href="https://magenteiro.com/cursos?utm_source=pagsegurosite&utm_media=footerbar" class="bd-linkbutton-1 data-control-id-2268226 bd-button-22  bd-own-margins bd-content-element"    >
+    saiba mais
+</a>
+    </div>
+</section>
+	
+		<section class="data-control-id-2143525 bd-section-1 bd-tagstyles" id="section4" data-section-title="Footer Two Columns">
+    <div class="bd-container-inner bd-margins clearfix">
+        <div class="data-control-id-2163355 bd-layoutcontainer-13 bd-columns bd-no-margins">
+    <div class="bd-container-inner">
+        <div class="container-fluid">
+            <div class="row 
+ bd-row-flex 
+ bd-row-align-top">
+                <div class="data-control-id-2163360 bd-columnwrapper-21 
+ col-lg-4
+ col-md-4
+ col-sm-12">
+    <div class="bd-layoutcolumn-21 bd-column" ><div class="bd-vertical-align-wrapper"><p class="data-control-id-2143634 bd-textblock-8 bd-content-element">
+    <b>Links Rápidos</b><br><a href="/download-wizard.html" draggable="false">Download</a><br><a href="https://pagseguro.ricardomartins.net.br/compare.html" draggable="false">Autorizar aplicação</a><br><a href="https://pagseguro.ricardomartins.net.br/pro/?_gl=1*mu1ha2*_ga*MTA3ODE4MjMyMy4xNjc1NjUwMDUx*_ga_RX1N5F90DX*MTY5ODYzMzQxNS4xOS4xLjE2OTg2MzgyNTUuMC4wLjA." draggable="false">Modelo de assinatura mensal</a><br><a href="https://pagsegurotransparente.zendesk.com/hc/pt-br" draggable="false">Central de ajuda</a>
+<br><a href="https://www.magenteiro.com/cursos?___store=default" draggable="false">Cursos Magento</a>
+<br><a href="https://pagseguro.ricardomartins.net.br/status.html" draggable="false">Status PagSeguro</a><br><a href="/naorecebi.html" rel="nofollow" draggable="false">Não recebi o módulo por e-mail</a><br>
+<a href="/terms.html" rel="nofollow" draggable="false">Termos de Uso e Privacidade</a><br>
+<!--<br><a href="http://r-martins.github.io/PagSeguro-Magento-Transparente/bounty.html">Programa de Recompensas</a>--><a href="https://pagseguro.ricardomartins.net.br/sobre.html" draggable="false">
+Sobre o autor</a><br><br>
+</p></div></div>
+</div>
+	
+		<div class="data-control-id-2163470 bd-columnwrapper-25 
+ col-lg-8
+ col-md-8
+ col-sm-12">
+    <div class="bd-layoutcolumn-25 bd-column" ><div class="bd-vertical-align-wrapper">
+    
+    <nav class="data-control-id-2163498 bd-hmenu-2"  data-responsive-menu="false" data-responsive-levels="expand on click" data-responsive-type="" data-offcanvas-delay="0ms" data-offcanvas-duration="700ms" data-offcanvas-timing-function="ease">
+        
+            
+            <div class="data-control-id-2163486 bd-horizontalmenu-2 clearfix">
+                <div class="bd-container-inner">
+                    
+                    
+                    <ul class="data-control-id-2163563 bd-menu-3 nav nav-pills navbar-left">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+                        
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../index.html" >Início</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../demo.html" >Demo</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../Vantagens.html" >Vantagens</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../faq.html" >Suporte</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../compare.html" >Taxas</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../magento1.html" >Magento 1</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a 
+ class="active" href="../magento2.html" >Magento 2</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../woocommerce.html" >Woocommerce</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                            
+                            <li class="data-control-id-2163564 bd-menuitem-10
+                                        
+                                        bd-toplevel-item
+                                        
+                                        "
+                                    >
+
+                                
+                            
+                            <a  href="../doar-com-pagseguro.html" >DoarBox</a>
+
+                                
+                                    
+                            
+                            
+                            </li>
+                    </ul>
+                    
+                    
+                </div>
+            </div>
+            
+            <div class="bd-menu-close-icon">
+    <a href="#" class="bd-icon data-control-id-2322696 bd-icon-101"></a>
+</div>
+        
+    </nav></div></div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</section>
+	
+		<section class="data-control-id-2115024 bd-section-2 bd-page-width bd-tagstyles " id="section2" data-section-title="">
+    <div class="bd-container-inner bd-margins clearfix">
+        <p class="data-control-id-2163641 bd-textblock-36 bd-content-element">
+    <small class="copyright">Módulos desenvolvidos por Ricardo Martins (e equipe/colaboradores). Não possuí nenhum vínculo com PagSeguro UOL.</small>
+</p>
+	
+		<div class="data-control-id-2201600 bd-pagefooter-1 hidden-md hidden-sm hidden-xs hidden-lg bd-page-width ">
+    <div class="bd-container-inner">
+        
+            <a href='http://www.themler.io/html-templates' target="_blank">HTML Template</a> created with <a href='http://themler.io' target="_blank">Themler</a>.
+    </div>
+</div>
+    </div>
+</section>
+</footer>
+</body>
+</html>
