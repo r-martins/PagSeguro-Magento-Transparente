@@ -299,24 +299,36 @@ RMPagSeguro = Class.create({
                 return;
             }
             RMPagSeguroObj.cardBin = ccNum.substring(0, 6);
-            PagSeguroDirectPayment.getBrand({
-                cardBin: currentBin,
-                success: function(psresponse){
-                    RMPagSeguroObj.brand = psresponse.brand;
-                    $('card-brand').innerHTML = psresponse.brand.name;
-                    if(RMPagSeguroObj.config.flag != ''){
+            
+            let cardTypes = RMPagSeguroObj.getCardTypes(ccNum);
+            if (cardTypes.length > 0) {
+                RMPagSeguroObj.brand = cardTypes[0].type;
+                $('card-brand').innerHTML = cardTypes[0].type;
+                if(RMPagSeguroObj.config.flag != ''){
 
-                        $('card-brand').innerHTML = '<img src="' + urlPrefix + 'public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>';
-                    }
-                    $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*!/g,'');
-                },
-                error: function(psresponse){
-                    console.error('Falha ao obter bandeira do cartão.');
-                    if(RMPagSeguroObj.config.debug){
-                        console.debug('Verifique a chamada para /getBin em df.uol.com.br no seu inspetor de Network a fim de obter mais detalhes.');
-                    }
+                    $('card-brand').innerHTML = '<img src="' + urlPrefix + 'public/img/payment-methods-flags/' +flag + '/' + cardTypes[0].type + '.png" alt="' + cardTypes[0].type + '" title="' + cardTypes[0].type + '"/>';
                 }
-            })
+                $('card-brand').className = cardTypes[0].type.replace(/[^a-zA-Z]*!/g,'');
+            } else {
+                PagSeguroDirectPayment.getBrand({
+                    cardBin: currentBin,
+                    success: function(psresponse){
+                        RMPagSeguroObj.brand = psresponse.brand;
+                        $('card-brand').innerHTML = psresponse.brand.name;
+                        if(RMPagSeguroObj.config.flag != ''){
+
+                            $('card-brand').innerHTML = '<img src="' + urlPrefix + 'public/img/payment-methods-flags/' +flag + '/' + psresponse.brand.name + '.png" alt="' + psresponse.brand.name + '" title="' + psresponse.brand.name + '"/>';
+                        }
+                        $('card-brand').className = psresponse.brand.name.replace(/[^a-zA-Z]*!/g,'');
+                    },
+                    error: function(psresponse){
+                        console.error('Falha ao obter bandeira do cartão.');
+                        if(RMPagSeguroObj.config.debug){
+                            console.debug('Verifique a chamada para /getBin em df.uol.com.br no seu inspetor de Network a fim de obter mais detalhes.');
+                        }
+                    }
+                })
+            }
         }
     },
     disablePlaceOrderButton: function(){
@@ -447,6 +459,103 @@ RMPagSeguro = Class.create({
                 PagSeguroDirectPayment.setSessionId(session_id);
             }
         });
+    },
+
+    getCardTypes: function (cardNumber) {
+        const typesPagBank = [
+            {
+                title: 'MasterCard',
+                type: 'mastercard',
+                pattern: '^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$',
+                gaps: [4, 8, 12],
+                lengths: [16],
+                code: {
+                    name: 'CVC',
+                    size: 3
+                }
+            },
+            {
+                title: 'American Express',
+                type: 'amex',
+                pattern: '^3([47]\\d*)?$',
+                isAmex: true,
+                gaps: [4, 10],
+                lengths: [15],
+                code: {
+                    name: 'CID',
+                    size: 4
+                }
+            },
+            {
+                title: 'Diners',
+                type: 'dinnersclub',
+                pattern: '^(3(0[0-5]|095|6|[8-9]))\\d*$',
+                gaps: [4, 10],
+                lengths: [14, 16, 17, 18, 19],
+                code: {
+                    name: 'CVV',
+                    size: 3
+                }
+            },
+            {
+                title: 'Elo',
+                type: 'elo',
+                pattern: '^((451416)|(509091)|(636368)|(636297)|(504175)|(438935)|(40117[8-9])|(45763[1-2])|' +
+                    '(457393)|(431274)|(50990[0-2])|(5099[7-9][0-9])|(50996[4-9])|(509[1-8][0-9][0-9])|' +
+                    '(5090(0[0-2]|0[4-9]|1[2-9]|[24589][0-9]|3[1-9]|6[0-46-9]|7[0-24-9]))|' +
+                    '(5067(0[0-24-8]|1[0-24-9]|2[014-9]|3[0-379]|4[0-9]|5[0-3]|6[0-5]|7[0-8]))|' +
+                    '(6504(0[5-9]|1[0-9]|2[0-9]|3[0-9]))|' +
+                    '(6504(8[5-9]|9[0-9])|6505(0[0-9]|1[0-9]|2[0-9]|3[0-8]))|' +
+                    '(6505(4[1-9]|5[0-9]|6[0-9]|7[0-9]|8[0-9]|9[0-8]))|' +
+                    '(6507(0[0-9]|1[0-8]))|(65072[0-7])|(6509(0[1-9]|1[0-9]|20))|' +
+                    '(6516(5[2-9]|6[0-9]|7[0-9]))|(6550(0[0-9]|1[0-9]))|' +
+                    '(6550(2[1-9]|3[0-9]|4[0-9]|5[0-8])))\\d*$',
+                gaps: [4, 8, 12],
+                lengths: [16],
+                code: {
+                    name: 'CVC',
+                    size: 3
+                }
+            },
+            {
+                title: 'Hipercard',
+                type: 'hipercard',
+                pattern: '^((606282)|(637095)|(637568)|(637599)|(637609)|(637612))\\d*$',
+                gaps: [4, 8, 12],
+                lengths: [13, 16],
+                code: {
+                    name: 'CVC',
+                    size: 3
+                }
+            },
+            {
+                title: 'Aura',
+                type: 'aura',
+                pattern: '^5078\\d*$',
+                gaps: [4, 8, 12],
+                lengths: [19],
+                code: {
+                    name: 'CVC',
+                    size: 3
+                }
+            }];
+
+        //remove spaces
+        cardNumber = cardNumber.replace(/\s/g, '');
+        let result = [];
+
+        if (jQuery.isEmptyObject(cardNumber)) {
+            return result;
+        }
+
+        for (let i = 0; i < typesPagBank.length; i++) {
+            let value = typesPagBank[i];
+            if (new RegExp(value.pattern).test(cardNumber)) {
+                result.push(jQuery.extend(true, {}, value));
+            }
+        }
+
+        return result.slice(-1);
     }
 });
 
@@ -1279,58 +1388,65 @@ RMPagSeguro_Multicc_CardForm = Class.create
             this._setupSyncLock("brand");
             this._debug("Solicitando bandeira do cartão de crédito");
 
-            PagSeguroDirectPayment.getBrand
-            ({
-                cardBin: fieldValue.substring(0, 6),
-                success: (function(response)
-                {
-                    if(response && response.brand)
+            let cardTypes = RMPagSeguroObj.getCardTypes(fieldValue);
+            if (cardTypes.length > 0) {
+                this.setCardData("brand", cardTypes[0].type);
+                this.setCardMetadata("cid_size", cardTypes[0].code.size);
+                this._debug("Bandeira armazenada com sucesso");
+            } else {
+                PagSeguroDirectPayment.getBrand
+                ({
+                    cardBin: fieldValue.substring(0, 6),
+                    success: (function(response)
                     {
-                        this.setCardData("brand", response.brand.name);
-                        this.setCardMetadata("cid_size", response.brand.cvvSize);
-                        this.setCardMetadata("validation_algorithm", response.brand.validationAlgorithm);
-                        this._debug("Bandeira armazenada com sucesso");
-                    }
-                    else
+                        if(response && response.brand)
+                        {
+                            this.setCardData("brand", response.brand.name);
+                            this.setCardMetadata("cid_size", response.brand.cvvSize);
+                            this.setCardMetadata("validation_algorithm", response.brand.validationAlgorithm);
+                            this._debug("Bandeira armazenada com sucesso");
+                        }
+                        else
+                        {
+                            this.setCardData("brand", "");
+                            this.setCardMetadata("cid_size", "");
+                            this.setCardMetadata("validation_algorithm", "");
+                            this._debug("Bandeira não encontrada");
+                        }
+
+                        // this validation must be here, to ensure that its going to run after
+                        // the set data (not happenned when code was placed on complete callback)
+                        if(field !== document.activeElement)
+                        {
+                            Validation.validate(field);
+                        }
+
+                        this._createCardTokenOnPagSeguro();
+
+                    }).bind(this),
+                    error: (function()
                     {
                         this.setCardData("brand", "");
                         this.setCardMetadata("cid_size", "");
                         this.setCardMetadata("validation_algorithm", "");
                         this._debug("Bandeira não encontrada");
-                    }
 
-                    // this validation must be here, to ensure that its going to run after 
-                    // the set data (not happenned when code was placed on complete callback)
-                    if(field !== document.activeElement)
+                        // this validation must be here, to ensure that its going to run after
+                        // the set data (not happenned when code was placed on complete callback)
+                        if(field !== document.activeElement)
+                        {
+                            Validation.validate(field);
+                        }
+
+                    }).bind(this),
+                    complete: (function()
                     {
-                        Validation.validate(field);
-                    }
+                        this._removeSyncLock("brand");
+                        this.setCardMetadata("bin_calculated_for", fieldValue.substring(0, 6));
 
-                    this._createCardTokenOnPagSeguro();
-
-                }).bind(this),
-                error: (function()
-                {
-                    this.setCardData("brand", "");
-                    this.setCardMetadata("cid_size", "");
-                    this.setCardMetadata("validation_algorithm", "");
-                    this._debug("Bandeira não encontrada");
-
-                    // this validation must be here, to ensure that its going to run after 
-                    // the set data (not happenned when code was placed on complete callback)
-                    if(field !== document.activeElement)
-                    {
-                        Validation.validate(field);
-                    }
-
-                }).bind(this),
-                complete: (function()
-                {
-                    this._removeSyncLock("brand");
-                    this.setCardMetadata("bin_calculated_for", fieldValue.substring(0, 6));
-
-                }).bind(this)
-            });
+                    }).bind(this)
+                });
+            }
         }
         // clears brand if the card data became smaller than 6 digits
         else if(fieldValue.length < 6)
