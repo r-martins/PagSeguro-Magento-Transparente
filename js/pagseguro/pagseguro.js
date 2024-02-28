@@ -2045,7 +2045,7 @@ RMPagSeguro_Multicc_CardForm = Class.create
         if( newValue.substring(0, 6) != oldValue.substring(0, 6) && 
             newValue.substring(0, 6) != this.getCardMetadata("bin_calculated_for")
         ) {
-            this.setCardData("brand", "");
+            //this.setCardData("brand", "");
             this._consultCardBrandOnPagSeguro(this._getFieldElement("number"));
         }
     },
