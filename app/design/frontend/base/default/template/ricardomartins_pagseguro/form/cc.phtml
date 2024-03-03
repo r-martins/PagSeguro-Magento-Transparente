@@ -39,7 +39,7 @@ $multiCcEnabled = Mage::helper('ricardomartins_pagseguro')->isMultiCcEnabled();
     <li>
         <label for="<?php echo $_code ?>_cc_number" class="required"><em>*</em><?php echo $this->__('Credit Card Number') ?></label>
         <div class="input-box">
-            <input type="text" id="<?php echo $_code ?>_cc_number" name="payment[ps_cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text embedded-flag validate-cc-number validate-cc-type required-entry validate-pagseguro" value="" maxlength="16"/>
+            <input type="text" id="<?php echo $_code ?>_cc_number" name="payment[ps_cc_number]" title="<?php echo $this->__('Credit Card Number') ?>" class="input-text embedded-flag validate-cc-number validate-cc-type required-entry validate-pagseguro" value="" maxlength="24"/>
             <?php #nao remover os campos abaixo ?>
             <input type="hidden" id="<?php echo $_code ?>_cc_type" name="payment[ps_cc_brand]" value=""/>
             <span id="card-brand" style="text-transform: capitalize; display: block;"></span>
