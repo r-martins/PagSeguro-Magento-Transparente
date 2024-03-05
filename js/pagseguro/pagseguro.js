@@ -296,7 +296,8 @@ RMPagSeguro = Class.create({
 
             let cardTypes = RMPagSeguroObj.getCardTypes(ccNum);
             if (cardTypes.length > 0) {
-                RMPagSeguroObj.brand = cardTypes[0].type;
+                RMPagSeguroObj.brand = {};
+                RMPagSeguroObj.brand.name = cardTypes[0].type;
                 RMPagSeguroObj._updateBrandOnHTML(cardTypes[0].type);
             } else {
                 PagSeguroDirectPayment.getBrand({
@@ -472,6 +473,17 @@ RMPagSeguro = Class.create({
                 title: 'MasterCard',
                 type: 'mastercard',
                 pattern: '^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$',
+                gaps: [4, 8, 12],
+                lengths: [16],
+                code: {
+                    name: 'CVC',
+                    size: 3
+                }
+            },
+            {
+                title: 'Visa',
+                type: 'visa',
+                pattern: '^4[0-9]{12}([0-9]{3})?$',
                 gaps: [4, 8, 12],
                 lengths: [16],
                 code: {
