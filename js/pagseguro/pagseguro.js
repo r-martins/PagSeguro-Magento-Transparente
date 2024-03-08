@@ -60,32 +60,32 @@ RMPagSeguro = Class.create({
      * @param String value
      * @returns Boolean
      */
-    validateCPFNumber: function(value)
+    validateCPFNumber: function(cpfValue)
     {
         // if (value.length != 11) return false;
 
         var repeatedDigits = true;
-        value = value.replace(/\D/g,"");
+        cpfValue = cpfValue.replace(/\D/g,"");
 
         for(var i = 0; i < 10; i++)
         {
-            if(value.charAt(i) != value.charAt(i + 1)) { repeatedDigits = false; break; }
+            if(cpfValue.charAt(i) != cpfValue.charAt(i + 1)) { repeatedDigits = false; break; }
         }
 
         if (repeatedDigits) { return false; }
         var sum = 0;
-        for (i=0; i < 9; i ++) { sum += parseInt(value.charAt(i)) * (10 - i); }
+        for (i=0; i < 9; i ++) { sum += parseInt(cpfValue.charAt(i)) * (10 - i); }
 
         var rev = 11 - (sum % 11);
         if (rev == 10 || rev == 11) rev = 0;
-        if (rev != parseInt(value.charAt(9))) return false;
+        if (rev != parseInt(cpfValue.charAt(9))) return false;
 
         sum = 0;
-        for (i = 0; i < 10; i ++) { sum += parseInt(value.charAt(i)) * (11 - i); }
+        for (i = 0; i < 10; i ++) { sum += parseInt(cpfValue.charAt(i)) * (11 - i); }
         rev = 11 - (sum % 11);
 
         if (rev == 10 || rev == 11) rev = 0;
-        if (rev != parseInt(value.charAt(10))) return false;
+        if (rev != parseInt(cpfValue.charAt(10))) return false;
 
         return true;
     },
@@ -1080,36 +1080,36 @@ RMPagSeguro_Multicc_Control = Class.create
 
     /**
      * Validates document (CPF) numbers
-     * @param String value
+     * @param String cpfVvalue 
      * @returns Boolean
      */
-    _validateCPFNumber: function(value)
+     _validateCPFNumber: function(cpfValue)
     {
-        if (value.length != 14) return false;
-
+        if (cpfValue.length != 14) return false;
+            
         var repeatedDigits = true;
-        value = value.replace(/\D/g,"");
-
+        cpfValue = cpfValue.replace(/\D/g,"");
+        
         for(var i = 0; i < 10; i++)
         {
-            if(value.charAt(i) != value.charAt(i + 1)) { repeatedDigits = false; break; }
+            if(cpfValue.charAt(i) != cpfValue.charAt(i + 1)) { repeatedDigits = false; break; }
         }
-
+        
         if (repeatedDigits) { return false; }
         var sum = 0;
-        for (i=0; i < 9; i ++) { sum += parseInt(value.charAt(i)) * (10 - i); }
-
+        for (i=0; i < 9; i ++) { sum += parseInt(cpfValue.charAt(i)) * (10 - i); }
+        
         var rev = 11 - (sum % 11);
         if (rev == 10 || rev == 11) rev = 0;
-        if (rev != parseInt(value.charAt(9))) return false;
-
+        if (rev != parseInt(cpfValue.charAt(9))) return false;
+        
         sum = 0;
-        for (i = 0; i < 10; i ++) { sum += parseInt(value.charAt(i)) * (11 - i); }
+        for (i = 0; i < 10; i ++) { sum += parseInt(cpfValue.charAt(i)) * (11 - i); }
         rev = 11 - (sum % 11);
 
         if (rev == 10 || rev == 11) rev = 0;
-        if (rev != parseInt(value.charAt(10))) return false;
-
+        if (rev != parseInt(cpfValue.charAt(10))) return false;
+        
         return true;
     },
 
