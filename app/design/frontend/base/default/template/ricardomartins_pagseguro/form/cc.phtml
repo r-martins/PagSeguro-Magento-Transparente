@@ -25,6 +25,13 @@ $multiCcEnabled = Mage::helper('ricardomartins_pagseguro')->isMultiCcEnabled();
         </div>
     </li>
 */ ?>
+    <?php if ($this->getInstructions()): ?>
+    <li>
+        <div class="<?php echo $_code; ?>-instructions-content agreement-content">
+            <?php echo nl2br($this->getInstructions()) ?>
+        </div>
+    </li>
+    <?php endif; ?>
     <?php if ($multiCcEnabled):?>
     <li>
         <label for="multicc"><?php echo __('Pay with 2 cards')?></label>

@@ -11,7 +11,9 @@
  */
 class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro_Model_Abstract
 {
-    protected $_code = 'rm_pagseguro_cc';
+    const CODE = 'rm_pagseguro_cc';
+
+    protected $_code = self::CODE;
     protected $_formBlockType = 'ricardomartins_pagseguro/form_cc';
     protected $_infoBlockType = 'ricardomartins_pagseguro/form_info_cc';
     protected $_isGateway = true;
@@ -73,6 +75,12 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     {
         if (!($data instanceof Varien_Object)) {
             $data = new Varien_Object($data);
+        }
+
+        $session = Mage::getSingleton('api/session');
+
+        if ($session->isLoggedIn()) {
+            $session->setData('PsPayment', serialize($data->getData('PsPayment')));
         }
 
         $info = $this->getInfoInstance();
@@ -315,6 +323,8 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
     protected function _order($payment, $amount, $ccIdx)
     {
         $order = $payment->getOrder();
+
+        $order->setState(Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW, true);
 
         if ($this->isMultiCardPayment($payment)) {
             $cardData = $payment->getAdditionalInformation("cc" . $ccIdx);
@@ -1301,5 +1311,10 @@ class RicardoMartins_PagSeguro_Model_Payment_Cc extends RicardoMartins_PagSeguro
         } catch (Exception $e) {
             Mage::throwException($e->getMessage());
         }
+    }
+
+    public function getInstructions()
+    {
+        return trim($this->getConfigData('instructions'));
     }
 }

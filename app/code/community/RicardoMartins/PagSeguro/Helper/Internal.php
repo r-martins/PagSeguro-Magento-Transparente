@@ -72,7 +72,7 @@ class RicardoMartins_PagSeguro_Helper_Internal extends Mage_Core_Helper_Abstract
             'extraAmount'       => $extraAmount,
             'notificationURL'   => Mage::getUrl(
                 'ricardomartins_pagseguro/notification',
-                array('_secure' => true, '_nosid' => $noSID)
+                array('_store' => $order->getStoreId(), '_secure' => true, '_nosid' => $noSID)
             ),
         );
         $params = array_merge($params, $pHelper->getItemsParams($order));

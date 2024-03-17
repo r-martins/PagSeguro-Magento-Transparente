@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+/**
+ * @package     RicardoMartins_PagSeguro
+ * @copyright   Copyright (c) 2022 Gamuza Technologies (http://www.gamuza.com.br/)
+ * @author      Eneias Ramos de Melo <eneias@gamuza.com.br>
+ */
+-->
+
+<config>
+    <api>
+        <resources>
+            <ricardomartins_pagseguro translate="title" module="ricardomartins_pagseguro">
+                <model>ricardomartins_pagseguro/api</model>
+                <title>RicardoMartins PagSeguro API</title>
+                <acl>ricardomartins_pagseguro</acl>
+                <methods>
+                    <session_id translate="title" module="ricardomartins_pagseguro">
+                        <title>Get session ID to process card token.</title>
+                        <acl>ricardomartins_pagseguro/session_id</acl>
+                        <method>sessionId</method>
+                    </session_id>
+                </methods>
+            </ricardomartins_pagseguro>
+        </resources>
+        <acl>
+            <resources>
+                <ricardomartins_pagseguro translate="title" module="ricardomartins_pagseguro">
+                    <title>RicardoMartins PagSeguro API</title>
+                    <sort_order>0</sort_order>
+                    <session_id translate="title" module="ricardomartins_pagseguro">
+                        <title>Session ID</title>
+                    </session_id>
+                </ricardomartins_pagseguro>
+            </resources>
+        </acl>
+    </api>
+</config>
+

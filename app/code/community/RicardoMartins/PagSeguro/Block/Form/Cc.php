@@ -11,6 +11,8 @@
  */
 class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
 {
+    protected $_instructions = null;
+
     /**
      * Set block template
      */
@@ -161,5 +163,14 @@ class RicardoMartins_PagSeguro_Block_Form_Cc extends Mage_Payment_Block_Form_Cc
         }
 
         return "";
+    }
+
+    protected function getInstructions()
+    {
+        if (is_null($this->_instructions)) {
+            $this->_instructions = $this->getMethod()->getInstructions();
+        }
+
+        return $this->_instructions;
     }
 }
