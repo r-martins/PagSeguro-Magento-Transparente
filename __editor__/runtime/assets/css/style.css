@@ -11682,8 +11682,6 @@ a.bd-backtotop-1:hover {
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWNvbnRlbnRsYXlvdXQx {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwx {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwx {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwxMA {}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwxMA {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwxMQ {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwxMQ {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwxMw {}
@@ -16021,21 +16019,6 @@ html[dir="ltr"] [data-responsive-menu="false"] .bd-horizontalmenu-1 .bd-menuitem
   height: 100%;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWltYWdlbGluazg5 {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWltYWdlbGluazk {}
-.bd-imagelink-9 {
-  position: absolute;
-  top: 0%;
-  left: auto;
-  right: 19.295%;
-  bottom: auto;
-  z-index: 2;
-}
-@media (max-width: 767px) {
-  .bd-imagelink-9 {
-    z-index: -2;
-  }
-}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWltYWdlbGluazk {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWltYWdlbGluazkw {}
 .bd-imagelink-90 {
   width: 915px;
@@ -20996,6 +20979,15 @@ h2.bd-postheader-4 a {
 .bd-sliderindicators-2:before {
   vertical-align: bottom;
 }
+.bd-slide-10 {
+  background-image: url(../../assets/images/dc185bcf0479bff56ce4a2879367871f_AdeusChargeback.jpg);
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-position: right center;
+  background-color: #bfbfbf;
+  position: relative;
+  background-size: cover;
+}
 .bd-slide-1 {
   background-color: #f5f5f5;
   background-image: url(../../assets/images/13bb891a1c06b59db3a4d7cb2eb30904_pagseguropagbank.jpg);
@@ -21003,18 +20995,6 @@ h2.bd-postheader-4 a {
   background-attachment: scroll;
   background-position: center center;
   background-size: 100% auto;
-}
-.bd-slide-8 {
-  position: relative;
-  background-color: #269ccb;
-  background-image: linear-gradient(180deg, #269ccb 0%, #0777a3 100%);
-  background-image: -webkit-linear-gradient(270deg, #269ccb 0%, #0777a3 100%);
-  background-image: -o-linear-gradient(270deg, #269ccb 0%, #0777a3 100%);
-  background-image: -ms-linear-gradient(270deg, #269ccb 0%, #0777a3 100%);
-  background-image: -moz-linear-gradient(270deg, #269ccb 0%, #0777a3 100%);
-  background-repeat: repeat;
-  background-attachment: scroll;
-  background-position: 0% 0%;
 }
 .bd-slide-11 {
   background-color: #000000;
@@ -21032,15 +21012,6 @@ h2.bd-postheader-4 a {
 .bd-textureoverlay-1:before {
   background-color: #000000;
   opacity: 0.5;
-}
-.bd-slide-10 {
-  background-image: url(../../assets/images/dc185bcf0479bff56ce4a2879367871f_AdeusChargeback.jpg);
-  background-repeat: no-repeat;
-  background-attachment: scroll;
-  background-position: right center;
-  background-color: #bfbfbf;
-  position: relative;
-  background-size: cover;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNsaWRlcjI {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNsaWRlcjU {}
@@ -21617,35 +21588,6 @@ h5.bd-textblock-16 {
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazE2OA {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazE2OQ {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazE2OQ {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazE3 {}
-.bd-textblock-17 {
-  position: absolute;
-  top: 46.786%;
-  left: 7.607%;
-  right: auto;
-  bottom: auto;
-  display: block;
-  height: 136px;
-}
-@media (max-width: 767px) {
-  .bd-textblock-17 {
-    z-index: 0;
-  }
-}
-.bd-textblock-17 {
-  line-height: 34.2857143px;
-  font-family: Lato, Arial, 'Arial Unicode MS', Helvetica, sans-serif;
-  font-size: 24px;
-  color: #ffffff;
-}
-@media (max-width: 767px) {
-  .bd-textblock-17 {
-    line-height: 18.57142858px;
-    color: #000000;
-    font-size: 13px;
-  }
-}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazE3 {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazE3MA {}
 h2.bd-textblock-170 {
   line-height: 34.2857143px;
@@ -22832,31 +22774,6 @@ h2.bd-textblock-398 {
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazM5OA {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazM5OQ {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazM5OQ {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazQ {}
-.bd-textblock-4 {
-  position: absolute;
-  top: 8.571%;
-  left: 7.746%;
-  right: auto;
-  bottom: auto;
-  z-index: 3;
-  padding: 0px;
-}
-h1.bd-textblock-4 {
-  line-height: 42.85714287px;
-  font-family: Montserrat, Arial, 'Arial Unicode MS', Helvetica, sans-serif;
-  font-weight: bold;
-  color: #f7f7f7;
-  font-size: 30px;
-}
-@media (max-width: 767px) {
-  h1.bd-textblock-4 {
-    line-height: 22.85714286px;
-    font-size: 16px;
-    color: #000000;
-  }
-}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazQ {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazQw {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazQw {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazQwMA {}
