@@ -5,24 +5,24 @@
 	<script>
     var themeHasJQuery = !!window.jQuery;
 </script>
-<script type="text/javascript" src="../../assets/js/jquery.js?1.0.1963"></script>
+<script type="text/javascript" src="../../assets/js/jquery.js?1.0.1974"></script>
 <script>
     window._$ = jQuery.noConflict(themeHasJQuery);
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../../assets/css/bootstrap.css?1.0.1963" media="screen" />
-<script type="text/javascript" src="../../assets/js/bootstrap.min.js?1.0.1963"></script>
+<link rel="stylesheet" href="../../assets/css/bootstrap.css?1.0.1974" media="screen" />
+<script type="text/javascript" src="../../assets/js/bootstrap.min.js?1.0.1974"></script>
 <!--[if lte IE 9]>
-<link rel="stylesheet" href="../../assets/css/layout.ie.css?1.0.1963">
-<script src="../../assets/js/layout.ie.js?1.0.1963"></script>
+<link rel="stylesheet" href="../../assets/css/layout.ie.css?1.0.1974">
+<script src="../../assets/js/layout.ie.js?1.0.1974"></script>
 <![endif]-->
 <link class="" href='//fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,regular,italic,700,700italic,900,900italic|Montserrat:regular,700|Open+Sans:300,300italic,regular,italic,600,600italic,700,700italic,800,800italic&subset=latin' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="../../assets/js/layout.core.js"></script>
-<script src="../../assets/js/CloudZoom.js?1.0.1963"></script>
+<script src="../../assets/js/CloudZoom.js?1.0.1974"></script>
 	
     <title>Autorização realizada com sucesso.</title>
-	<link rel="stylesheet" href="../../assets/css/style.css?1.0.1963">
-	<script src="../../assets/js/script.js?1.0.1963"></script>
+	<link rel="stylesheet" href="../../assets/css/style.css?1.0.1974">
+	<script src="../../assets/js/script.js?1.0.1974"></script>
     <meta charset="utf-8">
     
     <!-- Start cookieyes banner --> <script id="cookieyes" type="text/javascript" src="https://cdn-cookieyes.com/client_data/61b96aa96b1c5b93b2c02576/script.js"></script> <!-- End cookieyes banner -->
@@ -328,9 +328,11 @@ s.parentNode.insertBefore(b, s);})(window.lintrk);
 	
 		<h4 class=" bd-textblock-451 bd-content-element">
     Sua Connect Key é: <span id="chave" style="font-weight: bold; background-color: #f9f9f9"></span>
+<i id="copyButton" class="icon-copy" title="Copiar para área de transferência" style="cursor: pointer"></i>
+
 <script type="text/javascript">
   jQuery(document).ready(function(){
-  jQuery.extend({
+    jQuery.extend({
       getUrlVars: function(){
         var vars = [], hash;
         var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
@@ -346,8 +348,22 @@ s.parentNode.insertBefore(b, s);})(window.lintrk);
         return jQuery.getUrlVars()[name];
       }
     });
-  
-  jQuery('#chave').html(jQuery.getUrlVar('publicKey'));
+
+    jQuery('#chave').html(jQuery.getUrlVar('publicKey'));
+
+    // Copy to clipboard
+    jQuery('#copyButton').click(function(){
+      var temp = jQuery("<input>");
+      jQuery("body").append(temp);
+      temp.val(jQuery('#chave').text()).select();
+      document.execCommand("copy");
+      temp.remove();
+      jQuery(this).text(" Copiado");
+      // After 4 seconds, change the button text back to "Copy"
+      setTimeout(function(){
+        jQuery('#copyButton').text("");
+      }, 4000);
+    });
   });
 </script>
 </h4>
