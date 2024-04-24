@@ -44,7 +44,14 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
             );
         }
 
-        $info['compilation'] = $this->_getCompilerState();
+        try {
+            $info['compilation'] = $this->_getCompilerState();
+        } catch (Exception $e) {
+            $info['compilation'] = array(
+                'status' => 'Unavailable with Errors',
+                'state' => 'Unable to diagnose',
+            );
+        }
 
         $info['token_consistency'] = $this->_getTokenConsistency();
         $info['session_id'] = $helper->getSessionId();
