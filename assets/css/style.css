@@ -11773,8 +11773,6 @@ a.bd-backtotop-1:hover {
   display: none;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwz {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwzMA {}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwzMA {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwzMQ {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwzMQ {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWN1c3RvbWh0bWwzMg {}
@@ -15048,16 +15046,14 @@ html[dir="ltr"] [data-responsive-menu="false"] .bd-horizontalmenu-1 .bd-menuitem
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWljb25saW5rMjc {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWljb25saW5rMw {}
 .bd-icon-22:before {
-  content: '\229';
-}
-.bd-icon-22:before {
-  visibility: inherit;
+  content: url(../../assets/images/0f3d61bfc8441a9d4ad303bd29d5ec9c_parceiro.png);
+  font-size: 0 !important;
+  line-height: 0 !important;
 }
 .bd-icon-22:before {
   font-size: 48px;
   color: #777777;
   line-height: 68.57142859px;
-  line-height: 48px;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWljb25saW5rMw {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWljb25saW5rMzM {}
@@ -16125,11 +16121,6 @@ html[dir="ltr"] [data-responsive-menu="false"] .bd-horizontalmenu-1 .bd-menuitem
   border-bottom: 1px solid #777777;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWxheW91dGJveDE3 {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWxheW91dGJveDE5 {}
-.bd-layoutbox-19 {
-  display: inline-block;
-}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWxheW91dGJveDE5 {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLWxheW91dGJveDI {}
 .bd-layoutbox-2 {
   position: relative;
@@ -19009,14 +19000,6 @@ h2.bd-postheader-4 a {
   font-size: 48px;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNlY3Rpb24xMDQ {}
-#marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNlY3Rpb24xMDU {}
-.bd-section-105 {
-  margin-top: 32px;
-}
-.bd-section-105 {
-  text-align: center;
-}
-#marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNlY3Rpb24xMDU {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNlY3Rpb24xMDY {}
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNlY3Rpb24xMDY {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXNlY3Rpb24xMDc {}
@@ -22343,9 +22326,9 @@ h1.bd-textblock-203 {
   padding-top: 10px;
 }
 .bd-textblock-21 {
-  line-height: 18.57142858px;
+  line-height: 22.85714286px;
   text-align: center;
-  font-size: 13px;
+  font-size: 16px;
 }
 #marker-end-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazIx {}
 #marker-start-L3N0eWxlLmNzcw.L2NvbnRyb2xzL2JkLXRleHRibG9jazIxMw {}
