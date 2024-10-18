@@ -155,8 +155,15 @@ class RicardoMartins_PagSeguro_TestController extends Mage_Core_Controller_Front
         }
 
         $status = defined('COMPILER_INCLUDE_PATH') ? 'Enabled' : 'Disabled';
-        $compiledFilesCount = method_exists($compiler, 'getCompiledFilesCount') ? $compiler->getCompiledFilesCount() : 0;
-        $collectedFilesCount = method_exists($compiler, 'getCollectedFilesCount') ? $compiler->getCollectedFilesCount() : 0;
+        try {
+            $compiledFilesCount = method_exists($compiler, 'getCompiledFilesCount') ? $compiler->getCompiledFilesCount()
+                : 0;
+            $collectedFilesCount = method_exists($compiler, 'getCollectedFilesCount')
+                ? $compiler->getCollectedFilesCount() : 0;
+        } catch (Exception $e) {
+            $compiledFilesCount = 0;
+            $collectedFilesCount = 0;
+        }
         $state  = $collectedFilesCount > 0 ? 'Compiled' : 'Not Compiled';
         return array(
           'status' => $status,
