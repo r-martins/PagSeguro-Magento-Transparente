@@ -173,6 +173,7 @@
                 <active>0</active>
                 <title>Cartão de Crédito - via PagSeguro UOL</title>
                 <order_status>pending</order_status>
+                <paid_status>paid</paid_status>
                 <allowspecific>0</allowspecific>
                 <flag>42x20</flag>
                 <payment_action>order</payment_action>
@@ -182,18 +183,21 @@
                 <!--<specificcountry>BR</specificcountry>-->
                 <group_restriction>0</group_restriction>
                 <info_brl>1</info_brl>
-                <total_installments>0</total_installments>
+                <show_total>1</show_total>
+                <installment_limit>1</installment_limit>
                 <force_installments_selection>0</force_installments_selection>
                 <installments_product>0</installments_product>
                 <installments_product_message>Parcele em até {num_parcelas}x de R${valor_parcela} (Total R${valor_total}) com PagSeguro UOL.</installments_product_message>
                 <sort_order>1</sort_order>
             </rm_pagseguro_cc>
             <rm_pagseguro>
-                <customer_cpf_attribute>taxvat</customer_cpf_attribute>
-                <address_telephone_attribute>telephone</address_telephone_attribute>
+                <customer_cpf_attribute>customer|taxvat</customer_cpf_attribute>
+                <address_telephone_attribute>cellphone</address_telephone_attribute>
                 <address_street_attribute>street_1</address_street_attribute>
                 <address_number_attribute>street_2</address_number_attribute>
-                <address_neighborhood_attribute>street_2</address_neighborhood_attribute>
+                <address_complement_attribute>street_3</address_complement_attribute>
+                <address_neighborhood_attribute>street_4</address_neighborhood_attribute>
+                <notification_url_nosid>1</notification_url_nosid>
                 <ws_url>https://ws.pagseguro.uol.com.br/v2/</ws_url>
                 <ws_url_app>https://ws.ricardomartins.net.br/pspro/v7/wspagseguro/v2/</ws_url_app>
                 <js_url>https://stc.pagseguro.uol.com.br/pagseguro/api/v2/checkout/pagseguro.directpayment.js</js_url>
@@ -204,8 +208,9 @@
                 <jsdelivr_enabled>1</jsdelivr_enabled>
                 <jsdelivr_minify>1</jsdelivr_minify>
                 <stc_mirror>1</stc_mirror>
-                <updater_enabled>0</updater_enabled>
-                <send_status_change_email>0</send_status_change_email>
+                <updater_enabled>1</updater_enabled>
+                <send_invoice_email>1</send_invoice_email>
+                <send_status_change_email>1</send_status_change_email>
             </rm_pagseguro>
             <rm_pagseguro_kiosk>
                 <active>0</active>
